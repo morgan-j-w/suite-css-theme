@@ -48,7 +48,7 @@ export const useThemeState = () => {
   const [webfontImports, setWebfontImports] = useState("")
   const [bulkColorText, setBulkColorText] = useState("")
   const [globalIconStyle, setGlobalIconStyle] = useState("material-sharp")
-  const [globalIconSize, setGlobalIconSize] = useState("16")
+  const [globalIconSize, setGlobalIconSize] = useState("18")
 
   const [generatedCombinations, setGeneratedCombinations] = useState<StyleDefinition[]>([])
   const [showCombinationGenerator, setShowCombinationGenerator] = useState(false)
@@ -99,7 +99,7 @@ export const useThemeState = () => {
     setWebfontImports(loadFromLocalStorage("webfontImports", "") as string)
     setStyles(loadFromLocalStorage("themeStyles", []) as StyleDefinition[])
     setGlobalIconStyle(loadFromLocalStorage("globalIconStyle", "material-sharp") as string)
-    setGlobalIconSize(loadFromLocalStorage("globalIconSize", "16") as string)
+    setGlobalIconSize(loadFromLocalStorage("globalIconSize", "18") as string)
   }, [])
 
   return {

@@ -2348,9 +2348,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <Input
                     className="mt-2 w-full"
                     type="number"
-                    value={globalIconSize || "16"}
+                    value={globalIconSize || "18"}
                     onChange={(e) => setGlobalIconSize(e.target.value)}
-                    placeholder="16"
+                    placeholder="18"
                   />
                 </div>
                 <div>
@@ -2369,7 +2369,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         'material-sharp': 'material-sharp',
                       }
                       const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-                      const iconSize = globalIconSize || "16"
+                      const iconSize = globalIconSize || "18"
                       
                       return (
                         <img
@@ -2891,7 +2891,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 }
                                 const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
                                 const iconColor = style.iconColor || '#000000'
-                                const iconSize = globalIconSize || "16"
+                                const iconSize = globalIconSize || "18"
                                 
                                 return (
                                   <div
