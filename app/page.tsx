@@ -1870,9 +1870,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           e.stopPropagation()
                           removeColor(color.id)
                         }}
-                        className="absolute top-1 right-1 h-6 w-6 bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3 w-3 text-white" />
                       </Button>
                     </div>
                     {/* Color info below */}
