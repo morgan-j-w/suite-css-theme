@@ -124,8 +124,7 @@
 
   /* Input focus micro-interactions */
   input:focus-visible {
-    border-color: #22CDEC !important;
-    box-shadow: 0 0 0 2px rgba(34, 205, 236, 0.15) !important;
+    border-color: #9CA3AF !important;
     outline: none !important;
   }
 }
