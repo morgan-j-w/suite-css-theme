@@ -3571,6 +3571,7 @@ ${styles
               ← Back
             </Button>
           )}
+          {currentStep === 1 && <div className="flex-1" />}
           {currentStep < 4 && (
             <Button
               onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
@@ -3579,8 +3580,60 @@ ${styles
               Next →
             </Button>
           )}
-          {currentStep === 1 && currentStep < 4 && <div className="flex-1" />}
-          {currentStep === 4 && <div className="flex-1" />}
+          {currentStep === 4 && (
+            <Button
+              onClick={() => {
+                // Save theme
+                saveToLocalStorage("savedTheme", {
+                  colors,
+                  styles,
+                  headingFont,
+                  bodyFont,
+                  buttonFont,
+                  themePadding,
+                  h1Size,
+                  h1LineHeight,
+                  h1Weight,
+                  h2Size,
+                  h2LineHeight,
+                  h2Weight,
+                  h3Size,
+                  h3LineHeight,
+                  h3Weight,
+                  h4Size,
+                  h4LineHeight,
+                  h4Weight,
+                  bodySize,
+                  bodyLineHeight,
+                  bodyWeight,
+                  buttonSize,
+                  buttonLineHeight,
+                  buttonWeight,
+                  buttonPaddingTop,
+                  buttonPaddingRight,
+                  buttonPaddingBottom,
+                  buttonPaddingLeft,
+                  buttonBorderRadius,
+                  titlePaddingBottom,
+                  googleFontImport,
+                  adobeFontsKitId,
+                  adobeFontImport,
+                  customImport,
+                  webfontImports,
+                  globalIconStyle,
+                  globalIconSize,
+                })
+                setHasUnsavedChanges(false)
+                toast({
+                  description: "Theme saved successfully!",
+                  duration: 3000,
+                })
+              }}
+              className="flex-1 bg-green-600 text-white hover:bg-green-700"
+            >
+              Save Theme
+            </Button>
+          )}
         </div>
 
         {/* Exit Warning Dialog */}
