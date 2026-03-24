@@ -2613,10 +2613,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Text colour</Label>
+                            <Label className="text-xs text-slate-600">Heading colour</Label>
                             <Select
-                              value={style.textColor}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
+                              value={style.headingColor}
+                              onValueChange={(value) =>
+                                updateStyleWithSmartDescription(style.id, "headingColor", value)
+                              }
                             >
                               <SelectTrigger className="mt-1 h-8 text-xs">
                                 <SelectValue />
@@ -2640,12 +2642,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Heading colour</Label>
+                            <Label className="text-xs text-slate-600">Text colour</Label>
                             <Select
-                              value={style.headingColor}
-                              onValueChange={(value) =>
-                                updateStyleWithSmartDescription(style.id, "headingColor", value)
-                              }
+                              value={style.textColor}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
                             >
                               <SelectTrigger className="mt-1 h-8 text-xs">
                                 <SelectValue />
@@ -2682,41 +2682,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   .filter((color) => color.name.trim() !== "")
                                   .map((color) => (
                                     <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div>
-                            <Label className="text-xs text-slate-600">Icon colour</Label>
-                            <Select
-                              value={style.iconColor || "#000000"}
-                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className="w-4 h-4 rounded border"
-                                    style={{ backgroundColor: style.iconColor || "#000000" }}
-                                  />
-                                  <span>
-                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
-                                  </span>
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.hex}>
                                       <div className="flex items-center gap-2">
                                         <div
                                           className="w-4 h-4 rounded border"
@@ -2771,6 +2736,41 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   .filter((color) => color.name.trim() !== "")
                                   .map((color) => (
                                     <SelectItem key={color.id} value={color.name}>
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className="w-4 h-4 rounded border"
+                                          style={{ backgroundColor: color.hex }}
+                                        />
+                                        {color.name}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="col-start-3">
+                            <Label className="text-xs text-slate-600">Icon colour</Label>
+                            <Select
+                              value={style.iconColor || "#000000"}
+                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
+                            >
+                              <SelectTrigger className="mt-1 h-8 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: style.iconColor || "#000000" }}
+                                  />
+                                  <span>
+                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                  </span>
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors
+                                  .filter((color) => color.name.trim() !== "")
+                                  .map((color) => (
+                                    <SelectItem key={color.id} value={color.hex}>
                                       <div className="flex items-center gap-2">
                                         <div
                                           className="w-4 h-4 rounded border"
