@@ -2274,7 +2274,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Padding Value (px)</Label>
+                <Label>Padding value (px)</Label>
                 <Input
                   className="mt-1"
                   type="number"
@@ -2328,12 +2328,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             <CardContent className="space-y-4">
               <div className="space-y-4">
                 <div>
-                  <Label className="text-sm font-medium">Icon Style</Label>
+                  <Label className="text-sm font-medium">Icon style</Label>
                   <Select
                     value={globalIconStyle || "material-sharp"}
                     onValueChange={(value) => setGlobalIconStyle(value)}
                   >
-                    <SelectTrigger className="mt-2">
+                    <SelectTrigger className="mt-2 w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -2344,9 +2344,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Icon Size (px)</Label>
+                  <Label className="text-sm font-medium">Icon size (px)</Label>
                   <Input
-                    className="mt-2"
+                    className="mt-2 w-full"
                     type="number"
                     value={globalIconSize || "16"}
                     onChange={(e) => setGlobalIconSize(e.target.value)}
@@ -2605,7 +2605,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Text Colour</Label>
+                            <Label className="text-xs text-slate-600">Text colour</Label>
                             <Select
                               value={style.textColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
@@ -2632,7 +2632,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Heading Colour</Label>
+                            <Label className="text-xs text-slate-600">Heading colour</Label>
                             <Select
                               value={style.headingColor}
                               onValueChange={(value) =>
@@ -2661,7 +2661,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Link Colour</Label>
+                            <Label className="text-xs text-slate-600">Link colour</Label>
                             <Select
                               value={style.linkColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
@@ -2688,7 +2688,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Icon Colour</Label>
+                            <Label className="text-xs text-slate-600">Icon colour</Label>
                             <Select
                               value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
@@ -2723,7 +2723,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button Background</Label>
+                            <Label className="text-xs text-slate-600">Button background</Label>
                             <Select
                               value={style.buttonBg}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
@@ -2750,7 +2750,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button Text</Label>
+                            <Label className="text-xs text-slate-600">Button text</Label>
                             <Select
                               value={style.buttonText}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
