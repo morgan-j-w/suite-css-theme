@@ -121,10 +121,4 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  /* Input focus micro-interactions */
-  input:focus-visible {
-    border-color: #9CA3AF !important;
-    outline: none !important;
-  }
 }
