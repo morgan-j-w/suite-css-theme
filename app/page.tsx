@@ -1832,6 +1832,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setColorImportError("")
                   }}
                   className="min-h-[100px] text-sm font-mono"
+                  style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
                 />
                 {colorImportError && (
                   <p className="text-sm text-red-500">{colorImportError}</p>
