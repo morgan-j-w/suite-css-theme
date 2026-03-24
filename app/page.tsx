@@ -3582,7 +3582,7 @@ ${styles
               Save Theme
             </Button>
           )}
-          {currentStep > 1 && currentStep < 4 && (
+          {currentStep > 1 && currentStep <= 4 && (
             <Button
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
               variant="outline"
