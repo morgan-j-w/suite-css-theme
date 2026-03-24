@@ -2584,204 +2584,212 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           />
                         </div>
 
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <Label className="text-xs text-slate-600">Background</Label>
-                            <Select
-                              value={style.background}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <Label className="text-xs text-slate-600">Background</Label>
+                              <Select
+                                value={style.background}
+                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs text-slate-600">Heading colour</Label>
+                              <Select
+                                value={style.headingColor}
+                                onValueChange={(value) =>
+                                  updateStyleWithSmartDescription(style.id, "headingColor", value)
+                                }
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs text-slate-600">Text colour</Label>
+                              <Select
+                                value={style.textColor}
+                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
 
-                          <div>
-                            <Label className="text-xs text-slate-600">Heading colour</Label>
-                            <Select
-                              value={style.headingColor}
-                              onValueChange={(value) =>
-                                updateStyleWithSmartDescription(style.id, "headingColor", value)
-                              }
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <Label className="text-xs text-slate-600">Link colour</Label>
+                              <Select
+                                value={style.linkColor}
+                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs text-slate-600">Button background</Label>
+                              <Select
+                                value={style.buttonBg}
+                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs text-slate-600">Button text</Label>
+                              <Select
+                                value={style.buttonText}
+                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
 
-                          <div>
-                            <Label className="text-xs text-slate-600">Text colour</Label>
-                            <Select
-                              value={style.textColor}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div>
-                            <Label className="text-xs text-slate-600">Link colour</Label>
-                            <Select
-                              value={style.linkColor}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div>
-                            <Label className="text-xs text-slate-600">Button background</Label>
-                            <Select
-                              value={style.buttonBg}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div>
-                            <Label className="text-xs text-slate-600">Button text</Label>
-                            <Select
-                              value={style.buttonText}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.name}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="col-start-3">
-                            <Label className="text-xs text-slate-600">Icon colour</Label>
-                            <Select
-                              value={style.iconColor || "#000000"}
-                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className="w-4 h-4 rounded border"
-                                    style={{ backgroundColor: style.iconColor || "#000000" }}
-                                  />
-                                  <span>
-                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
-                                  </span>
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.hex}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div />
+                            <div />
+                            <div>
+                              <Label className="text-xs text-slate-600">Icon colour</Label>
+                              <Select
+                                value={style.iconColor || "#000000"}
+                                onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
+                              >
+                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="w-4 h-4 rounded border"
+                                      style={{ backgroundColor: style.iconColor || "#000000" }}
+                                    />
+                                    <span>
+                                      {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                    </span>
+                                  </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.hex}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                         </div>
 
