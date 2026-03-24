@@ -2310,7 +2310,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Padding value (px)</Label>
+                <Label>Padding</Label>
                 <Input
                   className="mt-2"
                   type="number"
@@ -2320,12 +2320,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setThemePadding(value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
-                  placeholder="15"
+                  placeholder="15 (px)"
                 />
                 <p className="text-xs text-muted-foreground mt-2">Used for block padding, image spacing, and content gaps throughout the theme</p>
               </div>
               <div>
-                <Label>Title padding bottom (px)</Label>
+                <Label>Title padding</Label>
                 <Input
                   className="mt-2"
                   type="number"
@@ -2334,7 +2334,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setTitlePaddingBottom(e.target.value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
-                  placeholder="14"
+                  placeholder="14 (px)"
                 />
                 <p className="text-xs text-muted-foreground mt-2">Controls padding below headers in style blocks</p>
               </div>
@@ -2398,13 +2398,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Icon size (px)</Label>
+                  <Label className="text-sm font-medium">Icon size</Label>
                   <Input
                     className="mt-2 w-full"
                     type="number"
                     value={globalIconSize || "18"}
                     onChange={(e) => setGlobalIconSize(e.target.value)}
-                    placeholder="18"
+                    placeholder="18 (px)"
                   />
                 </div>
                 <div>
@@ -2449,7 +2449,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-sm font-medium">Button padding (px)</Label>
+                <Label className="text-sm font-medium">Button padding</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   <div>
                     <Label className="text-xs text-muted-foreground">Top</Label>
