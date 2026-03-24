@@ -2392,6 +2392,21 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   />
                 </div>
               </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Preview</Label>
+                <div className="bg-slate-100 p-4 rounded-lg flex items-center justify-center">
+                  <button
+                    className="font-medium text-white bg-black hover:bg-slate-800"
+                    style={{
+                      padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                      borderRadius: `${buttonBorderRadius || "4"}px`,
+                    }}
+                  >
+                    Sample Button
+                  </button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
