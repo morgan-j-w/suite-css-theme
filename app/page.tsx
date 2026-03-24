@@ -3642,19 +3642,70 @@ ${styles
             <AlertDialogHeader>
               <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
               <AlertDialogDescription>
-                You have unsaved changes. Are you sure you want to exit without saving?
+                You have unsaved changes. What would you like to do?
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
+            <AlertDialogFooter className="flex gap-2">
+              <AlertDialogCancel className="flex-1">Cancel</AlertDialogCancel>
+              <Button
                 onClick={() => {
                   setShowExitWarning(false)
                   window.location.href = "/"
                 }}
+                variant="outline"
+                className="flex-1"
               >
-                Exit without saving
-              </AlertDialogAction>
+                Discard changes
+              </Button>
+              <Button
+                onClick={() => {
+                  // Save theme
+                  saveToLocalStorage("savedTheme", {
+                    colors,
+                    styles,
+                    headingFont,
+                    bodyFont,
+                    buttonFont,
+                    themePadding,
+                    h1Size,
+                    h1LineHeight,
+                    h1Weight,
+                    h2Size,
+                    h2LineHeight,
+                    h2Weight,
+                    h3Size,
+                    h3LineHeight,
+                    h3Weight,
+                    h4Size,
+                    h4LineHeight,
+                    h4Weight,
+                    bodySize,
+                    bodyLineHeight,
+                    bodyWeight,
+                    buttonSize,
+                    buttonLineHeight,
+                    buttonWeight,
+                    buttonPaddingTop,
+                    buttonPaddingRight,
+                    buttonPaddingBottom,
+                    buttonPaddingLeft,
+                    buttonBorderRadius,
+                    titlePaddingBottom,
+                    googleFontImport,
+                    adobeFontsKitId,
+                    adobeFontImport,
+                    customImport,
+                    webfontImports,
+                    globalIconStyle,
+                    globalIconSize,
+                  })
+                  setShowExitWarning(false)
+                  window.location.href = "/"
+                }}
+                className="flex-1 bg-green-600 text-white hover:bg-green-700"
+              >
+                Save and exit
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
