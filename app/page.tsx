@@ -2799,8 +2799,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   key={icon.id}
                                   src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
                                   alt={icon.name}
-                                  width="28"
-                                  height="28"
+                                  width="18"
+                                  height="18"
                                   title={icon.name}
                                   style={{ filter: `brightness(0) saturate(100%) invert(${iconColor === '#ffffff' ? '1' : '0'}) sepia(${iconColor === '#ffffff' ? '0' : '0'})` }}
                                 />
@@ -3278,23 +3278,42 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 <div class="icon-templates">
 ${styles
   .map(
-    (style, index) => `    <div class="text-style-${index + 1}"><br> 
+    (style, index) => {
+      const iconStyleMap: Record<string, string> = {
+        'ios-filled': 'ios-filled',
+        'ios-outline': 'ios',
+        'material-rounded': 'material-rounded',
+        'material-outlined': 'material-outlined',
+        'material-sharp': 'material-sharp',
+      }
+      const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
+      const iconColor = style.iconColor || '#000000'
+      const iconIds: Record<string, string> = {
+        facebook: 'facebook',
+        x: 'twitterx--v1',
+        linkedin: 'linkedin',
+        print: 'print',
+        email: 'new-post'
+      }
+      
+      return `    <div class="text-style-${index + 1}"><br> 
         <a title="Share on Facebook" class="sd-facebook" style="text-decoration: none;" href="{!FACEBOOK_SHARE_DOC!}">
-            <img alt="Facebook" src="[UPDATE_WITH_YOUR_FACEBOOK_ICON_URL]" width="18">
+            <img alt="Facebook" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.facebook}.png" width="18">
         </a>
         <a title="Share on X" class="sd-twitter" style="text-decoration: none;" href="{!TWITTER_SHARE_DOC!}">
-            <img alt="X" src="[UPDATE_WITH_YOUR_X_ICON_URL]" width="18">
+            <img alt="X" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.x}.png" width="18">
         </a>
         <a title="Share on LinkedIn" class="sd-linkedin" style="text-decoration: none;" href="{!LINKEDIN_SHARE_DOC!}">
-            <img alt="LinkedIn" src="[UPDATE_WITH_YOUR_LINKEDIN_ICON_URL]" width="18">
+            <img alt="LinkedIn" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.linkedin}.png" width="18">
         </a>
         <a title="Print" class="sd-print" style="text-decoration: none;" href="{!PRINT_SHARE_DOC!}">
-            <img alt="Print" src="[UPDATE_WITH_YOUR_PRINT_ICON_URL]" width="18">
+            <img alt="Print" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.print}.png" width="18">
         </a>
         <a title="Send as Email" class="sd-email" style="text-decoration: none;" href="{!EMAIL_SHARE_DOC!}">
-            <img alt="Email" src="[UPDATE_WITH_YOUR_EMAIL_ICON_URL]" width="18">
+            <img alt="Email" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.email}.png" width="18">
         </a>
     </div>`
+    }
   )
   .join("\n")}
 </div>`} />
