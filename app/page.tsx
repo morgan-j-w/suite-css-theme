@@ -2184,76 +2184,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <Label className="text-sm font-medium">Button padding (px)</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-1">
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Top</Label>
-                      <Input
-                        className="mt-1"
-                        type="number"
-                        value={buttonPaddingTop || "10"}
-                        onChange={(e) => {
-                          setButtonPaddingTop(e.target.value)
-                          setCssRefreshKey(prev => prev + 1)
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Right</Label>
-                      <Input
-                        className="mt-1"
-                        type="number"
-                        value={buttonPaddingRight || "20"}
-                        onChange={(e) => {
-                          setButtonPaddingRight(e.target.value)
-                          setCssRefreshKey(prev => prev + 1)
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Bottom</Label>
-                      <Input
-                        className="mt-1"
-                        type="number"
-                        value={buttonPaddingBottom || "10"}
-                        onChange={(e) => {
-                          setButtonPaddingBottom(e.target.value)
-                          setCssRefreshKey(prev => prev + 1)
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Left</Label>
-                      <Input
-                        className="mt-1"
-                        type="number"
-                        value={buttonPaddingLeft || "20"}
-                        onChange={(e) => {
-                          setButtonPaddingLeft(e.target.value)
-                          setCssRefreshKey(prev => prev + 1)
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium">Button border radius</Label>
-                  <div className="mt-1">
-                    <Input
-                      type="number"
-                      value={buttonBorderRadius || "44"}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        setButtonBorderRadius(value)
-                        setCssRefreshKey(prev => prev + 1)
-                      }}
-                      placeholder="4"
-                    />
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
@@ -2264,7 +2194,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             {currentStep === 2 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Configure your theme</h2>
-                <p className="text-slate-600 mb-4">Set up article padding, webfont imports and icon settings for your theme.</p>
+                <p className="text-slate-600 mb-4">Set up article padding, webfont imports, icon settings and button styling for your theme.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Theme padding */}
@@ -2383,6 +2313,84 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       )
                     })}
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Button settings */}
+          <Card className="shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Button settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Button padding (px)</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-1">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Top</Label>
+                    <Input
+                      className="mt-1"
+                      type="number"
+                      value={buttonPaddingTop || "10"}
+                      onChange={(e) => {
+                        setButtonPaddingTop(e.target.value)
+                        setCssRefreshKey(prev => prev + 1)
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Right</Label>
+                    <Input
+                      className="mt-1"
+                      type="number"
+                      value={buttonPaddingRight || "20"}
+                      onChange={(e) => {
+                        setButtonPaddingRight(e.target.value)
+                        setCssRefreshKey(prev => prev + 1)
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Bottom</Label>
+                    <Input
+                      className="mt-1"
+                      type="number"
+                      value={buttonPaddingBottom || "10"}
+                      onChange={(e) => {
+                        setButtonPaddingBottom(e.target.value)
+                        setCssRefreshKey(prev => prev + 1)
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Left</Label>
+                    <Input
+                      className="mt-1"
+                      type="number"
+                      value={buttonPaddingLeft || "20"}
+                      onChange={(e) => {
+                        setButtonPaddingLeft(e.target.value)
+                        setCssRefreshKey(prev => prev + 1)
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Button border radius</Label>
+                <div className="mt-1">
+                  <Input
+                    type="number"
+                    value={buttonBorderRadius || "4"}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setButtonBorderRadius(value)
+                      setCssRefreshKey(prev => prev + 1)
+                    }}
+                    placeholder="4"
+                  />
                 </div>
               </div>
             </CardContent>
