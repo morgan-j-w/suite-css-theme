@@ -2392,7 +2392,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 </div>
                 <div>
                   <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
-                  <div className="flex gap-3 p-4 bg-slate-200 rounded-lg">
+                  <div className="flex gap-3 p-4 bg-slate-100 rounded-lg">
                     {[
                       { id: 'facebook', name: 'Facebook' },
                       { id: 'x', name: 'X' },
@@ -2503,7 +2503,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
               <div>
                 <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
-                <div className="bg-slate-200 p-4 rounded-lg flex items-center justify-center">
+                <div className="bg-slate-100 p-4 rounded-lg flex items-center justify-center">
                   <button
                     className="font-medium text-white bg-black hover:bg-slate-800"
                     style={{
