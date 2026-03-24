@@ -922,32 +922,32 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     }
 
     const combinations: StyleDefinition[] = []
-    const minTextContrast = 4.5 // WCAG AA standard
-    const minButtonContrast = 3 // Lower threshold for button text
+    const minTextContrastHigh = 4.5 // WCAG AA standard
+    const minButtonContrastHigh = 3 // Lower threshold for button text
 
     // Generate combinations systematically
     colors.forEach((bgColor) => {
       colors.forEach((textColor) => {
         if (bgColor.id === textColor.id) return
         const textContrast = getContrastRatio(bgColor.hex, textColor.hex)
-        if (textContrast < minTextContrast) return
+        if (textContrast < minTextContrastHigh) return
 
         colors.forEach((headingColor) => {
           if (bgColor.id === headingColor.id) return
           const headingContrast = getContrastRatio(bgColor.hex, headingColor.hex)
-          if (headingContrast < minTextContrast) return
+          if (headingContrast < minTextContrastHigh) return
 
           colors.forEach((linkColor) => {
             if (bgColor.id === linkColor.id) return
             const linkContrast = getContrastRatio(bgColor.hex, linkColor.hex)
-            if (linkContrast < minTextContrast) return
+            if (linkContrast < minTextContrastHigh) return
 
             colors.forEach((btnBg) => {
               if (btnBg.id === bgColor.id) return
               colors.forEach((btnText) => {
                 if (btnBg.id === btnText.id) return
                 const btnContrast = getContrastRatio(btnBg.hex, btnText.hex)
-                if (btnContrast < minButtonContrast) return
+                if (btnContrast < minButtonContrastHigh) return
 
                 // Create combination
                 const combo: StyleDefinition = {
@@ -983,7 +983,17 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
                   buttonWeight: buttonWeight,
                   noPadding: false,
                   iconStyle: "ios-outline",
-                iconColor: "#000000",
+                  iconColor: "#000000",
+                }
+                
+                combinations.push(combo)
+              })
+            })
+          })
+        })
+      })
+    })
+
     const minTextContrast = 3
     const minButtonContrast = 2
 
@@ -1016,45 +1026,45 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         const btnBg = validBtn[Math.floor(Math.random() * validBtn.length)]
         const btnTextOptions = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
       
-      if (btnTextOptions.length === 0) return
-      const btnText = btnTextOptions[Math.floor(Math.random() * btnTextOptions.length)]
+        if (btnTextOptions.length === 0) return
+        const btnText = btnTextOptions[Math.floor(Math.random() * btnTextOptions.length)]
 
-      const combo: StyleDefinition = {
-        id: `combo-${Date.now()}-${Math.random()}`,
-        name: `Combination ${combinations.length + 1}`,
-        description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
-        background: bgColor.name,
-        textColor: textColor.name,
-        headingColor: headingColor.name,
-        buttonBg: btnBg.name,
-        buttonText: btnText.name,
-        linkColor: linkColor.name,
-        headingFont: headingFont,
-        bodyFont: bodyFont,
-        buttonFont: buttonFont,
-        h1Size: h1Size,
-        h1LineHeight: h1LineHeight,
-        h1Weight: h1Weight,
-        h2Size: h2Size,
-        h2LineHeight: h2LineHeight,
-        h2Weight: h2Weight,
-        h3Size: h3Size,
-        h3LineHeight: h3LineHeight,
-        h3Weight: h3Weight,
-        h4Size: h4Size,
-        h4LineHeight: h4LineHeight,
-        h4Weight: h4Weight,
-        bodySize: bodySize,
-        bodyLineHeight: bodyLineHeight,
-        bodyWeight: bodyWeight,
-        buttonSize: buttonSize,
-        buttonLineHeight: buttonLineHeight,
-        buttonWeight: buttonWeight,
-        noPadding: false,
-        iconStyle: "ios-outline",
-        iconColor: "#000000",
-      }
-      combinations.push(combo)
+        const combo: StyleDefinition = {
+          id: `combo-${Date.now()}-${Math.random()}`,
+          name: `Combination ${combinations.length + 1}`,
+          description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
+          background: bgColor.name,
+          textColor: textColor.name,
+          headingColor: headingColor.name,
+          buttonBg: btnBg.name,
+          buttonText: btnText.name,
+          linkColor: linkColor.name,
+          headingFont: headingFont,
+          bodyFont: bodyFont,
+          buttonFont: buttonFont,
+          h1Size: h1Size,
+          h1LineHeight: h1LineHeight,
+          h1Weight: h1Weight,
+          h2Size: h2Size,
+          h2LineHeight: h2LineHeight,
+          h2Weight: h2Weight,
+          h3Size: h3Size,
+          h3LineHeight: h3LineHeight,
+          h3Weight: h3Weight,
+          h4Size: h4Size,
+          h4LineHeight: h4LineHeight,
+          h4Weight: h4Weight,
+          bodySize: bodySize,
+          bodyLineHeight: bodyLineHeight,
+          bodyWeight: bodyWeight,
+          buttonSize: buttonSize,
+          buttonLineHeight: buttonLineHeight,
+          buttonWeight: buttonWeight,
+          noPadding: false,
+          iconStyle: "ios-outline",
+          iconColor: "#000000",
+        }
+        combinations.push(combo)
       }
     })
 
