@@ -1847,7 +1847,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col h-[152px]">
                     {/* Color swatch - dominant visual element */}
                     <div
-                      className="w-full h-12 md:h-14 cursor-pointer relative"
+                      className="w-full h-12 md:h-14 cursor-pointer relative transition-all duration-150 ease-out"
                       style={{ backgroundColor: color.hex }}
                       onClick={() => {
                         // Focus the color input when clicking the swatch
@@ -1870,7 +1870,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           e.stopPropagation()
                           removeColor(color.id)
                         }}
-                        className="absolute top-1 right-1 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 h-6 w-6 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-all duration-150"
                       >
                         <Trash2 className="h-3 w-3 text-white" />
                       </Button>
@@ -1881,13 +1881,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         placeholder="Color name"
                         value={color.name}
                         onChange={(e) => updateColor(color.id, "name", e.target.value)}
-                        className="h-8 text-xs"
+                        className="h-8 text-xs transition-all duration-150"
                       />
                       <Input
                         placeholder="#000000"
                         value={color.hex}
                         onChange={(e) => updateColor(color.id, "hex", e.target.value)}
-                        className="h-8 text-xs font-mono"
+                        className="h-8 text-xs font-mono transition-all duration-150"
                       />
                     </div>
                   </div>
