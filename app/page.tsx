@@ -1914,14 +1914,14 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   />
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium">Heading 1</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
                         <Label className="text-xs text-muted-foreground">Size</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h1Size || "22px").replace("px", "")}
                           onChange={(e) => {
@@ -1935,7 +1935,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       <div>
                         <Label className="text-xs text-muted-foreground">Line height</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h1LineHeight || "30px").replace("px", "")}
                           onChange={(e) => {
@@ -1952,7 +1952,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           setH1Weight(value)
                           updateAllStylesH1Weight(value)
                         }}>
-                          <SelectTrigger className="mt-1 h-9 w-full">
+                          <SelectTrigger className="mt-1.5 h-9 w-full">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -1969,11 +1969,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                   <div>
                     <Label className="text-sm font-medium">Heading 2</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
                         <Label className="text-xs text-muted-foreground">Size</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h2Size || "20px").replace("px", "")}
                           onChange={(e) => {
@@ -1987,7 +1987,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       <div>
                         <Label className="text-xs text-muted-foreground">Line height</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h2LineHeight || "28px").replace("px", "")}
                           onChange={(e) => {
@@ -2004,7 +2004,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           setH2Weight(value)
                           updateAllStylesH2Weight(value)
                         }}>
-                          <SelectTrigger className="mt-1 h-9 w-full">
+                          <SelectTrigger className="mt-1.5 h-9 w-full">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -2021,11 +2021,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                   <div>
                     <Label className="text-sm font-medium">Heading 3</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
                         <Label className="text-xs text-muted-foreground">Size</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h3Size || "18px").replace("px", "")}
                           onChange={(e) => {
@@ -2039,7 +2039,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       <div>
                         <Label className="text-xs text-muted-foreground">Line height</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h3LineHeight || "26px").replace("px", "")}
                           onChange={(e) => {
@@ -2056,7 +2056,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           setH3Weight(value)
                           updateAllStylesH3Weight(value)
                         }}>
-                          <SelectTrigger className="mt-1 h-9 w-full">
+                          <SelectTrigger className="mt-1.5 h-9 w-full">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -2073,11 +2073,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                   <div>
                     <Label className="text-sm font-medium">Heading 4</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
                         <Label className="text-xs text-muted-foreground">Size</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h4Size || "16px").replace("px", "")}
                           onChange={(e) => {
@@ -2091,7 +2091,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       <div>
                         <Label className="text-xs text-muted-foreground">Line height</Label>
                         <Input
-                          className="mt-1 w-full"
+                          className="mt-1.5 w-full"
                           type="number"
                           value={(h4LineHeight || "22px").replace("px", "")}
                           onChange={(e) => {
@@ -2108,7 +2108,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           setH4Weight(value)
                           updateAllStylesH4Weight(value)
                         }}>
-                          <SelectTrigger className="mt-1 h-9 w-full">
+                          <SelectTrigger className="mt-1.5 h-9 w-full">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -2153,7 +2153,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <div>
                       <Label className="text-xs text-muted-foreground">Size</Label>
                       <Input
-                        className="mt-1 w-full"
+                        className="mt-1.5 w-full"
                         type="number"
                         value={(bodySize || "15px").replace("px", "")}
                         onChange={(e) => {
@@ -2167,7 +2167,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height</Label>
                       <Input
-                        className="mt-1 w-full"
+                        className="mt-1.5 w-full"
                         type="number"
                         value={(bodyLineHeight || "22px").replace("px", "")}
                         onChange={(e) => {
@@ -2228,7 +2228,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <div>
                       <Label className="text-xs text-muted-foreground">Size</Label>
                       <Input
-                        className="mt-1 w-full"
+                        className="mt-1.5 w-full"
                         type="number"
                         value={(buttonSize || "15px").replace("px", "")}
                         onChange={(e) => {
@@ -2242,7 +2242,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height</Label>
                       <Input
-                        className="mt-1 w-full"
+                        className="mt-1.5 w-full"
                         type="number"
                         value={(buttonLineHeight || "22px").replace("px", "")}
                         onChange={(e) => {
