@@ -2850,7 +2850,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
                         </div>
 
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-end justify-between gap-4">
                           <div className="flex-1">
                             <Label className="text-xs text-slate-600">Icon colour</Label>
                             <Select
