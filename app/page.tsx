@@ -2657,7 +2657,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div key={style.id} className="p-4 border rounded-lg bg-slate-50">
+                  <div key={style.id} className="p-4 border rounded-lg bg-white">
                     <div className="grid md:grid-cols-2 gap-4">
                       {/* Left side - Controls */}
                       <div className="space-y-3">
