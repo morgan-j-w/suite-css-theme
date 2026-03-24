@@ -3732,8 +3732,8 @@ ${styles
             <div className="flex flex-col items-center justify-center py-6">
               <div className="mb-4">
                 <div className="relative w-20 h-20 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse" />
-                  <CheckCircle className="w-16 h-16 text-green-600 animate-spring-pop" strokeWidth={1.5} />
+                  <div className="absolute inset-0 rounded-full animate-pulse" style={{ backgroundColor: 'rgba(33, 205, 236, 0.1)' }} />
+                  <CheckCircle className="w-16 h-16 animate-spring-pop" style={{ color: '#21cdec' }} strokeWidth={1.5} />
                 </div>
               </div>
               <AlertDialogHeader className="text-center">
