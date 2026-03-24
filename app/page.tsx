@@ -2687,6 +2687,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
+                          <div>
+                            <Label className="text-xs text-slate-600">Icon size</Label>
+                            <Input
+                              className="mt-1 h-8 text-xs"
+                              type="number"
+                              value={style.iconSize || "16"}
+                              onChange={(e) => updateStyle(style.id, "iconSize", e.target.value)}
+                              placeholder="16"
+                            />
+                          </div>
+
                           <div className="flex items-end gap-2">
                             <Checkbox
                               id={`noPadding-${style.id}`}
@@ -2803,14 +2814,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               }
                               const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
                               const iconColor = style.iconColor || '#000000'
+                              const iconSize = style.iconSize || "16"
                               
                               return (
                                 <img
                                   key={icon.id}
                                   src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
                                   alt={icon.name}
-                                  width="18"
-                                  height="18"
+                                  width={iconSize}
+                                  height={iconSize}
                                   title={icon.name}
                                   style={{ filter: `brightness(0) saturate(100%) invert(${iconColor === '#ffffff' ? '1' : '0'}) sepia(${iconColor === '#ffffff' ? '0' : '0'})` }}
                                 />
