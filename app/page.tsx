@@ -289,16 +289,6 @@ export default function ThemeGenerator() {
     setHasUnsavedChanges(true)
   }, [colors, styles, headingFont, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, adobeFontsKitId, adobeFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
 
-  // Auto-close success modal after 3 seconds
-  useEffect(() => {
-    if (showSuccessModal) {
-      const timer = setTimeout(() => {
-        setShowSuccessModal(false)
-      }, 3000)
-      return () => clearTimeout(timer)
-    }
-  }, [showSuccessModal])
-
   // Sync all font imports into webfontImports (only if the sync result has content)
   useEffect(() => {
     const imports = [googleFontImport, adobeFontImport, customImport]
@@ -3753,12 +3743,23 @@ ${styles
                 </AlertDialogDescription>
               </AlertDialogHeader>
             </div>
-            <AlertDialogFooter className="flex justify-center">
+            <AlertDialogFooter className="flex gap-3 justify-center">
               <Button
                 onClick={() => setShowSuccessModal(false)}
-                className="bg-green-600 text-white hover:bg-green-700 px-6"
+                variant="outline"
+                className="px-6"
               >
-                Continue customizing
+                Continue customising
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowSuccessModal(false)
+                  window.location.href = "/"
+                }}
+                variant="outline"
+                className="px-6"
+              >
+                Exit to Theme Dashboard
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
