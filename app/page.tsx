@@ -2929,6 +2929,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
+                            </div>
                           </div>
                         </div>
                       </div>
