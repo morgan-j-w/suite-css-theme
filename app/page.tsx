@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, Download, CheckCircle } from "lucide-react"
+import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, Download, CheckCircle, Loader } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -27,6 +27,7 @@ import { shuffleArray, cleanFontValue, getAvailableFonts, fetchGoogleFonts, gene
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
 import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
+import { AppFooter } from "@/components/common/AppFooter"
 
 // Import hooks
 import { useThemeState } from "@/hooks/useThemeState"
@@ -48,6 +49,7 @@ export default function ThemeGenerator() {
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const { toast } = useToast()
   
   // Import theme state from hook
@@ -1590,49 +1592,68 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     setCssRefreshKey(prev => prev + 1)
   }
 
-  const handleSaveThemeFromHeader = () => {
-    // Save theme
-    saveToLocalStorage("savedTheme", {
-      colors,
-      styles,
-      headingFont,
-      bodyFont,
-      buttonFont,
-      themePadding,
-      h1Size,
-      h1LineHeight,
-      h1Weight,
-      h2Size,
-      h2LineHeight,
-      h2Weight,
-      h3Size,
-      h3LineHeight,
-      h3Weight,
-      h4Size,
-      h4LineHeight,
-      h4Weight,
-      bodySize,
-      bodyLineHeight,
-      bodyWeight,
-      buttonSize,
-      buttonLineHeight,
-      buttonWeight,
-      buttonPaddingTop,
-      buttonPaddingRight,
-      buttonPaddingBottom,
-      buttonPaddingLeft,
-      buttonBorderRadius,
-      titlePaddingBottom,
-      googleFontImport,
-      adobeFontsKitId,
-      adobeFontImport,
-      customImport,
-      webfontImports,
-      globalIconStyle,
-      globalIconSize,
-    })
-    setHasUnsavedChanges(false)
-    setShowSuccessModal(true)
+  const handleSaveThemeFromHeader = async () => {
+    try {
+      setIsSaving(true)
+      // Simulate a slight delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Save theme
+      saveToLocalStorage("savedTheme", {
+        colors,
+        styles,
+        headingFont,
+        bodyFont,
+        buttonFont,
+        themePadding,
+        h1Size,
+        h1LineHeight,
+        h1Weight,
+        h2Size,
+        h2LineHeight,
+        h2Weight,
+        h3Size,
+        h3LineHeight,
+        h3Weight,
+        h4Size,
+        h4LineHeight,
+        h4Weight,
+        bodySize,
+        bodyLineHeight,
+        bodyWeight,
+        buttonSize,
+        buttonLineHeight,
+        buttonWeight,
+        buttonPaddingTop,
+        buttonPaddingRight,
+        buttonPaddingBottom,
+        buttonPaddingLeft,
+        buttonBorderRadius,
+        titlePaddingBottom,
+        googleFontImport,
+        adobeFontsKitId,
+        adobeFontImport,
+        customImport,
+        webfontImports,
+        globalIconStyle,
+        globalIconSize,
+      })
+      setHasUnsavedChanges(false)
+      setShowSuccessModal(true)
+      toast({
+        title: "Success",
+        description: "Your theme has been saved successfully.",
+      })
+    } catch (error) {
+      console.error('Error saving theme:', error)
+      toast({
+        title: "Error",
+        description: "Failed to save theme. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleExitFromHeader = () => {
@@ -1721,7 +1742,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       {isClient && (
         <>
           {/* Header Bar - Full Width */}
-          <AppHeader onSaveTheme={handleSaveThemeFromHeader} onExit={handleExitFromHeader} />
+          <AppHeader 
+            onSaveTheme={handleSaveThemeFromHeader} 
+            onExit={handleExitFromHeader}
+            hasUnsavedChanges={hasUnsavedChanges}
+            isSaving={isSaving}
+          />
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8">
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
@@ -3776,6 +3802,7 @@ ${styles
         </datalist>
             </div>
             </div>
+          <AppFooter />
         </>
       )}
       <Toaster />
