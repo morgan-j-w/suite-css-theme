@@ -2492,8 +2492,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           />
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
-                          <div className="min-w-[150px] flex-1">
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
                             <Label className="text-xs text-slate-600">Background</Label>
                             <Select
                               value={style.background}
@@ -2520,7 +2520,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Text Colour</Label>
                             <Select
                               value={style.textColor}
@@ -2547,7 +2547,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Heading Colour</Label>
                             <Select
                               value={style.headingColor}
@@ -2576,7 +2576,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Link Colour</Label>
                             <Select
                               value={style.linkColor}
@@ -2603,7 +2603,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Button Background</Label>
                             <Select
                               value={style.buttonBg}
@@ -2630,7 +2630,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Button Text</Label>
                             <Select
                               value={style.buttonText}
@@ -2656,54 +2656,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               </SelectContent>
                             </Select>
                           </div>
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            id={`noPadding-${style.id}`}
-                            checked={style.noPadding === true}
-                            onCheckedChange={(checked) => {
-                              const updatedStyles = styles.map((s) => {
-                                if (s.id === style.id) {
-                                  const isChecking = checked as boolean
-                                  let newDescription = s.description
-                                  
-                                  if (isChecking) {
-                                    // Add prefix if not already there
-                                    if (!newDescription.startsWith("No padding - ")) {
-                                      newDescription = `No padding - ${newDescription}`
-                                    }
-                                  } else {
-                                    // Remove prefix if present
-                                    if (newDescription.startsWith("No padding - ")) {
-                                      newDescription = newDescription.replace("No padding - ", "")
-                                    }
-                                  }
-                                  
-                                  return { ...s, noPadding: isChecking, description: newDescription }
-                                }
-                                return s
-                              })
-                              setStyles(updatedStyles)
-                            }}
-                          />
-                          <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
-                            No Padding
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="h-3 w-3 text-slate-400" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs text-xs">
-                                Removes padding from all sides for this style
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Icon Style</Label>
                             <Select
                               value={style.iconStyle || "ios-outline"}
@@ -2722,7 +2676,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="min-w-[150px] flex-1">
+                          <div>
                             <Label className="text-xs text-slate-600">Icon Colour</Label>
                             <Select
                               value={style.iconColor || "#1D1D1B"}
@@ -2747,6 +2701,52 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   ))}
                               </SelectContent>
                             </Select>
+                          </div>
+
+                          <div className="flex items-end gap-2">
+                            <Checkbox
+                              id={`noPadding-${style.id}`}
+                              checked={style.noPadding === true}
+                              onCheckedChange={(checked) => {
+                                const updatedStyles = styles.map((s) => {
+                                  if (s.id === style.id) {
+                                    const isChecking = checked as boolean
+                                    let newDescription = s.description
+                                    
+                                    if (isChecking) {
+                                      // Add prefix if not already there
+                                      if (!newDescription.startsWith("No padding - ")) {
+                                        newDescription = `No padding - ${newDescription}`
+                                      }
+                                    } else {
+                                      // Remove prefix if present
+                                      if (newDescription.startsWith("No padding - ")) {
+                                        newDescription = newDescription.replace("No padding - ", "")
+                                      }
+                                    }
+                                    
+                                    return { ...s, noPadding: isChecking, description: newDescription }
+                                  }
+                                  return s
+                                })
+                                setStyles(updatedStyles)
+                              }}
+                            />
+                            <div className="flex items-center gap-1">
+                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
+                                No Padding
+                              </Label>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3 w-3 text-slate-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs text-xs">
+                                    Removes padding from all sides for this style
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </div>
                         </div>
                       </div>
