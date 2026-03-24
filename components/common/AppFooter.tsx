@@ -5,10 +5,10 @@ export const AppFooter = () => {
   const version = "1.0.0"
 
   return (
-    <footer className="bg-slate-900 text-slate-400 py-6 px-4 md:px-8 border-t border-slate-800">
+    <footer className="py-6 px-4 md:px-8 border-t" style={{ backgroundColor: '#21292C' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="text-sm">
+          <div className="text-sm" style={{ color: '#9baec6' }}>
             <p>&copy; {currentYear} Swift Digital. All rights reserved.</p>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm">
@@ -16,11 +16,12 @@ export const AppFooter = () => {
               href="https://swiftdigital.com.au/support" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
+              className="hover:opacity-80 transition-opacity"
+              style={{ color: '#9baec6' }}
             >
               Support & Feedback
             </a>
-            <span className="text-slate-600">v{version}</span>
+            <span style={{ color: '#9baec6' }}>v{version}</span>
           </div>
         </div>
       </div>
