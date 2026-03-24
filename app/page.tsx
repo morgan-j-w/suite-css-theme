@@ -1849,12 +1849,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <div
                       className="w-full h-12 md:h-14 cursor-pointer relative transition-all duration-150 ease-out"
                       style={{ backgroundColor: color.hex }}
+                      onClick={() => {
+                        // Trigger color picker
+                        const colorInput = document.querySelector(`input[data-color-id="${color.id}"]`) as HTMLInputElement
+                        if (colorInput) colorInput.click()
+                      }}
                     >
                       <input
                         type="color"
                         value={color.hex}
                         onChange={(e) => updateColor(color.id, "hex", e.target.value)}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        className="absolute inset-0 w-0 h-0 opacity-0"
                         data-color-id={color.id}
                       />
                       {/* Delete button in top right */}
