@@ -1589,6 +1589,62 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     setCssRefreshKey(prev => prev + 1)
   }
 
+  const handleSaveThemeFromHeader = () => {
+    // Save theme
+    saveToLocalStorage("savedTheme", {
+      colors,
+      styles,
+      headingFont,
+      bodyFont,
+      buttonFont,
+      themePadding,
+      h1Size,
+      h1LineHeight,
+      h1Weight,
+      h2Size,
+      h2LineHeight,
+      h2Weight,
+      h3Size,
+      h3LineHeight,
+      h3Weight,
+      h4Size,
+      h4LineHeight,
+      h4Weight,
+      bodySize,
+      bodyLineHeight,
+      bodyWeight,
+      buttonSize,
+      buttonLineHeight,
+      buttonWeight,
+      buttonPaddingTop,
+      buttonPaddingRight,
+      buttonPaddingBottom,
+      buttonPaddingLeft,
+      buttonBorderRadius,
+      titlePaddingBottom,
+      googleFontImport,
+      adobeFontsKitId,
+      adobeFontImport,
+      customImport,
+      webfontImports,
+      globalIconStyle,
+      globalIconSize,
+    })
+    setHasUnsavedChanges(false)
+    toast({
+      description: "Theme saved successfully!",
+      duration: 3000,
+    })
+  }
+
+  const handleExitFromHeader = () => {
+    if (hasUnsavedChanges) {
+      setShowExitWarning(true)
+    } else {
+      window.location.href = "/"
+    }
+  }
+
   const resetAllSettings = () => {
     if (
       confirm(
@@ -1665,7 +1721,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   return (
     <>
       {/* Header Bar - Full Width */}
-      {isClient && <AppHeader onResetSettings={resetAllSettings} onLogout={handleLogout} />}
+      {isClient && <AppHeader onSaveTheme={handleSaveThemeFromHeader} onExit={handleExitFromHeader} />}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8" suppressHydrationWarning>
         {isClient && (
         <>
@@ -3504,85 +3560,9 @@ ${styles
         </div>
         </div>
 
-        {/* Navigation Buttons - Client-Facing Version */}
+        {/* Step Navigation Buttons */}
         <div className="flex items-center justify-between mt-8 gap-4">
-          <Button
-            onClick={() => {
-              if (hasUnsavedChanges) {
-                setShowExitWarning(true)
-              } else {
-                // Exit to theme dashboard
-                window.location.href = "/"
-              }
-            }}
-            variant="outline"
-            className="flex-1"
-          >
-            Exit to Theme Dashboard
-          </Button>
-          {currentStep < 4 && (
-            <Button
-              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
-              className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
-            >
-              Next →
-            </Button>
-          )}
-          {currentStep === 4 && (
-            <Button
-              onClick={() => {
-                // Save theme
-                saveToLocalStorage("savedTheme", {
-                  colors,
-                  styles,
-                  headingFont,
-                  bodyFont,
-                  buttonFont,
-                  themePadding,
-                  h1Size,
-                  h1LineHeight,
-                  h1Weight,
-                  h2Size,
-                  h2LineHeight,
-                  h2Weight,
-                  h3Size,
-                  h3LineHeight,
-                  h3Weight,
-                  h4Size,
-                  h4LineHeight,
-                  h4Weight,
-                  bodySize,
-                  bodyLineHeight,
-                  bodyWeight,
-                  buttonSize,
-                  buttonLineHeight,
-                  buttonWeight,
-                  buttonPaddingTop,
-                  buttonPaddingRight,
-                  buttonPaddingBottom,
-                  buttonPaddingLeft,
-                  buttonBorderRadius,
-                  titlePaddingBottom,
-                  googleFontImport,
-                  adobeFontsKitId,
-                  adobeFontImport,
-                  customImport,
-                  webfontImports,
-                  globalIconStyle,
-                  globalIconSize,
-                })
-                setHasUnsavedChanges(false)
-                toast({
-                  description: "Theme saved successfully!",
-                  duration: 3000,
-                })
-              }}
-              className="flex-1 bg-green-600 text-white hover:bg-green-700"
-            >
-              Save Theme
-            </Button>
-          )}
-          {currentStep > 1 && currentStep <= 4 && (
+          {currentStep > 1 && (
             <Button
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
               variant="outline"
@@ -3591,6 +3571,16 @@ ${styles
               ← Back
             </Button>
           )}
+          {currentStep < 4 && (
+            <Button
+              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
+              className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
+            >
+              Next →
+            </Button>
+          )}
+          {currentStep === 1 && currentStep < 4 && <div className="flex-1" />}
+          {currentStep === 4 && <div className="flex-1" />}
         </div>
 
         {/* Exit Warning Dialog */}
