@@ -2336,7 +2336,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   onChange={(e) => setWebfontImports(e.target.value)}
                   placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
                   className="font-mono text-sm min-h-[120px] pr-10"
-                  style={{ backgroundColor: '#F5F7FA' }}
+                  style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
                 />
                 {webfontImports && (
                   <Button
