@@ -2704,7 +2704,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               <SelectTrigger className="mt-1 h-8 text-xs">
                                 <div className="flex items-center gap-2">
                                   <div
-                                    className="w-3 h-3 rounded border"
+                                    className="w-4 h-4 rounded border"
                                     style={{ backgroundColor: style.iconColor || "#000000" }}
                                   />
                                   <span>
