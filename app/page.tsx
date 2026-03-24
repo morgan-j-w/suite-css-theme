@@ -2243,7 +2243,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               <Textarea
                 value={webfontImports}
                 onChange={(e) => setWebfontImports(e.target.value)}
-                placeholder="Eg. @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');"
+                placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
                 className="font-mono text-sm min-h-[120px]"
               />
             </CardContent>
