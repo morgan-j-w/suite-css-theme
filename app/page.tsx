@@ -2184,7 +2184,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         setBodyWeight(value)
                         updateAllStylesBodyWeight(value)
                       }}>
-                        <SelectTrigger className="mt-1 h-9 w-full">
+                        <SelectTrigger className="mt-1.5 h-9 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -2259,7 +2259,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         setButtonWeight(value)
                         updateAllStylesButtonWeight(value)
                       }}>
-                        <SelectTrigger className="mt-1 h-9 w-full">
+                        <SelectTrigger className="mt-1.5 h-9 w-full">
                           <SelectValue placeholder="Select weight" />
                         </SelectTrigger>
                         <SelectContent>
@@ -2684,7 +2684,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             value={style.description}
                             onChange={(e) => updateStyle(style.id, "description", e.target.value)}
                             placeholder="Style description"
-                            className="mt-1 h-[78px]"
+                            className="mt-1.5 h-[78px]"
                           />
                         </div>
 
@@ -2696,7 +2696,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 value={style.background}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
                               >
-                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectTrigger className="mt-1.5 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -2725,7 +2725,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   updateStyleWithSmartDescription(style.id, "headingColor", value)
                                 }
                               >
-                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectTrigger className="mt-1.5 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -2752,7 +2752,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 value={style.textColor}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
                               >
-                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectTrigger className="mt-1.5 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -2781,7 +2781,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 value={style.linkColor}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
                               >
-                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectTrigger className="mt-1.5 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -2808,7 +2808,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 value={style.buttonBg}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
                               >
-                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectTrigger className="mt-1.5 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -2835,7 +2835,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 value={style.buttonText}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
                               >
-                                <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectTrigger className="mt-1.5 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -2961,7 +2961,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
+                              <SelectTrigger className="mt-1.5 h-8 text-xs">
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-4 h-4 rounded border"
