@@ -1844,34 +1844,51 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 {colors.map((color) => (
-                  <div key={color.id} className="border-2 border-slate-200 rounded-lg p-3 bg-white space-y-2">
-                    <div className="flex items-center justify-between gap-1">
-                      <Label className="text-xs font-medium truncate">{color.name || "Colour"}</Label>
-                      <Button variant="ghost" size="icon" onClick={() => removeColor(color.id)} className="h-6 w-6">
+                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white">
+                    {/* Color swatch - dominant visual element */}
+                    <div
+                      className="w-full h-24 md:h-28 cursor-pointer relative group"
+                      style={{ backgroundColor: color.hex }}
+                      onClick={() => {
+                        // Focus the color input when clicking the swatch
+                        const colorInput = document.querySelector(`input[data-color-id="${color.id}"]`) as HTMLInputElement
+                        if (colorInput) colorInput.click()
+                      }}
+                    >
+                      <input
+                        type="color"
+                        value={color.hex}
+                        onChange={(e) => updateColor(color.id, "hex", e.target.value)}
+                        className="hidden"
+                        data-color-id={color.id}
+                      />
+                      {/* Delete button in top right */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          removeColor(color.id)
+                        }}
+                        className="absolute top-1 right-1 h-6 w-6 bg-black/40 hover:bg-black/60 text-white"
+                      >
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    {/* Color info below */}
+                    <div className="p-3 space-y-2">
                       <Input
-                        placeholder="Name"
+                        placeholder="Color name"
                         value={color.name}
                         onChange={(e) => updateColor(color.id, "name", e.target.value)}
                         className="h-8 text-xs"
                       />
-                      <div className="flex gap-2">
-                        <Input
-                          type="color"
-                          value={color.hex}
-                          onChange={(e) => updateColor(color.id, "hex", e.target.value)}
-                          className="h-8 w-12 p-1 cursor-pointer"
-                        />
-                        <Input
-                          placeholder="#000000"
-                          value={color.hex}
-                          onChange={(e) => updateColor(color.id, "hex", e.target.value)}
-                          className="h-8 text-xs flex-1"
-                        />
-                      </div>
+                      <Input
+                        placeholder="#000000"
+                        value={color.hex}
+                        onChange={(e) => updateColor(color.id, "hex", e.target.value)}
+                        className="h-8 text-xs font-mono"
+                      />
                     </div>
                   </div>
                 ))}
