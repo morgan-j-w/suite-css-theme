@@ -2295,7 +2295,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               <div>
                 <Label>Padding value (px)</Label>
                 <Input
-                  className="mt-1"
+                  className="mt-2"
                   type="number"
                   value={(themePadding || "25px").replace("px", "")}
                   onChange={(e) => {
@@ -2310,7 +2310,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               <div>
                 <Label>Title padding bottom (px)</Label>
                 <Input
-                  className="mt-1"
+                  className="mt-2"
                   type="number"
                   value={titlePaddingBottom || "14"}
                   onChange={(e) => {
@@ -2415,7 +2415,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             <CardContent className="space-y-4">
               <div>
                 <Label className="text-sm font-medium">Button padding (px)</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-1">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   <div>
                     <Label className="text-xs text-muted-foreground">Top</Label>
                     <Input
@@ -2469,7 +2469,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
               <div>
                 <Label className="text-sm font-medium">Button border radius</Label>
-                <div className="mt-1">
+                <div className="mt-2">
                   <Input
                     type="number"
                     value={buttonBorderRadius || "4"}
