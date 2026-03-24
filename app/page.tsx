@@ -1842,9 +1842,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {colors.map((color) => (
-                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group">
+                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col h-[152px]">
                     {/* Color swatch - dominant visual element */}
                     <div
                       className="w-full h-12 md:h-14 cursor-pointer relative"
@@ -1876,7 +1876,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       </Button>
                     </div>
                     {/* Color info below */}
-                    <div className="p-3 space-y-2">
+                    <div className="p-3 space-y-2 flex-1 flex flex-col">
                       <Input
                         placeholder="Color name"
                         value={color.name}
