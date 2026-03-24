@@ -41,6 +41,7 @@ export default function ThemeGenerator() {
   const [selectedGoogleFont, setSelectedGoogleFont] = useState("")
   const [adobeFonts, setAdobeFonts] = useState<Array<string>>([])
   const [selectedAdobeFont, setSelectedAdobeFont] = useState("")
+  const [colorImportError, setColorImportError] = useState("")
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -321,15 +322,32 @@ export default function ThemeGenerator() {
   }
 
   const importColorsFromText = () => {
+    setColorImportError("")
     // Split by comma or newline
     const entries = bulkColorText.split(/[,\n]/).map(e => e.trim()).filter(e => e)
     const newColors: ColorDefinition[] = []
+    const invalidEntries: string[] = []
 
     entries.forEach((entry) => {
-      // Match patterns like "#000 Black", "#000 - Black", or "#000 — Black"
-      const match = entry.match(/^(#[0-9A-Fa-f]{6})\s+[-–—]?\s*(.+)$/)
+      // Match patterns like "#000 Black", "#000 - Black", "#000 — Black"
+      // OR "Black #000", "Black - #000", "Black — #000"
+      const match1 = entry.match(/^(#[0-9A-Fa-f]{6})\s+[-–—]?\s*(.+)$/)
+      const match2 = entry.match(/^(.+?)\s+[-–—]?\s*(#[0-9A-Fa-f]{6})$/)
+      
+      const match = match1 || match2
+      
       if (match) {
-        const [, hex, name] = match
+        let hex: string
+        let name: string
+        
+        if (match1) {
+          [, hex, name] = match1
+        } else {
+          const [, nameVal, hexVal] = match2
+          hex = hexVal
+          name = nameVal
+        }
+        
         if (hex && name && name.trim()) {
           newColors.push({
             id: Date.now().toString() + Math.random(),
@@ -337,14 +355,19 @@ export default function ThemeGenerator() {
             hex: hex.toUpperCase(),
           })
         }
+      } else {
+        invalidEntries.push(entry)
       }
     })
 
     if (newColors.length > 0) {
       setColors([...colors, ...newColors])
       setBulkColorText("")
+      if (invalidEntries.length > 0) {
+        setColorImportError(`Added ${newColors.length} colour(s), but ${invalidEntries.length} line(s) had invalid format.`)
+      }
     } else if (bulkColorText.trim()) {
-      alert("No valid colors found. Use format: #HEX Name (e.g., #0026C5 Bright Blue)")
+      setColorImportError("No valid colors found. Use format: #HEX Name or Name #HEX (e.g., #0026C5 Bright Blue or Bright Blue #0026C5)")
     }
   }
 
@@ -1703,20 +1726,27 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         <HelpCircle className="h-4 w-4 cursor-help text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent side="right" className="max-w-xs">
-                        <p>Enter hex codes on new lines or comma-separated on one line using these formats:</p>
+                        <p>Enter hex codes on new lines or comma-separated on one line. You can place the hex code first or last:</p>
                         <p className="mt-2 font-mono text-xs">#HEX Name</p>
-                        <p className="font-mono text-xs">#HEX - Name</p>
-                        <p className="font-mono text-xs">#HEX — Name</p>
+                        <p className="font-mono text-xs">Name #HEX</p>
+                        <p className="mt-2 font-mono text-xs">#HEX - Name</p>
+                        <p className="font-mono text-xs">Name - #HEX</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
                 <Textarea
-                  placeholder="Enter hex codes on new lines or comma-separated on one line using these formats: #HEX Name, #HEX - Name, or #HEX — Name."
+                  placeholder="Enter hex codes on new lines or comma-separated. Format: #HEX Name or Name #HEX (e.g., #0026C5 Bright Blue or Bright Blue #0026C5)"
                   value={bulkColorText}
-                  onChange={(e) => setBulkColorText(e.target.value)}
+                  onChange={(e) => {
+                    setBulkColorText(e.target.value)
+                    setColorImportError("")
+                  }}
                   className="min-h-[100px] text-sm font-mono"
                 />
+                {colorImportError && (
+                  <p className="text-sm text-red-500">{colorImportError}</p>
+                )}
                 <Button onClick={importColorsFromText} disabled={!bulkColorText.trim()} variant="outline" className="w-full bg-transparent">
                   <Upload className="h-4 w-4 mr-2" />
                   Import
@@ -2289,75 +2319,75 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               />
             </CardContent>
           </Card>
-        </div>
 
-        {/* Icons section */}
-        <Card className="shadow-sm mt-6">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Icons</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Icon Style</Label>
-                <Select
-                  value={globalIconStyle || "material-sharp"}
-                  onValueChange={(value) => setGlobalIconStyle(value)}
-                >
-                  <SelectTrigger className="mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="material-rounded">Material Rounded</SelectItem>
-                    <SelectItem value="material-outlined">Material Outlined</SelectItem>
-                    <SelectItem value="material-sharp">Material Sharp</SelectItem>
-                  </SelectContent>
-                </Select>
+          {/* Icons section */}
+          <Card className="shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Icons</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium">Icon Style</Label>
+                  <Select
+                    value={globalIconStyle || "material-sharp"}
+                    onValueChange={(value) => setGlobalIconStyle(value)}
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="material-rounded">Material Rounded</SelectItem>
+                      <SelectItem value="material-outlined">Material Outlined</SelectItem>
+                      <SelectItem value="material-sharp">Material Sharp</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Icon Size (px)</Label>
+                  <Input
+                    className="mt-2"
+                    type="number"
+                    value={globalIconSize || "16"}
+                    onChange={(e) => setGlobalIconSize(e.target.value)}
+                    placeholder="16"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Preview</Label>
+                  <div className="flex gap-3 p-4 bg-slate-100 rounded-lg">
+                    {[
+                      { id: 'facebook', name: 'Facebook' },
+                      { id: 'x', name: 'X' },
+                      { id: 'linkedin', name: 'LinkedIn' },
+                      { id: 'print', name: 'Print' },
+                      { id: 'new-post', name: 'Email' },
+                    ].map((icon) => {
+                      const iconStyleMap: Record<string, string> = {
+                        'material-rounded': 'material-rounded',
+                        'material-outlined': 'material-outlined',
+                        'material-sharp': 'material-sharp',
+                      }
+                      const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                      const iconSize = globalIconSize || "16"
+                      
+                      return (
+                        <img
+                          key={icon.id}
+                          src={`https://img.icons8.com/${mappedStyle}/96/000000/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                          alt={icon.name}
+                          width={iconSize}
+                          height={iconSize}
+                          title={icon.name}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
-              <div>
-                <Label className="text-sm font-medium">Icon Size (px)</Label>
-                <Input
-                  className="mt-2"
-                  type="number"
-                  value={globalIconSize || "16"}
-                  onChange={(e) => setGlobalIconSize(e.target.value)}
-                  placeholder="16"
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-sm font-medium mb-3 block">Preview</Label>
-              <div className="flex gap-3 p-4 bg-slate-100 rounded-lg">
-                {[
-                  { id: 'facebook', name: 'Facebook' },
-                  { id: 'x', name: 'X' },
-                  { id: 'linkedin', name: 'LinkedIn' },
-                  { id: 'print', name: 'Print' },
-                  { id: 'new-post', name: 'Email' },
-                ].map((icon) => {
-                  const iconStyleMap: Record<string, string> = {
-                    'material-rounded': 'material-rounded',
-                    'material-outlined': 'material-outlined',
-                    'material-sharp': 'material-sharp',
-                  }
-                  const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-                  const iconSize = globalIconSize || "16"
-                  
-                  return (
-                    <img
-                      key={icon.id}
-                      src={`https://img.icons8.com/${mappedStyle}/96/000000/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                      alt={icon.name}
-                      width={iconSize}
-                      height={iconSize}
-                      title={icon.name}
-                    />
-                  )
-                })}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
               </>
             )}
@@ -2658,6 +2688,41 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
 
                           <div>
+                            <Label className="text-xs text-slate-600">Icon Colour</Label>
+                            <Select
+                              value={style.iconColor || "#000000"}
+                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
+                            >
+                              <SelectTrigger className="mt-1 h-8 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-3 h-3 rounded border"
+                                    style={{ backgroundColor: style.iconColor || "#000000" }}
+                                  />
+                                  <span>
+                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                  </span>
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors
+                                  .filter((color) => color.name.trim() !== "")
+                                  .map((color) => (
+                                    <SelectItem key={color.id} value={color.hex}>
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className="w-4 h-4 rounded border"
+                                          style={{ backgroundColor: color.hex }}
+                                        />
+                                        {color.name}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
                             <Label className="text-xs text-slate-600">Button Background</Label>
                             <Select
                               value={style.buttonBg}
@@ -2853,43 +2918,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
                         </div>
 
-                        {/* Icon Colour Control */}
-                        <div className="grid grid-cols-1 gap-3">
-                          <div>
-                            <Label className="text-xs text-slate-600">Icon Colour</Label>
-                            <Select
-                              value={style.iconColor || "#000000"}
-                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className="w-3 h-3 rounded border"
-                                    style={{ backgroundColor: style.iconColor || "#000000" }}
-                                  />
-                                  <span>
-                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
-                                  </span>
-                                </div>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.hex}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
