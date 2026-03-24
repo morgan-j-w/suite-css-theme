@@ -117,6 +117,10 @@ export default function ThemeGenerator() {
     setWebfontImports,
     bulkColorText,
     setBulkColorText,
+    globalIconStyle,
+    setGlobalIconStyle,
+    globalIconSize,
+    setGlobalIconSize,
     generatedCombinations,
     setGeneratedCombinations,
     showCombinationGenerator,
@@ -383,7 +387,6 @@ export default function ThemeGenerator() {
         buttonLineHeight: buttonLineHeight || "22px",
         buttonWeight: buttonWeight || "400",
         noPadding: false,
-        iconStyle: "ios-outline",
         iconColor: "#000000",
       },
     ])
@@ -436,8 +439,8 @@ export default function ThemeGenerator() {
   }
 
   const generateDescription = (style: StyleDefinition): string => {
-    const text = `${style.background} background with ${style.headingColor} headings and ${style.buttonBg} buttons`
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+    const text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
   const updateStyleWithSmartDescription = (id: string, field: keyof StyleDefinition, value: string) => {
@@ -1118,7 +1121,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const combo: StyleDefinition = {
         id: `combo-${Date.now()}-${Math.random()}`,
         name: `Combination ${generatedCombinations.length + newCombinations.length + 1}`,
-        description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
+        description: `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`.replace(/^./, ch => ch.toUpperCase()),
         background: bgColor.name,
         textColor: textColor.name,
         headingColor: headingColor.name,
@@ -1147,7 +1150,6 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         buttonLineHeight: buttonLineHeight,
         buttonWeight: buttonWeight,
         noPadding: false,
-        iconStyle: "ios-outline",
         iconColor: "#000000",
       }
       newCombinations.push(combo)
@@ -2288,6 +2290,75 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </CardContent>
           </Card>
         </div>
+
+        {/* Icons section */}
+        <Card className="shadow-sm mt-6">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Icons</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">Icon Style</Label>
+                <Select
+                  value={globalIconStyle || "material-sharp"}
+                  onValueChange={(value) => setGlobalIconStyle(value)}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="material-rounded">Material Rounded</SelectItem>
+                    <SelectItem value="material-outlined">Material Outlined</SelectItem>
+                    <SelectItem value="material-sharp">Material Sharp</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Icon Size (px)</Label>
+                <Input
+                  className="mt-2"
+                  type="number"
+                  value={globalIconSize || "16"}
+                  onChange={(e) => setGlobalIconSize(e.target.value)}
+                  placeholder="16"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Preview</Label>
+              <div className="flex gap-3 p-4 bg-slate-100 rounded-lg">
+                {[
+                  { id: 'facebook', name: 'Facebook' },
+                  { id: 'x', name: 'X' },
+                  { id: 'linkedin', name: 'LinkedIn' },
+                  { id: 'print', name: 'Print' },
+                  { id: 'new-post', name: 'Email' },
+                ].map((icon) => {
+                  const iconStyleMap: Record<string, string> = {
+                    'material-rounded': 'material-rounded',
+                    'material-outlined': 'material-outlined',
+                    'material-sharp': 'material-sharp',
+                  }
+                  const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                  const iconSize = globalIconSize || "16"
+                  
+                  return (
+                    <img
+                      key={icon.id}
+                      src={`https://img.icons8.com/${mappedStyle}/96/000000/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                      alt={icon.name}
+                      width={iconSize}
+                      height={iconSize}
+                      title={icon.name}
+                    />
+                  )
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
               </>
             )}
 
@@ -2302,10 +2373,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             <button
               onClick={() => {
                 if (!showCombinationGenerator) {
-                  generateMixedCombinations()
-                } else {
-                  setShowCombinationGenerator(!showCombinationGenerator)
+                  generateMoreCombinations()
                 }
+                setShowCombinationGenerator(!showCombinationGenerator)
               }}
               className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
             >
@@ -2472,7 +2542,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             value={style.description}
                             onChange={(e) => updateStyle(style.id, "description", e.target.value)}
                             placeholder="Style description"
-                            className="mt-1 min-h-[60px]"
+                            className="mt-1 h-[78px]"
                           />
                         </div>
 
@@ -2750,53 +2820,41 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 { id: 'new-post', name: 'Email' },
                               ].map((icon) => {
                                 const iconStyleMap: Record<string, string> = {
-                                  'ios-filled': 'ios-filled',
-                                  'ios-outline': 'ios',
                                   'material-rounded': 'material-rounded',
                                   'material-outlined': 'material-outlined',
                                   'material-sharp': 'material-sharp',
                                 }
-                                const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
+                                const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
                                 const iconColor = style.iconColor || '#000000'
-                                const iconSize = style.iconSize || "16"
+                                const iconSize = globalIconSize || "16"
                                 
                                 return (
-                                  <img
+                                  <div
                                     key={icon.id}
-                                    src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                    alt={icon.name}
-                                    width={iconSize}
-                                    height={iconSize}
+                                    className="flex items-center justify-center"
+                                    style={{
+                                      width: `${parseInt(iconSize) + 8}px`,
+                                      height: `${parseInt(iconSize) + 8}px`,
+                                      backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
+                                      borderRadius: '4px'
+                                    }}
                                     title={icon.name}
-                                    style={{ filter: `brightness(0) saturate(100%) invert(${iconColor === '#ffffff' ? '1' : '0'}) sepia(${iconColor === '#ffffff' ? '0' : '0'})` }}
-                                  />
+                                  >
+                                    <img
+                                      src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                                      alt={icon.name}
+                                      width={iconSize}
+                                      height={iconSize}
+                                    />
+                                  </div>
                                 )
                               })}
                             </div>
                           </div>
                         </div>
 
-                        {/* Icon Controls Row */}
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <Label className="text-xs text-slate-600">Icon Style</Label>
-                            <Select
-                              value={style.iconStyle || "ios-outline"}
-                              onValueChange={(value) => updateStyle(style.id, "iconStyle", value)}
-                            >
-                              <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="ios-filled">iOS Filled</SelectItem>
-                                <SelectItem value="ios-outline">iOS Outline</SelectItem>
-                                <SelectItem value="material-rounded">Material Rounded</SelectItem>
-                                <SelectItem value="material-outlined">Material Outlined</SelectItem>
-                                <SelectItem value="material-sharp">Material Sharp</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
+                        {/* Icon Colour Control */}
+                        <div className="grid grid-cols-1 gap-3">
                           <div>
                             <Label className="text-xs text-slate-600">Icon Colour</Label>
                             <Select
@@ -2804,7 +2862,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
                               <SelectTrigger className="mt-1 h-8 text-xs">
-                                <SelectValue />
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-3 h-3 rounded border"
+                                    style={{ backgroundColor: style.iconColor || "#000000" }}
+                                  />
+                                  <span>
+                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                  </span>
+                                </div>
                               </SelectTrigger>
                               <SelectContent>
                                 {colors
@@ -2822,17 +2888,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   ))}
                               </SelectContent>
                             </Select>
-                          </div>
-
-                          <div>
-                            <Label className="text-xs text-slate-600">Icon size</Label>
-                            <Input
-                              className="mt-1 h-8 text-xs"
-                              type="number"
-                              value={style.iconSize || "16"}
-                              onChange={(e) => updateStyle(style.id, "iconSize", e.target.value)}
-                              placeholder="16"
-                            />
                           </div>
                         </div>
                       </div>
@@ -3307,15 +3362,13 @@ ${styles
   .map(
     (style, index) => {
       const iconStyleMap: Record<string, string> = {
-        'ios-filled': 'ios-filled',
-        'ios-outline': 'ios',
         'material-rounded': 'material-rounded',
         'material-outlined': 'material-outlined',
         'material-sharp': 'material-sharp',
       }
-      const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
+      const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
       const iconColor = style.iconColor || '#000000'
-      const iconSize = style.iconSize || '16'
+      const iconSize = globalIconSize || '16'
       const iconIds: Record<string, string> = {
         facebook: 'facebook',
         x: 'twitterx--v1',
