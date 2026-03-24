@@ -1847,7 +1847,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white">
                     {/* Color swatch - dominant visual element */}
                     <div
-                      className="w-full h-24 md:h-28 cursor-pointer relative group"
+                      className="w-full h-12 md:h-14 cursor-pointer relative group"
                       style={{ backgroundColor: color.hex }}
                       onClick={() => {
                         // Focus the color input when clicking the swatch
