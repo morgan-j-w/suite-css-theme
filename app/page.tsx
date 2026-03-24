@@ -2850,84 +2850,85 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
                         </div>
 
-                        <div>
-                          <Label className="text-xs text-slate-600">Icon colour</Label>
-                          <Select
-                            value={style.iconColor || "#000000"}
-                            onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
-                          >
-                            <SelectTrigger className="mt-1 h-8 text-xs">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="w-4 h-4 rounded border"
-                                  style={{ backgroundColor: style.iconColor || "#000000" }}
-                                />
-                                <span>
-                                  {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
-                                </span>
-                              </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {colors
-                                .filter((color) => color.name.trim() !== "")
-                                .map((color) => (
-                                  <SelectItem key={color.id} value={color.hex}>
-                                    <div className="flex items-center gap-2">
-                                      <div
-                                        className="w-4 h-4 rounded border"
-                                        style={{ backgroundColor: color.hex }}
-                                      />
-                                      {color.name}
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <Label className="text-xs text-slate-600">Icon colour</Label>
+                            <Select
+                              value={style.iconColor || "#000000"}
+                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
+                            >
+                              <SelectTrigger className="mt-1 h-8 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: style.iconColor || "#000000" }}
+                                  />
+                                  <span>
+                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                  </span>
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors
+                                  .filter((color) => color.name.trim() !== "")
+                                  .map((color) => (
+                                    <SelectItem key={color.id} value={color.hex}>
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className="w-4 h-4 rounded border"
+                                          style={{ backgroundColor: color.hex }}
+                                        />
+                                        {color.name}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
 
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            id={`noPadding-${style.id}`}
-                            checked={style.noPadding === true}
-                            onCheckedChange={(checked) => {
-                              const updatedStyles = styles.map((s) => {
-                                if (s.id === style.id) {
-                                  const isChecking = checked as boolean
-                                  let newDescription = s.description
-                                  
-                                  if (isChecking) {
-                                    // Add prefix if not already there
-                                    if (!newDescription.startsWith("No padding - ")) {
-                                      newDescription = `No padding - ${newDescription}`
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              id={`noPadding-${style.id}`}
+                              checked={style.noPadding === true}
+                              onCheckedChange={(checked) => {
+                                const updatedStyles = styles.map((s) => {
+                                  if (s.id === style.id) {
+                                    const isChecking = checked as boolean
+                                    let newDescription = s.description
+                                    
+                                    if (isChecking) {
+                                      // Add prefix if not already there
+                                      if (!newDescription.startsWith("No padding - ")) {
+                                        newDescription = `No padding - ${newDescription}`
+                                      }
+                                    } else {
+                                      // Remove prefix if present
+                                      if (newDescription.startsWith("No padding - ")) {
+                                        newDescription = newDescription.replace("No padding - ", "")
+                                      }
                                     }
-                                  } else {
-                                    // Remove prefix if present
-                                    if (newDescription.startsWith("No padding - ")) {
-                                      newDescription = newDescription.replace("No padding - ", "")
-                                    }
+                                    
+                                    return { ...s, noPadding: isChecking, description: newDescription }
                                   }
-                                  
-                                  return { ...s, noPadding: isChecking, description: newDescription }
-                                }
-                                return s
-                              })
-                              setStyles(updatedStyles)
-                            }}
-                          />
-                          <div className="flex items-center gap-1">
-                            <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
-                              No Padding
-                            </Label>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <HelpCircle className="h-3 w-3 text-slate-400" />
-                                </TooltipTrigger>
-                                <TooltipContent side="right" className="max-w-xs text-xs">
-                                  Removes padding from all sides for this style
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                                  return s
+                                })
+                                setStyles(updatedStyles)
+                              }}
+                            />
+                            <div className="flex items-center gap-1">
+                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
+                                No Padding
+                              </Label>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3 w-3 text-slate-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs text-xs">
+                                    Removes padding from all sides for this style
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                           </div>
                         </div>
                       </div>
