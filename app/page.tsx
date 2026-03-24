@@ -2264,7 +2264,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             {currentStep === 2 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Configure your theme</h2>
-                <p className="text-slate-600 mb-4">Set up padding and webfont imports for your theme.</p>
+                <p className="text-slate-600 mb-4">Set up article padding, webfont imports and icon settings for your theme.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Theme padding */}
