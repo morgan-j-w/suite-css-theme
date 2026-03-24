@@ -3697,7 +3697,10 @@ ${styles
                   setShowExitWarning(false)
                   window.location.href = "/"
                 }}
-                className="flex-1 bg-green-600 text-white hover:bg-green-700"
+                className="flex-1 text-white"
+                style={{ backgroundColor: '#16A34A' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#15803d'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#16A34A'}
               >
                 Save and exit
               </Button>

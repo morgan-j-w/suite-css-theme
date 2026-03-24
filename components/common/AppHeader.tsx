@@ -28,7 +28,7 @@ export const AppHeader = ({ onSaveTheme, onExit }: AppHeaderProps) => {
         >
           Exit to Theme Dashboard
         </Button>
-        <Button onClick={onSaveTheme} className="bg-green-600 text-white hover:bg-green-700 text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto">
+        <Button onClick={onSaveTheme} className="text-white text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto" style={{ backgroundColor: '#16A34A' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#15803d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#16A34A'}>
           Save Theme
         </Button>
       </div>
