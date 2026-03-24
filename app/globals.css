@@ -121,4 +121,19 @@
   body {
     @apply bg-background text-foreground;
   }
-}
+
+  /* Input focus micro-interactions */
+  input:focus-visible {
+    border-color: #22CDEC !important;
+    box-shadow: 0 0 0 2px rgba(34, 205, 236, 0.15) !important;
+    outline: none !important;
+  }
+
+  /* Card hover micro-interactions */
+  [data-slot="card"] {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  [data-slot="card"]:hover {
+    transform: translateY(-1px);
+  }}
