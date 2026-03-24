@@ -2800,6 +2800,39 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           >
                             Sample Button
                           </button>
+                          
+                          {/* Icon Preview */}
+                          <div className="mt-4 flex gap-2">
+                            {[
+                              { id: 'facebook', name: 'Facebook' },
+                              { id: 'x', name: 'X' },
+                              { id: 'linkedin', name: 'LinkedIn' },
+                              { id: 'print', name: 'Print' },
+                              { id: 'new-post', name: 'Email' },
+                            ].map((icon) => {
+                              const iconStyleMap: Record<string, string> = {
+                                'ios-filled': 'ios-filled',
+                                'ios-outline': 'ios',
+                                'material-rounded': 'material-rounded',
+                                'material-outlined': 'material-outlined',
+                                'material-sharp': 'material-sharp',
+                              }
+                              const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
+                              const iconColor = style.iconColor || '#1D1D1B'
+                              
+                              return (
+                                <img
+                                  key={icon.id}
+                                  src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                                  alt={icon.name}
+                                  width="28"
+                                  height="28"
+                                  title={icon.name}
+                                  style={{ filter: `brightness(0) saturate(100%) invert(${iconColor === '#ffffff' ? '1' : '0'}) sepia(${iconColor === '#ffffff' ? '0' : '0'})` }}
+                                />
+                              )
+                            })}
+                          </div>
                         </div>
                       </div>
                     </div>
