@@ -12,15 +12,6 @@ export const AppFooter = () => {
             <p>&copy; {currentYear} Swift Digital. All rights reserved.</p>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-sm">
-            <a 
-              href="https://swiftdigital.com.au/support" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition-opacity"
-              style={{ color: '#9baec6' }}
-            >
-              Support & Feedback
-            </a>
             <span style={{ color: '#9baec6' }}>v{version}</span>
           </div>
         </div>
