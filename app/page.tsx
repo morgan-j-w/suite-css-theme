@@ -384,7 +384,7 @@ export default function ThemeGenerator() {
         buttonWeight: buttonWeight || "400",
         noPadding: false,
         iconStyle: "ios-outline",
-        iconColor: "#1D1D1B",
+        iconColor: "#000000",
       },
     ])
   }
@@ -983,33 +983,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
                   buttonWeight: buttonWeight,
                   noPadding: false,
                   iconStyle: "ios-outline",
-                  iconColor: "#1D1D1B",
-                }
-                combinations.push(combo)
-
-                // Limit to 15 combinations
-                if (combinations.length >= 15) return
-              })
-              if (combinations.length >= 15) return
-            })
-            if (combinations.length >= 15) return
-          })
-        })
-      })
-      if (combinations.length >= 15) return
-    })
-
-    setGeneratedCombinations(combinations.slice(0, 15))
-    setShowCombinationGenerator(true)
-  }
-
-  const generateMixedCombinations = () => {
-    if (colors.length < 2) {
-      alert("Please add at least 2 colours to generate combinations")
-      return
-    }
-
-    const combinations: StyleDefinition[] = []
+                iconColor: "#000000",
     const minTextContrast = 3
     const minButtonContrast = 2
 
@@ -1078,7 +1052,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         buttonWeight: buttonWeight,
         noPadding: false,
         iconStyle: "ios-outline",
-        iconColor: "#1D1D1B",
+        iconColor: "#000000",
       }
       combinations.push(combo)
       }
@@ -1164,7 +1138,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         buttonWeight: buttonWeight,
         noPadding: false,
         iconStyle: "ios-outline",
-        iconColor: "#1D1D1B",
+        iconColor: "#000000",
       }
       newCombinations.push(combo)
     }
@@ -2679,7 +2653,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           <div>
                             <Label className="text-xs text-slate-600">Icon Colour</Label>
                             <Select
-                              value={style.iconColor || "#1D1D1B"}
+                              value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
                               <SelectTrigger className="mt-1 h-8 text-xs">
@@ -2818,7 +2792,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 'material-sharp': 'material-sharp',
                               }
                               const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
-                              const iconColor = style.iconColor || '#1D1D1B'
+                              const iconColor = style.iconColor || '#000000'
                               
                               return (
                                 <img
