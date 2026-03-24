@@ -2640,7 +2640,144 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               </SelectContent>
                             </Select>
                           </div>
+                        </div>
 
+                        <div className="flex items-end gap-2">
+                          <Checkbox
+                            id={`noPadding-${style.id}`}
+                            checked={style.noPadding === true}
+                            onCheckedChange={(checked) => {
+                              const updatedStyles = styles.map((s) => {
+                                if (s.id === style.id) {
+                                  const isChecking = checked as boolean
+                                  let newDescription = s.description
+                                  
+                                  if (isChecking) {
+                                    // Add prefix if not already there
+                                    if (!newDescription.startsWith("No padding - ")) {
+                                      newDescription = `No padding - ${newDescription}`
+                                    }
+                                  } else {
+                                    // Remove prefix if present
+                                    if (newDescription.startsWith("No padding - ")) {
+                                      newDescription = newDescription.replace("No padding - ", "")
+                                    }
+                                  }
+                                  
+                                  return { ...s, noPadding: isChecking, description: newDescription }
+                                }
+                                return s
+                              })
+                              setStyles(updatedStyles)
+                            }}
+                          />
+                          <div className="flex items-center gap-1">
+                            <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
+                              No Padding
+                            </Label>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <HelpCircle className="h-3 w-3 text-slate-400" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs text-xs">
+                                  Removes padding from all sides for this style
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right side - Preview */}
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs text-slate-600 mb-2 block">Preview</Label>
+                          <div
+                            className={style.noPadding ? "p-0 rounded-lg border" : "p-4 rounded-lg border"}
+                            style={{ backgroundColor: bgColor, color: textColor }}
+                          >
+                            <div
+                              className="header1"
+                              style={{
+                                color: headingColor,
+                                fontFamily: cleanFontValue(style.headingFont),
+                                fontSize: `${style.h1Size || h1Size}`,
+                                lineHeight: `${style.h1LineHeight || h1LineHeight}`,
+                                fontWeight: style.h1Weight || h1Weight,
+                                paddingBottom: `${titlePaddingBottom || "14"}px`,
+                              }}
+                            >
+                              Style {index + 1} - Sample heading
+                            </div>
+                            <p
+                              style={{
+                                fontFamily: cleanFontValue(style.bodyFont),
+                                fontSize: `${(style.bodySize || bodySize).replace('px', '')}px`,
+                                lineHeight: `${(style.bodyLineHeight || bodyLineHeight).replace('px', '')}px`,
+                                fontWeight: style.bodyWeight || bodyWeight,
+                              }}
+                            >
+                              This is sample body text.{" "}
+                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                                Here is a link
+                              </a>
+                              .
+                            </p>
+                            <button
+                              className="mt-3 rounded"
+                              style={{
+                                backgroundColor: buttonBg,
+                                color: buttonText,
+                                fontFamily: cleanFontValue(style.buttonFont),
+                                fontSize: `${style.buttonSize || buttonSize || "15px"}`,
+                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
+                                fontWeight: style.buttonWeight || buttonWeight,
+                                borderRadius: `${buttonBorderRadius}px`,
+                                padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                              }}
+                            >
+                              Sample Button
+                            </button>
+                            
+                            {/* Icon Preview */}
+                            <div className="mt-4 flex gap-2">
+                              {[
+                                { id: 'facebook', name: 'Facebook' },
+                                { id: 'x', name: 'X' },
+                                { id: 'linkedin', name: 'LinkedIn' },
+                                { id: 'print', name: 'Print' },
+                                { id: 'new-post', name: 'Email' },
+                              ].map((icon) => {
+                                const iconStyleMap: Record<string, string> = {
+                                  'ios-filled': 'ios-filled',
+                                  'ios-outline': 'ios',
+                                  'material-rounded': 'material-rounded',
+                                  'material-outlined': 'material-outlined',
+                                  'material-sharp': 'material-sharp',
+                                }
+                                const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
+                                const iconColor = style.iconColor || '#000000'
+                                const iconSize = style.iconSize || "16"
+                                
+                                return (
+                                  <img
+                                    key={icon.id}
+                                    src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                                    alt={icon.name}
+                                    width={iconSize}
+                                    height={iconSize}
+                                    title={icon.name}
+                                    style={{ filter: `brightness(0) saturate(100%) invert(${iconColor === '#ffffff' ? '1' : '0'}) sepia(${iconColor === '#ffffff' ? '0' : '0'})` }}
+                                  />
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Icon Controls Row */}
+                        <div className="grid grid-cols-3 gap-3">
                           <div>
                             <Label className="text-xs text-slate-600">Icon Style</Label>
                             <Select
@@ -2696,138 +2833,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               onChange={(e) => updateStyle(style.id, "iconSize", e.target.value)}
                               placeholder="16"
                             />
-                          </div>
-
-                          <div className="flex items-end gap-2">
-                            <Checkbox
-                              id={`noPadding-${style.id}`}
-                              checked={style.noPadding === true}
-                              onCheckedChange={(checked) => {
-                                const updatedStyles = styles.map((s) => {
-                                  if (s.id === style.id) {
-                                    const isChecking = checked as boolean
-                                    let newDescription = s.description
-                                    
-                                    if (isChecking) {
-                                      // Add prefix if not already there
-                                      if (!newDescription.startsWith("No padding - ")) {
-                                        newDescription = `No padding - ${newDescription}`
-                                      }
-                                    } else {
-                                      // Remove prefix if present
-                                      if (newDescription.startsWith("No padding - ")) {
-                                        newDescription = newDescription.replace("No padding - ", "")
-                                      }
-                                    }
-                                    
-                                    return { ...s, noPadding: isChecking, description: newDescription }
-                                  }
-                                  return s
-                                })
-                                setStyles(updatedStyles)
-                              }}
-                            />
-                            <div className="flex items-center gap-1">
-                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
-                                No Padding
-                              </Label>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <HelpCircle className="h-3 w-3 text-slate-400" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right" className="max-w-xs text-xs">
-                                    Removes padding from all sides for this style
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right side - Preview */}
-                      <div>
-                        <Label className="text-xs text-slate-600 mb-2 block">Preview</Label>
-                        <div
-                          className={style.noPadding ? "p-0 rounded-lg border" : "p-4 rounded-lg border"}
-                          style={{ backgroundColor: bgColor, color: textColor }}
-                        >
-                          <div
-                            className="header1"
-                            style={{
-                              color: headingColor,
-                              fontFamily: cleanFontValue(style.headingFont),
-                              fontSize: `${style.h1Size || h1Size}`,
-                              lineHeight: `${style.h1LineHeight || h1LineHeight}`,
-                              fontWeight: style.h1Weight || h1Weight,
-                              paddingBottom: `${titlePaddingBottom || "14"}px`,
-                            }}
-                          >
-                            Style {index + 1} - Sample heading
-                          </div>
-                          <p
-                            style={{
-                              fontFamily: cleanFontValue(style.bodyFont),
-                              fontSize: `${(style.bodySize || bodySize).replace('px', '')}px`,
-                              lineHeight: `${(style.bodyLineHeight || bodyLineHeight).replace('px', '')}px`,
-                              fontWeight: style.bodyWeight || bodyWeight,
-                            }}
-                          >
-                            This is sample body text.{" "}
-                            <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                              Here is a link
-                            </a>
-                            .
-                          </p>
-                          <button
-                            className="mt-3 rounded"
-                            style={{
-                              backgroundColor: buttonBg,
-                              color: buttonText,
-                              fontFamily: cleanFontValue(style.buttonFont),
-                              fontSize: `${style.buttonSize || buttonSize || "15px"}`,
-                              lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
-                              fontWeight: style.buttonWeight || buttonWeight,
-                              borderRadius: `${buttonBorderRadius}px`,
-                              padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
-                            }}
-                          >
-                            Sample Button
-                          </button>
-                          
-                          {/* Icon Preview */}
-                          <div className="mt-4 flex gap-2">
-                            {[
-                              { id: 'facebook', name: 'Facebook' },
-                              { id: 'x', name: 'X' },
-                              { id: 'linkedin', name: 'LinkedIn' },
-                              { id: 'print', name: 'Print' },
-                              { id: 'new-post', name: 'Email' },
-                            ].map((icon) => {
-                              const iconStyleMap: Record<string, string> = {
-                                'ios-filled': 'ios-filled',
-                                'ios-outline': 'ios',
-                                'material-rounded': 'material-rounded',
-                                'material-outlined': 'material-outlined',
-                                'material-sharp': 'material-sharp',
-                              }
-                              const mappedStyle = iconStyleMap[style.iconStyle || 'ios-outline']
-                              const iconColor = style.iconColor || '#000000'
-                              const iconSize = style.iconSize || "16"
-                              
-                              return (
-                                <img
-                                  key={icon.id}
-                                  src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                  alt={icon.name}
-                                  width={iconSize}
-                                  height={iconSize}
-                                  title={icon.name}
-                                  style={{ filter: `brightness(0) saturate(100%) invert(${iconColor === '#ffffff' ? '1' : '0'}) sepia(${iconColor === '#ffffff' ? '0' : '0'})` }}
-                                />
-                              )
-                            })}
                           </div>
                         </div>
                       </div>
