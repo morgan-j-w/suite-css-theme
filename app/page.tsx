@@ -2373,8 +2373,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Preview</Label>
-                  <div className="flex gap-3 p-4 bg-slate-100 rounded-lg">
+                  <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
+                  <div className="flex gap-3 p-4 bg-slate-200 rounded-lg">
                     {[
                       { id: 'facebook', name: 'Facebook' },
                       { id: 'x', name: 'X' },
@@ -2484,8 +2484,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </div>
 
               <div>
-                <Label className="text-sm font-medium mb-2 block">Preview</Label>
-                <div className="bg-slate-100 p-4 rounded-lg flex items-center justify-center">
+                <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
+                <div className="bg-slate-200 p-4 rounded-lg flex items-center justify-center">
                   <button
                     className="font-medium text-white bg-black hover:bg-slate-800"
                     style={{
@@ -2863,9 +2863,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       {/* Right side - Preview */}
                       <div className="space-y-3">
                         <div>
-                          <Label className="text-xs text-slate-600 mb-2 block">Preview</Label>
+                          <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
                           <div
-                            className={style.noPadding ? "p-0 rounded-lg border" : "p-4 rounded-lg border"}
+                            className={style.noPadding ? "p-0 rounded-lg border border-slate-300" : "p-4 rounded-lg border border-slate-300"}
                             style={{ backgroundColor: bgColor, color: textColor }}
                           >
                             <div
