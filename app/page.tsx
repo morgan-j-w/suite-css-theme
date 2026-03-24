@@ -1736,7 +1736,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </TooltipProvider>
                 </div>
                 <Textarea
-                  placeholder="Enter hex codes on new lines or comma-separated. Format: #HEX Name or Name #HEX (e.g., #0026C5 Bright Blue or Bright Blue #0026C5)"
+                  placeholder="Enter hex codes on new lines or comma-separated. (Format: #HEX Name or Name #HEX)"
                   value={bulkColorText}
                   onChange={(e) => {
                     setBulkColorText(e.target.value)
