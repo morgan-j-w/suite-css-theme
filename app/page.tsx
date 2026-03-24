@@ -1836,9 +1836,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 {colorImportError && (
                   <p className="text-sm text-red-500">{colorImportError}</p>
                 )}
-                <Button onClick={importColorsFromText} disabled={!bulkColorText.trim()} variant="outline" className="w-full bg-transparent">
+                <Button onClick={importColorsFromText} disabled={!bulkColorText.trim()} variant="outline" className="w-full bg-slate-50 hover:bg-slate-100 border-slate-200">
                   <Upload className="h-4 w-4 mr-2" />
-                  Import
+                  Import colours
                 </Button>
               </div>
 
@@ -1893,7 +1893,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </div>
                 ))}
               </div>
-              <Button onClick={addColor} variant="outline" className="mt-4 bg-transparent w-full">
+              <Button onClick={addColor} variant="outline" className="mt-4 bg-slate-50 hover:bg-slate-100 border-slate-200 w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Add colour
               </Button>
