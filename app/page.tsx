@@ -2330,12 +2330,30 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               <CardTitle className="text-lg">Webfont imports</CardTitle>
             </CardHeader>
             <CardContent>
-              <Textarea
-                value={webfontImports}
-                onChange={(e) => setWebfontImports(e.target.value)}
-                placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
-                className="font-mono text-sm min-h-[120px]"
-              />
+              <div className="relative">
+                <Textarea
+                  value={webfontImports}
+                  onChange={(e) => setWebfontImports(e.target.value)}
+                  placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
+                  className="font-mono text-sm min-h-[120px] pr-10"
+                  style={{ backgroundColor: '#F5F7FA' }}
+                />
+                {webfontImports && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="absolute top-2 right-2 h-8 w-8 p-0"
+                    onClick={() => {
+                      navigator.clipboard.writeText(webfontImports)
+                      toast({
+                        description: "Webfont imports copied to clipboard",
+                      })
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
 
