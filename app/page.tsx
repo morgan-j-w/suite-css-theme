@@ -117,8 +117,6 @@ export default function ThemeGenerator() {
     setWebfontImports,
     bulkColorText,
     setBulkColorText,
-    iconColor,
-    setIconColor,
     generatedCombinations,
     setGeneratedCombinations,
     showCombinationGenerator,
@@ -210,7 +208,6 @@ export default function ThemeGenerator() {
   useEffect(() => { localStorage.setItem("webfontImports", webfontImports) }, [webfontImports])
   useEffect(() => { localStorage.setItem("customImport", customImport) }, [customImport])
   useEffect(() => { saveToLocalStorage("themeStyles", styles) }, [styles])
-  useEffect(() => { saveToLocalStorage("iconColor", iconColor) }, [iconColor])
 
   // Initialize client and fonts list
   useEffect(() => {
@@ -386,6 +383,8 @@ export default function ThemeGenerator() {
         buttonLineHeight: buttonLineHeight || "22px",
         buttonWeight: buttonWeight || "400",
         noPadding: false,
+        iconStyle: "ios-outline",
+        iconColor: "#1D1D1B",
       },
     ])
   }
@@ -983,6 +982,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
                   buttonLineHeight: buttonLineHeight,
                   buttonWeight: buttonWeight,
                   noPadding: false,
+                  iconStyle: "ios-outline",
+                  iconColor: "#1D1D1B",
                 }
                 combinations.push(combo)
 
@@ -1076,6 +1077,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         buttonLineHeight: buttonLineHeight,
         buttonWeight: buttonWeight,
         noPadding: false,
+        iconStyle: "ios-outline",
+        iconColor: "#1D1D1B",
       }
       combinations.push(combo)
       }
@@ -1159,6 +1162,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         buttonSize: buttonSize,
         buttonLineHeight: buttonLineHeight,
         buttonWeight: buttonWeight,
+        noPadding: false,
+        iconStyle: "ios-outline",
+        iconColor: "#1D1D1B",
       }
       newCombinations.push(combo)
     }
@@ -1652,7 +1658,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         {/* Step Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3, 4, 5, 6].map((step) => (
+            {[1, 2, 3, 4, 5].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
                 <button
                   onClick={() => setCurrentStep(step)}
@@ -1674,8 +1680,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   {step === 2 && "Theme"}
                   {step === 3 && "Typography"}
                   {step === 4 && "Styles"}
-                  {step === 5 && "Icons"}
-                  {step === 6 && "Export"}
+                  {step === 5 && "Export"}
                 </span>
               </div>
             ))}
@@ -1683,7 +1688,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
           <div className="h-1 bg-slate-200 rounded-full">
             <div
               className="h-full rounded-full transition-all"
-              style={{ width: `${(currentStep - 1) * (100 / 5)}%`, backgroundColor: "#ec2176" }}
+              style={{ width: `${(currentStep - 1) * (100 / 4)}%`, backgroundColor: "#ec2176" }}
             />
           </div>
         </div>
@@ -2302,192 +2307,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-        {/* STEP 5: ICONS */}
-            {currentStep === 5 && (
-              <>
-                <h2 className="text-2xl font-bold mb-4">Customise icon colour</h2>
-                <p className="text-slate-600 mb-4">Select a colour for each style's icons. Download the ZIP file and upload the images to Suite to use them in your theme.</p>
-                <p className="text-slate-600 mb-4">The icons include built-in padding. If necessary, you can open them in Photoshop and re-save them without the padding.</p>
-
-                <Card className="mb-6">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Left Column: Color Picker */}
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <div className="w-32 h-32 rounded-lg border-4 border-slate-200 flex items-center justify-center" style={{ backgroundColor: iconColor }}>
-                          <div className="text-white text-xl font-bold drop-shadow-lg">{iconColor}</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="color"
-                            value={iconColor}
-                            onChange={(e) => setIconColor(e.target.value)}
-                            className="w-12 h-12 cursor-pointer rounded border-2 border-slate-300"
-                          />
-                          <code className="bg-slate-100 px-2 py-1 rounded text-sm font-mono">
-                            {iconColor}
-                          </code>
-                        </div>
-                      </div>
-
-                      {/* Right Column: Palette Swatches */}
-                      <div className="flex flex-col justify-center gap-2">
-                        <p className="text-xs font-semibold text-slate-600">Your colour palette</p>
-                        <div className="flex gap-2 flex-wrap">
-                          {colors.map((color) => (
-                            <button
-                              key={color.id}
-                              onClick={() => setIconColor(color.hex)}
-                              className="w-10 h-10 rounded border-3 hover:shadow-lg transition-shadow"
-                              style={{ backgroundColor: color.hex, borderColor: iconColor === color.hex ? '#000' : '#ddd' }}
-                              title={color.name}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Icon Styles Reference */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Available Icon Styles</CardTitle>
-                    <CardDescription className="mb-4">Preview your selected color across all available icon styles</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b bg-slate-50">
-                            <th className="text-left py-3 px-4 font-semibold text-sm">Icon</th>
-                            <th className="text-center py-3 px-4 font-semibold text-sm">
-                              <div className="flex items-center justify-center gap-2">
-                                <span>iOS Filled</span>
-                                <button
-                                  onClick={() => downloadIconsZip('iOS Filled', 'ios-filled')}
-                                  className="p-1 hover:bg-slate-200 rounded transition-colors"
-                                  title="Download icons"
-                                >
-                                  <Download size={16} className="text-slate-600" />
-                                </button>
-                              </div>
-                            </th>
-                            <th className="text-center py-3 px-4 font-semibold text-sm">
-                              <div className="flex items-center justify-center gap-2">
-                                <span>iOS Outline</span>
-                                <button
-                                  onClick={() => downloadIconsZip('iOS Outline', 'ios')}
-                                  className="p-1 hover:bg-slate-200 rounded transition-colors"
-                                  title="Download icons"
-                                >
-                                  <Download size={16} className="text-slate-600" />
-                                </button>
-                              </div>
-                            </th>
-                            <th className="text-center py-3 px-4 font-semibold text-sm">
-                              <div className="flex items-center justify-center gap-2">
-                                <span>Material Rounded</span>
-                                <button
-                                  onClick={() => downloadIconsZip('Material Rounded', 'material-rounded')}
-                                  className="p-1 hover:bg-slate-200 rounded transition-colors"
-                                  title="Download icons"
-                                >
-                                  <Download size={16} className="text-slate-600" />
-                                </button>
-                              </div>
-                            </th>
-                            <th className="text-center py-3 px-4 font-semibold text-sm">
-                              <div className="flex items-center justify-center gap-2">
-                                <span>Material Outlined</span>
-                                <button
-                                  onClick={() => downloadIconsZip('Material Outlined', 'material-outlined')}
-                                  className="p-1 hover:bg-slate-200 rounded transition-colors"
-                                  title="Download icons"
-                                >
-                                  <Download size={16} className="text-slate-600" />
-                                </button>
-                              </div>
-                            </th>
-                            <th className="text-center py-3 px-4 font-semibold text-sm">
-                              <div className="flex items-center justify-center gap-2">
-                                <span>Material Sharp</span>
-                                <button
-                                  onClick={() => downloadIconsZip('Material Sharp', 'material-sharp')}
-                                  className="p-1 hover:bg-slate-200 rounded transition-colors"
-                                  title="Download icons"
-                                >
-                                  <Download size={16} className="text-slate-600" />
-                                </button>
-                              </div>
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {[
-                            { id: 'facebook', name: 'Facebook' },
-                            { id: 'x', name: 'X (Twitter)' },
-                            { id: 'linkedin', name: 'LinkedIn' },
-                            { id: 'print', name: 'Print' },
-                            { id: 'new-post', name: 'Email' },
-                          ].map((icon) => (
-                            <tr key={icon.id} className="border-b hover:bg-slate-50">
-                              <td className="py-4 px-4 font-medium text-sm">{icon.name}</td>
-                              <td className="py-4 px-4 text-center">
-                                <img
-                                  src={`https://img.icons8.com/ios-filled/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                  alt={`${icon.name} iOS Filled`}
-                                  width="32"
-                                  height="32"
-                                  className="mx-auto"
-                                />
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <img
-                                  src={`https://img.icons8.com/ios/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                  alt={`${icon.name} iOS Outline`}
-                                  width="32"
-                                  height="32"
-                                  className="mx-auto"
-                                />
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <img
-                                  src={`https://img.icons8.com/material-rounded/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                  alt={`${icon.name} Material Rounded`}
-                                  width="32"
-                                  height="32"
-                                  className="mx-auto"
-                                />
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <img
-                                  src={`https://img.icons8.com/material-outlined/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                  alt={`${icon.name} Material Outlined`}
-                                  width="32"
-                                  height="32"
-                                  className="mx-auto"
-                                />
-                              </td>
-                              <td className="py-4 px-4 text-center">
-                                <img
-                                  src={`https://img.icons8.com/material-sharp/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                  alt={`${icon.name} Material Sharp`}
-                                  width="32"
-                                  height="32"
-                                  className="mx-auto"
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-
         {/* STEP 4: STYLES */}
             {currentStep === 4 && (
               <>
@@ -2882,6 +2701,54 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Tooltip>
                           </TooltipProvider>
                         </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <div className="min-w-[150px] flex-1">
+                            <Label className="text-xs text-slate-600">Icon Style</Label>
+                            <Select
+                              value={style.iconStyle || "ios-outline"}
+                              onValueChange={(value) => updateStyle(style.id, "iconStyle", value)}
+                            >
+                              <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="ios-filled">iOS Filled</SelectItem>
+                                <SelectItem value="ios-outline">iOS Outline</SelectItem>
+                                <SelectItem value="material-rounded">Material Rounded</SelectItem>
+                                <SelectItem value="material-outlined">Material Outlined</SelectItem>
+                                <SelectItem value="material-sharp">Material Sharp</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="min-w-[150px] flex-1">
+                            <Label className="text-xs text-slate-600">Icon Colour</Label>
+                            <Select
+                              value={style.iconColor || "#1D1D1B"}
+                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
+                            >
+                              <SelectTrigger className="mt-1 h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors
+                                  .filter((color) => color.name.trim() !== "")
+                                  .map((color) => (
+                                    <SelectItem key={color.id} value={color.hex}>
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className="w-4 h-4 rounded border"
+                                          style={{ backgroundColor: color.hex }}
+                                        />
+                                        {color.name}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Right side - Preview */}
@@ -2950,8 +2817,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-        {/* STEP 6: EXPORT */}
-            {currentStep === 6 && (
+        {/* STEP 5: EXPORT */}
+            {currentStep === 5 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Export your CSS</h2>
                 <p className="text-slate-600 mb-4">Review all your styles and export the generated CSS.</p>
@@ -3474,15 +3341,15 @@ ${styles
           >
             ← Back
           </Button>
-          {currentStep < 6 && (
+          {currentStep < 5 && (
             <Button
-              onClick={() => setCurrentStep(Math.min(6, currentStep + 1))}
+              onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
               className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
             >
               Next →
             </Button>
           )}
-          {currentStep === 6 && <div className="flex-1" />}
+          {currentStep === 5 && <div className="flex-1" />}
         </div>
 
         {/* Datalist for available webfonts */}

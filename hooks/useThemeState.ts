@@ -48,7 +48,6 @@ export const useThemeState = () => {
   const [webfontImports, setWebfontImports] = useState("")
   const [bulkColorText, setBulkColorText] = useState("")
 
-  const [iconColor, setIconColor] = useState("#1D1D1B")
   const [generatedCombinations, setGeneratedCombinations] = useState<StyleDefinition[]>([])
   const [showCombinationGenerator, setShowCombinationGenerator] = useState(false)
   const [cssRefreshKey, setCssRefreshKey] = useState(0)
@@ -97,7 +96,6 @@ export const useThemeState = () => {
     setCustomImport(loadFromLocalStorage("customImport", "") as string)
     setWebfontImports(loadFromLocalStorage("webfontImports", "") as string)
     setStyles(loadFromLocalStorage("themeStyles", []) as StyleDefinition[])
-    setIconColor(loadFromLocalStorage("iconColor", "#1D1D1B") as string)
   }, [])
 
   return {
@@ -173,8 +171,6 @@ export const useThemeState = () => {
     setWebfontImports,
     bulkColorText,
     setBulkColorText,
-    iconColor,
-    setIconColor,
     generatedCombinations,
     setGeneratedCombinations,
     showCombinationGenerator,

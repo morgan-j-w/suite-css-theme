@@ -36,6 +36,8 @@ export interface StyleDefinition {
   buttonLineHeight: string
   buttonWeight: string
   noPadding?: boolean
+  iconStyle?: string
+  iconColor?: string
 }
 
 export interface GoogleFont {
