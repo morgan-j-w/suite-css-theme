@@ -1656,12 +1656,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       {/* Header Bar - Full Width */}
       {isClient && <AppHeader onResetSettings={resetAllSettings} onLogout={handleLogout} />}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8" suppressHydrationWarning>
+        {isClient && (
+        <>
         {webfontImports && (
           <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
         )}
-        {isClient && (
-        <>
-      
           <div className="max-w-6xl mx-auto">
 
         {/* Step Indicator */}
