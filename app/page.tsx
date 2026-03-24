@@ -3743,11 +3743,11 @@ ${styles
                 </AlertDialogDescription>
               </AlertDialogHeader>
             </div>
-            <AlertDialogFooter className="flex gap-3 justify-center">
+            <AlertDialogFooter className="flex gap-3 w-full">
               <Button
                 onClick={() => setShowSuccessModal(false)}
                 variant="outline"
-                className="px-6"
+                className="flex-1"
               >
                 Continue customising
               </Button>
@@ -3757,7 +3757,7 @@ ${styles
                   window.location.href = "/"
                 }}
                 variant="outline"
-                className="px-6"
+                className="flex-1"
               >
                 Exit to Theme Dashboard
               </Button>
