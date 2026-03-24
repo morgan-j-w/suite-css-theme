@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, Download } from "lucide-react"
+import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, Download, CheckCircle } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -47,6 +47,7 @@ export default function ThemeGenerator() {
   const [colorImportError, setColorImportError] = useState("")
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const { toast } = useToast()
   
   // Import theme state from hook
@@ -287,6 +288,16 @@ export default function ThemeGenerator() {
   useEffect(() => {
     setHasUnsavedChanges(true)
   }, [colors, styles, headingFont, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, adobeFontsKitId, adobeFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
+
+  // Auto-close success modal after 3 seconds
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [showSuccessModal])
 
   // Sync all font imports into webfontImports (only if the sync result has content)
   useEffect(() => {
@@ -1631,10 +1642,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       globalIconSize,
     })
     setHasUnsavedChanges(false)
-    toast({
-      description: "Theme saved successfully!",
-      duration: 3000,
-    })
+    setShowSuccessModal(true)
   }
 
   const handleExitFromHeader = () => {
@@ -3624,10 +3632,7 @@ ${styles
                   globalIconSize,
                 })
                 setHasUnsavedChanges(false)
-                toast({
-                  description: "Theme saved successfully!",
-                  duration: 3000,
-                })
+                setShowSuccessModal(true)
               }}
               className="flex-1 bg-green-600 text-white hover:bg-green-700"
             >
@@ -3705,6 +3710,34 @@ ${styles
                 className="flex-1 bg-green-600 text-white hover:bg-green-700"
               >
                 Save and exit
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Success Modal */}
+        <AlertDialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+          <AlertDialogContent className="max-w-md">
+            <div className="flex flex-col items-center justify-center py-6">
+              <div className="mb-4">
+                <div className="relative w-20 h-20 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse" />
+                  <CheckCircle className="w-16 h-16 text-green-600" strokeWidth={1.5} />
+                </div>
+              </div>
+              <AlertDialogHeader className="text-center">
+                <AlertDialogTitle className="text-2xl">Theme saved!</AlertDialogTitle>
+                <AlertDialogDescription className="text-base mt-2">
+                  Your theme has been saved successfully. You can continue customizing or exit anytime.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+            </div>
+            <AlertDialogFooter className="flex justify-center">
+              <Button
+                onClick={() => setShowSuccessModal(false)}
+                className="bg-green-600 text-white hover:bg-green-700 px-6"
+              >
+                Continue customizing
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
