@@ -3716,13 +3716,34 @@ ${styles
         </AlertDialog>
 
         {/* Success Modal */}
+        <style>{`
+          @keyframes springPop {
+            0% {
+              opacity: 0;
+              transform: scale(0.3);
+            }
+            50% {
+              opacity: 1;
+            }
+            70% {
+              transform: scale(1.15);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          .animate-spring-pop {
+            animation: springPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          }
+        `}</style>
         <AlertDialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
           <AlertDialogContent className="max-w-md">
             <div className="flex flex-col items-center justify-center py-6">
               <div className="mb-4">
                 <div className="relative w-20 h-20 flex items-center justify-center">
                   <div className="absolute inset-0 bg-green-100 rounded-full animate-pulse" />
-                  <CheckCircle className="w-16 h-16 text-green-600" strokeWidth={1.5} />
+                  <CheckCircle className="w-16 h-16 text-green-600 animate-spring-pop" strokeWidth={1.5} />
                 </div>
               </div>
               <AlertDialogHeader className="text-center">
