@@ -10,6 +10,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, Download } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Toaster } from "@/components/ui/sonner"
+import { useToast } from "@/hooks/use-toast"
 
 // Import types
 import { ColorDefinition, StyleDefinition } from "@/lib/types"
@@ -42,6 +45,9 @@ export default function ThemeGenerator() {
   const [adobeFonts, setAdobeFonts] = useState<Array<string>>([])
   const [selectedAdobeFont, setSelectedAdobeFont] = useState("")
   const [colorImportError, setColorImportError] = useState("")
+  const [showExitWarning, setShowExitWarning] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const { toast } = useToast()
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -276,6 +282,11 @@ export default function ThemeGenerator() {
     ]
     setAdobeFonts(adobePopularFonts)
   }, [])
+
+  // Track unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(true)
+  }, [colors, styles, headingFont, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, adobeFontsKitId, adobeFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
 
   // Sync all font imports into webfontImports (only if the sync result has content)
   useEffect(() => {
@@ -1666,7 +1677,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         {/* Step Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3, 4, 5].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
                 <button
                   onClick={() => setCurrentStep(step)}
@@ -1688,7 +1699,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   {step === 2 && "Theme"}
                   {step === 3 && "Typography"}
                   {step === 4 && "Styles"}
-                  {step === 5 && "Export"}
                 </span>
               </div>
             ))}
@@ -1696,7 +1706,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
           <div className="h-1 bg-slate-200 rounded-full">
             <div
               className="h-full rounded-full transition-all"
-              style={{ width: `${(currentStep - 1) * (100 / 4)}%`, backgroundColor: "#ec2176" }}
+              style={{ width: `${(currentStep - 1) * (100 / 3)}%`, backgroundColor: "#ec2176" }}
             />
           </div>
         </div>
@@ -2962,8 +2972,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-        {/* STEP 5: EXPORT */}
-            {currentStep === 5 && (
+        {/* STEP 5: EXPORT - HIDDEN FOR CLIENT-FACING VERSION */}
+            {false && currentStep === 5 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Export your CSS</h2>
                 <p className="text-slate-600 mb-4">Review all your styles and export the generated CSS.</p>
@@ -3494,26 +3504,117 @@ ${styles
         </div>
         </div>
 
-        {/* Navigation Buttons */}
+        {/* Navigation Buttons - Client-Facing Version */}
         <div className="flex items-center justify-between mt-8 gap-4">
           <Button
-            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+            onClick={() => {
+              if (hasUnsavedChanges) {
+                setShowExitWarning(true)
+              } else {
+                // Exit to theme dashboard
+                window.location.href = "/"
+              }
+            }}
             variant="outline"
-            disabled={currentStep === 1}
             className="flex-1"
           >
-            ← Back
+            Exit to Theme Dashboard
           </Button>
-          {currentStep < 5 && (
+          {currentStep < 4 && (
             <Button
-              onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
+              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
               className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
             >
               Next →
             </Button>
           )}
-          {currentStep === 5 && <div className="flex-1" />}
+          {currentStep === 4 && (
+            <Button
+              onClick={() => {
+                // Save theme
+                saveToLocalStorage("savedTheme", {
+                  colors,
+                  styles,
+                  headingFont,
+                  bodyFont,
+                  buttonFont,
+                  themePadding,
+                  h1Size,
+                  h1LineHeight,
+                  h1Weight,
+                  h2Size,
+                  h2LineHeight,
+                  h2Weight,
+                  h3Size,
+                  h3LineHeight,
+                  h3Weight,
+                  h4Size,
+                  h4LineHeight,
+                  h4Weight,
+                  bodySize,
+                  bodyLineHeight,
+                  bodyWeight,
+                  buttonSize,
+                  buttonLineHeight,
+                  buttonWeight,
+                  buttonPaddingTop,
+                  buttonPaddingRight,
+                  buttonPaddingBottom,
+                  buttonPaddingLeft,
+                  buttonBorderRadius,
+                  titlePaddingBottom,
+                  googleFontImport,
+                  adobeFontsKitId,
+                  adobeFontImport,
+                  customImport,
+                  webfontImports,
+                  globalIconStyle,
+                  globalIconSize,
+                })
+                setHasUnsavedChanges(false)
+                toast({
+                  description: "Theme saved successfully!",
+                  duration: 3000,
+                })
+              }}
+              className="flex-1 bg-green-600 text-white hover:bg-green-700"
+            >
+              Save Theme
+            </Button>
+          )}
+          {currentStep > 1 && currentStep < 4 && (
+            <Button
+              onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+              variant="outline"
+              className="flex-1"
+            >
+              ← Back
+            </Button>
+          )}
         </div>
+
+        {/* Exit Warning Dialog */}
+        <AlertDialog open={showExitWarning} onOpenChange={setShowExitWarning}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+              <AlertDialogDescription>
+                You have unsaved changes. Are you sure you want to exit without saving?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setShowExitWarning(false)
+                  window.location.href = "/"
+                }}
+              >
+                Exit without saving
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Datalist for available webfonts */}
         <datalist id="available-fonts">
@@ -3525,6 +3626,7 @@ ${styles
         </>
         )}
       </div>
+      <Toaster />
     </>
   )
 }
