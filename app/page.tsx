@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -57,6 +57,9 @@ export default function ThemeGenerator() {
   const [copiedCss, setCopiedCss] = useState(false)
   const [copiedMediaQuery, setCopiedMediaQuery] = useState(false)
   const [copiedImport, setCopiedImport] = useState(false)
+  const [editingStyleId, setEditingStyleId] = useState<string | null>(null)
+  const previewSidebarRef = useRef<HTMLDivElement>(null)
+  const previewCardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -68,6 +71,17 @@ export default function ThemeGenerator() {
     }
     setExpandedTypography(newSet)
   }
+
+  // Scroll preview sidebar to editing style
+  useEffect(() => {
+    if (editingStyleId && previewCardRefs.current.has(editingStyleId) && previewSidebarRef.current) {
+      const cardElement = previewCardRefs.current.get(editingStyleId)
+      if (cardElement) {
+        // Scroll smoothly to the card with some padding from the top
+        cardElement.scrollIntoView({ behavior: "smooth", block: "nearest" })
+      }
+    }
+  }, [editingStyleId])
 
   // Safe value extractors for typography fields
   const getSafeValue = (value: string | undefined, defaultValue: string = "") => {
@@ -2824,7 +2838,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div key={style.id} className="p-4 border rounded-lg bg-slate-100">
+                  <div 
+                    key={style.id} 
+                    className="p-4 border rounded-lg bg-slate-100 cursor-pointer transition-colors hover:bg-slate-200"
+                    onClick={() => setEditingStyleId(style.id)}
+                  >
                     <div className="grid md:grid-cols-3 gap-4">
                       {/* Left side - Controls */}
                       <div className="space-y-3 md:col-span-2">
@@ -3991,7 +4009,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </div>
               
               {/* Right Column - Live Preview Sidebar */}
-              <div className="w-80 bg-white rounded-lg shadow-sm p-6 border border-slate-200 sticky top-8 max-h-[calc(100vh-150px)] overflow-y-auto">
+              <div ref={previewSidebarRef} className="w-80 bg-white rounded-lg shadow-sm p-6 border border-slate-200 sticky top-8 max-h-[calc(100vh-150px)] overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-4 text-slate-900">Live Preview</h3>
                 <div className="space-y-4">
                   {styles.length === 0 ? (
@@ -4006,7 +4024,14 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       const buttonText = getColorHexValue(style.buttonText)
 
                       return (
-                        <Card key={style.id} className="overflow-hidden !py-0 border" style={{ backgroundColor: bgColor }}>
+                        <Card 
+                          key={style.id} 
+                          ref={(el) => {
+                            if (el) previewCardRefs.current.set(style.id, el)
+                          }}
+                          className="overflow-hidden !py-0 border cursor-pointer transition-shadow hover:shadow-md" 
+                          style={{ backgroundColor: bgColor }}
+                        >
                           <CardContent className="p-3 space-y-3" style={{ color: textColor }}>
                             {/* Style Header */}
                             <div className="pb-2">
