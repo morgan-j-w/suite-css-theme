@@ -1905,7 +1905,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         {/* Step Indicator */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3, 4, 5].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
                 <button
                   onClick={() => {
@@ -1938,7 +1938,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   {step === 2 && "Theme"}
                   {step === 3 && "Typography"}
                   {step === 4 && "Styles"}
-                  {step === 5 && "Preview"}
                 </span>
               </div>
             ))}
@@ -1946,7 +1945,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
           <div className="h-1 bg-slate-200 rounded-full">
             <div
               className="h-full rounded-full transition-all"
-              style={{ width: `${(currentStep - 1) * (100 / 4)}%`, backgroundColor: "#ec2176" }}
+              style={{ width: `${(currentStep - 1) * (100 / 3)}%`, backgroundColor: "#ec2176" }}
             />
           </div>
         </div>
@@ -3813,14 +3812,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-            
-            {/* STEP 5: Complete */}
-            {currentStep === 5 && (
-              <>
-                <h2 className="text-2xl font-bold mb-4">Theme Complete</h2>
-                <p className="text-slate-600 mb-4">Your theme is ready! View all styles in the live preview on the right.</p>
-              </>
-            )}
+
         </div>
         </div>
 
@@ -3836,14 +3828,14 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </Button>
           )}
           {currentStep === 1 && <div className="flex-1" />}
-          {currentStep < 5 && (
+          {currentStep < 4 && (
             <Button
               onClick={() => {
                 // Validate colors on step 1 before advancing
                 if (currentStep === 1 && !validateColorsForStep()) {
                   return
                 }
-                setCurrentStep(Math.min(5, currentStep + 1))
+                setCurrentStep(Math.min(4, currentStep + 1))
               }}
               disabled={currentStep === 1 && colorNameError}
               className="flex-1 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -3851,7 +3843,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               Next →
             </Button>
           )}
-          {currentStep === 5 && (
+          {currentStep === 4 && (
             <Button
               onClick={() => {
                 // Save theme
