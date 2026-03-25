@@ -62,6 +62,17 @@ export default function ThemeGenerator() {
     }
     setExpandedTypography(newSet)
   }
+
+  // Safe value extractors for typography fields
+  const getSafeValue = (value: string | undefined, defaultValue: string = "") => {
+    if (!value) return defaultValue
+    return value.replace("px", "")
+  }
+
+  const getDisplayValue = (styleValue: string | undefined, globalValue: string | undefined, defaultValue: string = "0") => {
+    const value = styleValue || globalValue || defaultValue
+    return value.replace("px", "").replace("px", "") // double replace to handle any edge cases
+  }
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -3109,9 +3120,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs text-slate-600">Heading font</Label>
                                 <Input
                                   className="mt-1.5 text-xs bg-slate-50"
-                                  value={style.headingFont || headingFont}
+                                  value={style.headingFont || headingFont || ""}
                                   onChange={(e) => updateStyle(style.id, "headingFont", e.target.value)}
-                                  placeholder={headingFont}
+                                  placeholder={headingFont || "Arial, sans-serif"}
                                 />
                               </div>
 
@@ -3124,9 +3135,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.h1Size || h1Size).replace("px", "")}
+                                      value={getDisplayValue(style.h1Size, h1Size, "22")}
                                       onChange={(e) => updateStyle(style.id, "h1Size", `${e.target.value}px`)}
-                                      placeholder={h1Size.replace("px", "")}
+                                      placeholder="22"
                                     />
                                   </div>
                                   <div>
@@ -3134,15 +3145,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.h1LineHeight || h1LineHeight).replace("px", "")}
+                                      value={getDisplayValue(style.h1LineHeight, h1LineHeight, "30")}
                                       onChange={(e) => updateStyle(style.id, "h1LineHeight", `${e.target.value}px`)}
-                                      placeholder={h1LineHeight.replace("px", "")}
+                                      placeholder="30"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Weight</Label>
                                     <Select
-                                      value={style.h1Weight || h1Weight}
+                                      value={style.h1Weight || h1Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
                                     >
                                       <SelectTrigger className="mt-1 h-8 text-xs bg-white">
@@ -3170,9 +3181,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.h2Size || h2Size).replace("px", "")}
+                                      value={getDisplayValue(style.h2Size, h2Size, "20")}
                                       onChange={(e) => updateStyle(style.id, "h2Size", `${e.target.value}px`)}
-                                      placeholder={h2Size.replace("px", "")}
+                                      placeholder="20"
                                     />
                                   </div>
                                   <div>
@@ -3180,15 +3191,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.h2LineHeight || h2LineHeight).replace("px", "")}
+                                      value={getDisplayValue(style.h2LineHeight, h2LineHeight, "28")}
                                       onChange={(e) => updateStyle(style.id, "h2LineHeight", `${e.target.value}px`)}
-                                      placeholder={h2LineHeight.replace("px", "")}
+                                      placeholder="28"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Weight</Label>
                                     <Select
-                                      value={style.h2Weight || h2Weight}
+                                      value={style.h2Weight || h2Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
                                     >
                                       <SelectTrigger className="mt-1 h-8 text-xs bg-white">
@@ -3216,9 +3227,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.h3Size || h3Size).replace("px", "")}
+                                      value={getDisplayValue(style.h3Size, h3Size, "18")}
                                       onChange={(e) => updateStyle(style.id, "h3Size", `${e.target.value}px`)}
-                                      placeholder={h3Size.replace("px", "")}
+                                      placeholder="18"
                                     />
                                   </div>
                                   <div>
@@ -3226,15 +3237,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.h3LineHeight || h3LineHeight).replace("px", "")}
+                                      value={getDisplayValue(style.h3LineHeight, h3LineHeight, "26")}
                                       onChange={(e) => updateStyle(style.id, "h3LineHeight", `${e.target.value}px`)}
-                                      placeholder={h3LineHeight.replace("px", "")}
+                                      placeholder="26"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Weight</Label>
                                     <Select
-                                      value={style.h3Weight || h3Weight}
+                                      value={style.h3Weight || h3Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
                                     >
                                       <SelectTrigger className="mt-1 h-8 text-xs bg-white">
@@ -3260,9 +3271,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs text-slate-600">Body font</Label>
                                 <Input
                                   className="mt-1.5 text-xs bg-slate-50"
-                                  value={style.bodyFont || bodyFont}
+                                  value={style.bodyFont || bodyFont || ""}
                                   onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
-                                  placeholder={bodyFont}
+                                  placeholder={bodyFont || "Arial, sans-serif"}
                                 />
                               </div>
 
@@ -3275,9 +3286,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.bodySize || bodySize).replace("px", "")}
+                                      value={getDisplayValue(style.bodySize, bodySize, "16")}
                                       onChange={(e) => updateStyle(style.id, "bodySize", `${e.target.value}px`)}
-                                      placeholder={bodySize.replace("px", "")}
+                                      placeholder="16"
                                     />
                                   </div>
                                   <div>
@@ -3285,15 +3296,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.bodyLineHeight || bodyLineHeight).replace("px", "")}
+                                      value={getDisplayValue(style.bodyLineHeight, bodyLineHeight, "24")}
                                       onChange={(e) => updateStyle(style.id, "bodyLineHeight", `${e.target.value}px`)}
-                                      placeholder={bodyLineHeight.replace("px", "")}
+                                      placeholder="24"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Weight</Label>
                                     <Select
-                                      value={style.bodyWeight || bodyWeight}
+                                      value={style.bodyWeight || bodyWeight || "400"}
                                       onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
                                     >
                                       <SelectTrigger className="mt-1 h-8 text-xs bg-white">
@@ -3319,9 +3330,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs text-slate-600">Button font</Label>
                                 <Input
                                   className="mt-1.5 text-xs bg-slate-50"
-                                  value={style.buttonFont || buttonFont}
+                                  value={style.buttonFont || buttonFont || ""}
                                   onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
-                                  placeholder={buttonFont}
+                                  placeholder={buttonFont || "Arial, sans-serif"}
                                 />
                               </div>
 
@@ -3334,9 +3345,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.buttonSize || buttonSize).replace("px", "")}
+                                      value={getDisplayValue(style.buttonSize, buttonSize, "15")}
                                       onChange={(e) => updateStyle(style.id, "buttonSize", `${e.target.value}px`)}
-                                      placeholder={buttonSize.replace("px", "")}
+                                      placeholder="15"
                                     />
                                   </div>
                                   <div>
@@ -3344,15 +3355,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
-                                      value={(style.buttonLineHeight || buttonLineHeight).replace("px", "")}
+                                      value={getDisplayValue(style.buttonLineHeight, buttonLineHeight, "22")}
                                       onChange={(e) => updateStyle(style.id, "buttonLineHeight", `${e.target.value}px`)}
-                                      placeholder={buttonLineHeight.replace("px", "")}
+                                      placeholder="22"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Weight</Label>
                                     <Select
-                                      value={style.buttonWeight || buttonWeight}
+                                      value={style.buttonWeight || buttonWeight || "600"}
                                       onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
                                     >
                                       <SelectTrigger className="mt-1 h-8 text-xs bg-white">
