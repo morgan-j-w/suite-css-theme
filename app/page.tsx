@@ -3424,7 +3424,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs font-semibold text-slate-700">Body text</Label>
                                 <div className="grid grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3434,7 +3434,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3483,7 +3483,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs font-semibold text-slate-700">Button text</Label>
                                 <div className="grid grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3493,7 +3493,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
