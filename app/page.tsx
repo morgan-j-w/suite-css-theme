@@ -3225,7 +3225,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H1 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 1</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
@@ -3271,7 +3271,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H2 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 2</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
@@ -3317,7 +3317,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H3 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 3</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
@@ -3363,7 +3363,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H4 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 4</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
@@ -3422,7 +3422,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* Body Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Body text</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
@@ -3481,7 +3481,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* Button Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Button text</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
