@@ -3793,533 +3793,111 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-        {/* STEP 5: EXPORT - HIDDEN FOR CLIENT-FACING VERSION */}
-            {false && currentStep === 5 && (
+        {/* STEP 5: STYLE PREVIEWS */}
+            {currentStep === 5 && (
               <>
-                <h2 className="text-2xl font-bold mb-4">Export your CSS</h2>
-                <p className="text-slate-600 mb-4">Review all your styles and export the generated CSS.</p>
+                <h2 className="text-2xl font-bold mb-4">Preview all created styles</h2>
+                <p className="text-slate-600 mb-4">See how each theme style looks with headings, body text, buttons, and icons.</p>
 
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Complete Style Preview - 4 columns wide */}
-          <Card className="lg:col-span-4">
-            <CardHeader>
-              <CardTitle>Complete Style Preview</CardTitle>
-              <CardDescription>View all your styles together</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 max-h-[600px] overflow-y-auto pr-2">
-                {styles.map((style, index) => {
-                  const bgColor = colors.find((c) => c.name === style.background)?.hex || "#ffffff"
-                  const headingColor = colors.find((c) => c.name === style.headingColor)?.hex || "#000000"
-                  const textColor = colors.find((c) => c.name === style.textColor)?.hex || "#000000"
-                  const linkColor = colors.find((c) => c.name === style.linkColor)?.hex || "#0000ff"
-                  const buttonBg = colors.find((c) => c.name === style.buttonBg)?.hex || "#000000"
-                  const buttonText = colors.find((c) => c.name === style.buttonText)?.hex || "#ffffff"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {styles.map((style, index) => {
+            const bgColor = getColorHexValue(style.background)
+            const headingColor = getColorHexValue(style.headingColor)
+            const textColor = getColorHexValue(style.textColor)
+            const linkColor = getColorHexValue(style.linkColor)
+            const buttonBg = getColorHexValue(style.buttonBg)
+            const buttonText = getColorHexValue(style.buttonText)
 
-                  return (
+            return (
+              <Card key={style.id} className="overflow-hidden">
+                <CardContent className={`${style.noPadding ? "p-0" : "p-4"}`} style={{ backgroundColor: bgColor, color: textColor }}>
+                  <div className="space-y-2">
                     <div
-                      key={style.id}
-                      className={style.noPadding ? "border rounded-lg p-0" : "border rounded-lg p-4"}
+                      className="font-semibold"
                       style={{
-                        backgroundColor: bgColor,
-                        color: textColor,
+                        color: headingColor,
+                        fontFamily: cleanFontValue(style.headingFont),
+                        fontSize: `${style.h1Size || h1Size}`,
+                        lineHeight: `${style.h1LineHeight || h1LineHeight}`,
+                        fontWeight: style.h1Weight || h1Weight,
                       }}
                     >
-                      <h3
-                        className="text-lg font-semibold"
-                        style={{
-                          color: headingColor,
-                          fontFamily: cleanFontValue(style.headingFont),
-                          fontSize: `${style.h1Size || h1Size}`,
-                          lineHeight: `${style.h1LineHeight || h1LineHeight}`,
-                          fontWeight: style.h1Weight || h1Weight,
-                          paddingBottom: `${titlePaddingBottom || "14"}px`,
-                        }}
-                      >
-                        Style {index + 1}
-                      </h3>
-                      <p
-                        className="text-sm mb-3"
-                        style={{
-                          fontFamily: cleanFontValue(style.bodyFont),
-                          fontSize: `${style.bodySize || bodySize}`,
-                          lineHeight: `${style.bodyLineHeight || bodyLineHeight}`,
-                          fontWeight: style.bodyWeight || bodyWeight,
-                        }}
-                      >
-                        Sample body text with{" "}
-                        <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                          a link
-                        </a>
-                        .
-                      </p>
-                      <button
-                        className="rounded"
-                        style={{
-                          backgroundColor: buttonBg,
-                          color: buttonText,
-                          fontFamily: cleanFontValue(style.buttonFont),
-                          fontSize: `${style.buttonSize || buttonSize || "15px"}`,
-                          lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
-                          fontWeight: style.buttonWeight || buttonWeight,
-                          borderRadius: `${buttonBorderRadius}px`,
-                          padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
-                        }}
-                      >
-                        Button
-                      </button>
+                      Sample heading
                     </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Generated CSS - 8 columns wide */}
-          <Card className="lg:col-span-8">
-            <CardHeader>
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <CardTitle>Generated CSS</CardTitle>
-                  <CardDescription>Copy and paste this CSS</CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={copyToClipboard} variant="outline" size="sm" className="shrink-0">
-                    {copied ? (
-                      <>
-                        <Check className="h-4 w-4 mr-2" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-[600px] overflow-y-auto">
-                <SyntaxHighlightedCSS key={cssRefreshKey} css={generateCSS()} />
-              </div>
-            </CardContent>
-          </Card>
+                    <p
+                      className="text-sm"
+                      style={{
+                        fontFamily: cleanFontValue(style.bodyFont),
+                        fontSize: `${style.bodySize || bodySize}`,
+                        lineHeight: `${style.bodyLineHeight || bodyLineHeight}`,
+                        fontWeight: style.bodyWeight || bodyWeight,
+                      }}
+                    >
+                      This is sample body text with{" "}
+                      <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                        a link
+                      </a>
+                      .
+                    </p>
+                    <button
+                      className="rounded text-sm mt-2"
+                      style={{
+                        backgroundColor: buttonBg,
+                        color: buttonText,
+                        fontFamily: cleanFontValue(style.buttonFont),
+                        fontSize: `${style.buttonSize || buttonSize || "14px"}`,
+                        lineHeight: `${style.buttonLineHeight || buttonLineHeight || "20px"}`,
+                        fontWeight: style.buttonWeight || buttonWeight,
+                        borderRadius: `${buttonBorderRadius}px`,
+                        padding: `${buttonPaddingTop || "8"}px ${buttonPaddingRight || "16"}px ${buttonPaddingBottom || "8"}px ${buttonPaddingLeft || "16"}px`,
+                      }}
+                    >
+                      Sample Button
+                    </button>
+                    {/* Icon Preview */}
+                    <div className="flex gap-2 pt-2">
+                      {[
+                        { id: 'facebook', name: 'Facebook' },
+                        { id: 'x', name: 'X' },
+                        { id: 'linkedin', name: 'LinkedIn' },
+                      ].map((icon) => {
+                        const iconStyleMap: Record<string, string> = {
+                          'material-rounded': 'material-rounded',
+                          'material-outlined': 'material-outlined',
+                          'material-sharp': 'material-sharp',
+                        }
+                        const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                        const iconColor = style.iconColor || '#000000'
+                        const iconSize = globalIconSize || "16"
+                        
+                        return (
+                          <div
+                            key={icon.id}
+                            className="flex items-center justify-center"
+                            style={{
+                              width: `${iconSize}px`,
+                              height: `${iconSize}px`,
+                              backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
+                              borderRadius: '4px'
+                            }}
+                            title={icon.name}
+                          >
+                            <img
+                              src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                              alt={icon.name}
+                              width={iconSize}
+                              height={iconSize}
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
-
-        {/* Sample HTML */}
-        <Card className="mt-6">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <CardTitle>Sample Theme HTML</CardTitle>
-                <CardDescription className="pb-2">Copy this HTML structure and update the icon image URLs to match your color palette</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={copyHtmlToClipboard} variant="outline" size="sm" className="shrink-0">
-                  {copiedHtml ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="max-h-[500px] overflow-y-auto">
-              <SyntaxHighlightedHTML html={`<div class="read-more-button">
-    <div><!--[if mso]>
-        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
-                    stroke="#f" fillcolor="#64ccc9">
-            <w:anchorlock></w:anchorlock>
-            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
-                Read more
-            </center>
-        </v:roundrect>
-        <![endif]-->
-        <a class="btn-cm" href="http://">
-            Read more
-        </a>
-    </div>
-</div>
-
-<div class="grid-templates">
-        <div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="contenttable mso-full-width skip-mso" style="width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 1-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="mobileBlock" valign="top" align="left"> 
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-2 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">  
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-3 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-
-
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-4 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-<div class="icon-templates">
-${styles
-  .map(
-    (style, index) => {
-      const iconStyleMap: Record<string, string> = {
-        'material-rounded': 'material-rounded',
-        'material-outlined': 'material-outlined',
-        'material-sharp': 'material-sharp',
-      }
-      const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-      const iconColor = style.iconColor || '#000000'
-      const iconSize = globalIconSize || '16'
-      const iconIds: Record<string, string> = {
-        facebook: 'facebook',
-        x: 'twitterx--v1',
-        linkedin: 'linkedin',
-        print: 'print',
-        email: 'new-post'
-      }
-      
-      return `    <div class="text-style-${index + 1}"><br> 
-        <a title="Share on Facebook" class="sd-facebook" style="text-decoration: none;" href="{!FACEBOOK_SHARE_DOC!}">
-            <img alt="Facebook" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.facebook}.png" width="${iconSize}">
-        </a>
-        <a title="Share on X" class="sd-twitter" style="text-decoration: none;" href="{!TWITTER_SHARE_DOC!}">
-            <img alt="X" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.x}.png" width="${iconSize}">
-        </a>
-        <a title="Share on LinkedIn" class="sd-linkedin" style="text-decoration: none;" href="{!LINKEDIN_SHARE_DOC!}">
-            <img alt="LinkedIn" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.linkedin}.png" width="${iconSize}">
-        </a>
-        <a title="Print" class="sd-print" style="text-decoration: none;" href="{!PRINT_SHARE_DOC!}">
-            <img alt="Print" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.print}.png" width="${iconSize}">
-        </a>
-        <a title="Send as Email" class="sd-email" style="text-decoration: none;" href="{!EMAIL_SHARE_DOC!}">
-            <img alt="Email" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.email}.png" width="${iconSize}">
-        </a>
-    </div>`
-    }
-  )
-  .join("\n")}
-</div>`} />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Mobile Responsive Media Query */}
-        <Card className="mt-6">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <CardTitle>Sample Media Query</CardTitle>
-                <CardDescription className="pb-2">Add this @media query to handle mobile responsiveness for your email template</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={copyMediaToClipboard} variant="outline" size="sm" className="shrink-0">
-                  {copiedMedia ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="max-h-[500px] overflow-y-auto break-words">
-              <SyntaxHighlightedCSS css="@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}" />
-            </div>
-          </CardContent>
-        </Card>
               </>
             )}
         </div>
@@ -4337,14 +3915,14 @@ ${styles
             </Button>
           )}
           {currentStep === 1 && <div className="flex-1" />}
-          {currentStep < 4 && (
+          {currentStep < 5 && (
             <Button
               onClick={() => {
                 // Validate colors on step 1 before advancing
                 if (currentStep === 1 && !validateColorsForStep()) {
                   return
                 }
-                setCurrentStep(Math.min(4, currentStep + 1))
+                setCurrentStep(Math.min(5, currentStep + 1))
               }}
               disabled={currentStep === 1 && colorNameError}
               className="flex-1 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -4352,7 +3930,7 @@ ${styles
               Next →
             </Button>
           )}
-          {currentStep === 4 && (
+          {currentStep === 5 && (
             <Button
               onClick={() => {
                 // Save theme
