@@ -50,7 +50,18 @@ export default function ThemeGenerator() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
   const { toast } = useToast()
+
+  const toggleTypographyExpanded = (styleId: string) => {
+    const newSet = new Set(expandedTypography)
+    if (newSet.has(styleId)) {
+      newSet.delete(styleId)
+    } else {
+      newSet.add(styleId)
+    }
+    setExpandedTypography(newSet)
+  }
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -3073,6 +3084,325 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Typography Overrides Section */}
+                    <div className="mt-4 border-t pt-4">
+                      <button
+                        onClick={() => toggleTypographyExpanded(style.id)}
+                        className="w-full flex items-center justify-between hover:bg-slate-100 transition-colors p-2 rounded"
+                      >
+                        <span className="font-semibold text-sm">Typography overrides</span>
+                        {expandedTypography.has(style.id) ? (
+                          <ChevronUp className="h-4 w-4 text-slate-600" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-slate-600" />
+                        )}
+                      </button>
+
+                      {expandedTypography.has(style.id) && (
+                        <div className="mt-4 space-y-4">
+                          {/* Heading Font */}
+                          <div>
+                            <Label className="text-xs text-slate-600">Heading font</Label>
+                            <Input
+                              className="mt-1.5 text-xs bg-white"
+                              value={style.headingFont || headingFont}
+                              onChange={(e) => updateStyle(style.id, "headingFont", e.target.value)}
+                              placeholder={`Default: ${headingFont}`}
+                            />
+                          </div>
+
+                          {/* H1 Settings */}
+                          <div>
+                            <Label className="text-xs font-semibold text-slate-700">Heading 1</Label>
+                            <div className="grid grid-cols-3 gap-2 mt-1.5">
+                              <div>
+                                <Label className="text-xs text-slate-600">Size</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.h1Size || h1Size).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "h1Size", `${e.target.value}px`)}
+                                  placeholder={h1Size}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Height</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.h1LineHeight || h1LineHeight).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "h1LineHeight", `${e.target.value}px`)}
+                                  placeholder={h1LineHeight}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Weight</Label>
+                                <Select
+                                  value={style.h1Weight || h1Weight}
+                                  onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
+                                >
+                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">Semibold</SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                    <SelectItem value="800">Extrabold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* H2 Settings */}
+                          <div>
+                            <Label className="text-xs font-semibold text-slate-700">Heading 2</Label>
+                            <div className="grid grid-cols-3 gap-2 mt-1.5">
+                              <div>
+                                <Label className="text-xs text-slate-600">Size</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.h2Size || h2Size).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "h2Size", `${e.target.value}px`)}
+                                  placeholder={h2Size}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Height</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.h2LineHeight || h2LineHeight).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "h2LineHeight", `${e.target.value}px`)}
+                                  placeholder={h2LineHeight}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Weight</Label>
+                                <Select
+                                  value={style.h2Weight || h2Weight}
+                                  onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
+                                >
+                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">Semibold</SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                    <SelectItem value="800">Extrabold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* H3 Settings */}
+                          <div>
+                            <Label className="text-xs font-semibold text-slate-700">Heading 3</Label>
+                            <div className="grid grid-cols-3 gap-2 mt-1.5">
+                              <div>
+                                <Label className="text-xs text-slate-600">Size</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.h3Size || h3Size).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "h3Size", `${e.target.value}px`)}
+                                  placeholder={h3Size}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Height</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.h3LineHeight || h3LineHeight).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "h3LineHeight", `${e.target.value}px`)}
+                                  placeholder={h3LineHeight}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Weight</Label>
+                                <Select
+                                  value={style.h3Weight || h3Weight}
+                                  onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
+                                >
+                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">Semibold</SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                    <SelectItem value="800">Extrabold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Body Font */}
+                          <div>
+                            <Label className="text-xs text-slate-600">Body font</Label>
+                            <Input
+                              className="mt-1.5 text-xs bg-white"
+                              value={style.bodyFont || bodyFont}
+                              onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
+                              placeholder={`Default: ${bodyFont}`}
+                            />
+                          </div>
+
+                          {/* Body Settings */}
+                          <div>
+                            <Label className="text-xs font-semibold text-slate-700">Body text</Label>
+                            <div className="grid grid-cols-3 gap-2 mt-1.5">
+                              <div>
+                                <Label className="text-xs text-slate-600">Size</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.bodySize || bodySize).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "bodySize", `${e.target.value}px`)}
+                                  placeholder={bodySize}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Height</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.bodyLineHeight || bodyLineHeight).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "bodyLineHeight", `${e.target.value}px`)}
+                                  placeholder={bodyLineHeight}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Weight</Label>
+                                <Select
+                                  value={style.bodyWeight || bodyWeight}
+                                  onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
+                                >
+                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">Semibold</SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                    <SelectItem value="800">Extrabold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Button Font */}
+                          <div>
+                            <Label className="text-xs text-slate-600">Button font</Label>
+                            <Input
+                              className="mt-1.5 text-xs bg-white"
+                              value={style.buttonFont || buttonFont}
+                              onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
+                              placeholder={`Default: ${buttonFont}`}
+                            />
+                          </div>
+
+                          {/* Button Settings */}
+                          <div>
+                            <Label className="text-xs font-semibold text-slate-700">Button text</Label>
+                            <div className="grid grid-cols-3 gap-2 mt-1.5">
+                              <div>
+                                <Label className="text-xs text-slate-600">Size</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.buttonSize || buttonSize).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "buttonSize", `${e.target.value}px`)}
+                                  placeholder={buttonSize}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Height</Label>
+                                <Input
+                                  className="mt-1 text-xs bg-white"
+                                  type="number"
+                                  value={(style.buttonLineHeight || buttonLineHeight).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "buttonLineHeight", `${e.target.value}px`)}
+                                  placeholder={buttonLineHeight}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-slate-600">Weight</Label>
+                                <Select
+                                  value={style.buttonWeight || buttonWeight}
+                                  onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
+                                >
+                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">Semibold</SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                    <SelectItem value="800">Extrabold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => {
+                              const updatedStyles = styles.map((s) => {
+                                if (s.id === style.id) {
+                                  return {
+                                    ...s,
+                                    headingFont: undefined,
+                                    bodyFont: undefined,
+                                    buttonFont: undefined,
+                                    h1Size: undefined,
+                                    h1LineHeight: undefined,
+                                    h1Weight: undefined,
+                                    h2Size: undefined,
+                                    h2LineHeight: undefined,
+                                    h2Weight: undefined,
+                                    h3Size: undefined,
+                                    h3LineHeight: undefined,
+                                    h3Weight: undefined,
+                                    bodySize: undefined,
+                                    bodyLineHeight: undefined,
+                                    bodyWeight: undefined,
+                                    buttonSize: undefined,
+                                    buttonLineHeight: undefined,
+                                    buttonWeight: undefined,
+                                  }
+                                }
+                                return s
+                              })
+                              setStyles(updatedStyles)
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-4"
+                          >
+                            Reset to global settings
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
