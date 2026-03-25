@@ -1886,7 +1886,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         {/* Step Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3, 4].map((step) => (
+            {[1, 2, 3, 4, 5].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
                 <button
                   onClick={() => {
@@ -1919,6 +1919,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   {step === 2 && "Theme"}
                   {step === 3 && "Typography"}
                   {step === 4 && "Styles"}
+                  {step === 5 && "Preview"}
                 </span>
               </div>
             ))}
@@ -1926,7 +1927,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
           <div className="h-1 bg-slate-200 rounded-full">
             <div
               className="h-full rounded-full transition-all"
-              style={{ width: `${(currentStep - 1) * (100 / 3)}%`, backgroundColor: "#ec2176" }}
+              style={{ width: `${(currentStep - 1) * (100 / 4)}%`, backgroundColor: "#ec2176" }}
             />
           </div>
         </div>
@@ -1941,7 +1942,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <h2 className="text-2xl font-bold mb-4">Set up your colour palette</h2>
                 <p className="text-slate-600 mb-4">Add the colours you'll use in your email themes. You can paste multiple colours at once.</p>
           {/* Colours section - full width */}
-          <Card className="shadow-sm">
+          <Card className="shadow-sm py-4">
             <CardHeader className="pb-2 pt-0">
               <CardTitle className="text-lg">Colours</CardTitle>
             </CardHeader>
