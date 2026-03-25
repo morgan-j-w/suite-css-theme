@@ -38,6 +38,7 @@ export interface StyleDefinition {
   noPadding?: boolean
   iconStyle?: string
   iconColor?: string
+  iconSize?: string
 }
 
 export interface GoogleFont {

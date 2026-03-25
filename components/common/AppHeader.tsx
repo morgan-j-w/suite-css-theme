@@ -1,13 +1,16 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Loader } from "lucide-react"
 
 interface AppHeaderProps {
-  onResetSettings: () => void
-  onLogout: () => void
+  onSaveTheme: () => void
+  onExit: () => void
+  hasUnsavedChanges?: boolean
+  isSaving?: boolean
 }
 
-export const AppHeader = ({ onResetSettings, onLogout }: AppHeaderProps) => {
+export const AppHeader = ({ onSaveTheme, onExit, hasUnsavedChanges, isSaving }: AppHeaderProps) => {
   return (
     <header className="text-white shadow-lg p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-4" style={{ backgroundColor: "#21292C" }}>
       <div className="flex items-center gap-2 md:gap-4">
@@ -21,24 +24,24 @@ export const AppHeader = ({ onResetSettings, onLogout }: AppHeaderProps) => {
         <h1 className="text-lg md:text-3xl font-bold">CSS Theme Generator</h1>
       </div>
       <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-        <Button onClick={onResetSettings} variant="outline" className="bg-white text-slate-900 hover:bg-slate-100 text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto">
-          Reset All Settings
+        <Button 
+          onClick={onExit} 
+          variant="outline" 
+          className="text-slate-700 hover:bg-slate-50 text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto bg-white border-slate-300 disabled:opacity-50"
+          disabled={isSaving}
+        >
+          Exit to Theme Dashboard
         </Button>
         <Button 
-          onClick={onLogout} 
-          variant="outline" 
-          className="text-white transition-colors text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto"
-          style={{ backgroundColor: '#ec333c', borderColor: '#ec333c', color: 'white' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#E7000B'
-            e.currentTarget.style.borderColor = '#E7000B'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#ec333c'
-            e.currentTarget.style.borderColor = '#ec333c'
-          }}
+          onClick={onSaveTheme} 
+          className="text-white text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto disabled:opacity-50 flex items-center justify-center gap-2" 
+          style={{ backgroundColor: '#EC2076' }} 
+          onMouseEnter={(e) => !isSaving && (e.currentTarget.style.backgroundColor = '#d41864')} 
+          onMouseLeave={(e) => !isSaving && (e.currentTarget.style.backgroundColor = '#EC2076')}
+          disabled={isSaving}
         >
-          Logout
+          {isSaving && <Loader className="w-4 h-4 animate-spin" />}
+          {isSaving ? 'Saving...' : 'Save Theme'}
         </Button>
       </div>
     </header>
