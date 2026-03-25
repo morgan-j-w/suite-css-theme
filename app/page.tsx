@@ -533,7 +533,22 @@ export default function ThemeGenerator() {
   }
 
   const updateStyle = (id: string, field: keyof StyleDefinition, value: string | boolean) => {
-    setStyles(styles.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
+    setStyles(styles.map((s) => {
+      if (s.id === id) {
+        const updated = { ...s, [field]: value }
+        
+        // Mirror button hover colors when button colors change (unless manually customized)
+        if (field === "buttonBg" && s.buttonBgHover === s.buttonBg) {
+          updated.buttonBgHover = value as string
+        }
+        if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
+          updated.buttonTextHover = value as string
+        }
+        
+        return updated
+      }
+      return s
+    }))
   }
 
   const generateDescription = (style: StyleDefinition): string => {
@@ -549,6 +564,13 @@ export default function ThemeGenerator() {
           // Auto-update description when any colour field changes
           if (["background", "textColor", "headingColor", "buttonBg", "buttonText", "linkColor"].includes(field)) {
             updated.description = generateDescription(updated)
+          }
+          // Mirror button hover colors when button colors change (unless manually customized)
+          if (field === "buttonBg" && s.buttonBgHover === s.buttonBg) {
+            updated.buttonBgHover = value
+          }
+          if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
+            updated.buttonTextHover = value
           }
           return updated
         }
