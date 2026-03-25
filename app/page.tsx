@@ -3052,7 +3052,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3 p-3 rounded-lg border-2 border-slate-300 bg-white">
                             <Checkbox
                               id={`noPadding-${style.id}`}
                               checked={style.noPadding === true}
@@ -3080,9 +3080,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 })
                                 setStyles(updatedStyles)
                               }}
+                              className="h-5 w-5 rounded border-2 border-slate-400 cursor-pointer"
                             />
                             <div className="flex items-center gap-1">
-                              <Label htmlFor={`noPadding-${style.id}`} className="text-sm font-medium text-slate-700 cursor-pointer">
+                              <Label htmlFor={`noPadding-${style.id}`} className="text-sm font-semibold text-slate-800 cursor-pointer">
                                 No Padding
                               </Label>
                               <TooltipProvider>
