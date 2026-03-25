@@ -3353,6 +3353,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 fontWeight: style.buttonWeight || buttonWeight,
                                 borderRadius: `${buttonBorderRadius}px`,
                                 padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                                transition: 'background-color 0.2s ease, color 0.2s ease',
                               }}
                             >
                               Sample Button
