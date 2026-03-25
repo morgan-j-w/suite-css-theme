@@ -54,7 +54,6 @@ export default function ThemeGenerator() {
   const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
   const [showDevInfo, setShowDevInfo] = useState(false)
   const [copiedCss, setCopiedCss] = useState(false)
-  const [copiedHtml, setCopiedHtml] = useState(false)
   const [copiedMediaQuery, setCopiedMediaQuery] = useState(false)
   const [copiedImport, setCopiedImport] = useState(false)
   const { toast } = useToast()
@@ -1617,8 +1616,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   const copyExportMediaQuery = async () => {
     const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}}`
     await navigator.clipboard.writeText(mediaQuery)
-    setCopiedMediaQuery(true)
-    setTimeout(() => setCopiedMediaQuery(false), 2000)
+    setCopiedMedia(true)
+    setTimeout(() => setCopiedMedia(false), 2000)
   }
 
   const copyImportToClipboard = async () => {
@@ -4301,7 +4300,7 @@ ${styles
         onCopyImport={copyImportToClipboard}
         copiedCss={copiedCss}
         copiedHtml={copiedHtml}
-        copiedMediaQuery={copiedMediaQuery}
+        copiedMediaQuery={copiedMedia}
         copiedImport={copiedImport}
       />
       <Toaster />
