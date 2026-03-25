@@ -22,7 +22,7 @@ export const AppHeader = ({ onSaveTheme, onExit, hasUnsavedChanges, isSaving, on
             className="h-8 md:h-12 w-auto"
           />
         </a>
-        <h1 className="text-lg md:text-3xl font-bold">CSS Theme Generator</h1>
+        <h1 className="text-lg md:text-3xl font-bold">Theme Generator</h1>
       </div>
       <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
         {onDevInfo && (
