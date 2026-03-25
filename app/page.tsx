@@ -3280,6 +3280,78 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             >
                               Sample heading 4
                             </div>
+
+                            <p
+                              style={{
+                                fontFamily: cleanFontValue(style.bodyFont),
+                                fontSize: `${(style.bodySize || bodySize).replace('px', '')}px`,
+                                lineHeight: `${(style.bodyLineHeight || bodyLineHeight).replace('px', '')}px`,
+                                fontWeight: style.bodyWeight || bodyWeight,
+                              }}
+                            >
+                              This is sample body text.{" "}
+                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                                Here is a link
+                              </a>
+                              .
+                            </p>
+
+                            <button
+                              className={`mt-3 rounded preview-btn-${style.id}`}
+                              style={{
+                                backgroundColor: buttonBg,
+                                color: buttonText,
+                                fontFamily: cleanFontValue(style.buttonFont),
+                                fontSize: `${style.buttonSize || buttonSize || "15px"}`,
+                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
+                                fontWeight: style.buttonWeight || buttonWeight,
+                                borderRadius: `${buttonBorderRadius}px`,
+                                padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                              }}
+                            >
+                              Sample Button
+                            </button>
+
+                            {/* Icon Preview */}
+                            <div className="mt-4 flex gap-2">
+                              {[
+                                { id: 'facebook', name: 'Facebook' },
+                                { id: 'x', name: 'X' },
+                                { id: 'linkedin', name: 'LinkedIn' },
+                                { id: 'print', name: 'Print' },
+                                { id: 'new-post', name: 'Email' },
+                              ].map((icon) => {
+                                const iconStyleMap: Record<string, string> = {
+                                  'material-rounded': 'material-rounded',
+                                  'material-outlined': 'material-outlined',
+                                  'material-sharp': 'material-sharp',
+                                }
+                                const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                                const iconColor = style.iconColor || '#000000'
+                                const iconSize = globalIconSize || "18"
+                                
+                                return (
+                                  <div
+                                    key={icon.id}
+                                    className="flex items-center justify-center"
+                                    style={{
+                                      width: `${iconSize}px`,
+                                      height: `${iconSize}px`,
+                                      backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
+                                      borderRadius: '4px'
+                                    }}
+                                    title={icon.name}
+                                  >
+                                    <img
+                                      src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                                      alt={icon.name}
+                                      width={iconSize}
+                                      height={iconSize}
+                                    />
+                                  </div>
+                                )
+                              })}
+                            </div>
                           </div>
                         </div>
 
