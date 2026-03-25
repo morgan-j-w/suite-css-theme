@@ -460,6 +460,8 @@ export default function ThemeGenerator() {
         headingColor: blackColor?.name || "Black",
         buttonBg: blackColor?.name || "Black",
         buttonText: whiteColor?.name || "White",
+        buttonBgHover: blackColor?.name || "Black",
+        buttonTextHover: whiteColor?.name || "White",
         linkColor: blackColor?.name || "Black",
         headingFont: headingFont || "Arial, sans-serif",
         bodyFont: bodyFont || "Arial, sans-serif",
@@ -950,6 +952,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const headingColor = getColorHexValue(style.headingColor)
       const btnBg = getColorHexValue(style.buttonBg)
       const btnText = getColorHexValue(style.buttonText)
+      const btnBgHover = getColorHexValue(style.buttonBgHover)
+      const btnTextHover = getColorHexValue(style.buttonTextHover)
       const linkColor = getColorHexValue(style.linkColor)
 
       // Use fallback values for all typography if empty
@@ -995,7 +999,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`
       css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;}\n`
       css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight};}\n`
-      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBg} !important; text-decoration:none;color:${btnText} !important;}\n`
+      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important;}\n`
       
       // Add no padding CSS if noPadding is enabled
       if (style.noPadding) {
@@ -2987,6 +2991,60 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               <Select
                                 value={style.buttonText}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
+                              >
+                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs text-slate-600">Button background hover</Label>
+                              <Select
+                                value={style.buttonBgHover}
+                                onValueChange={(value) => updateStyle(style.id, "buttonBgHover", value)}
+                              >
+                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors
+                                    .filter((color) => color.name.trim() !== "")
+                                    .map((color) => (
+                                      <SelectItem key={color.id} value={color.name}>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="w-4 h-4 rounded border"
+                                            style={{ backgroundColor: color.hex }}
+                                          />
+                                          {color.name}
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div>
+                              <Label className="text-xs text-slate-600">Button text hover</Label>
+                              <Select
+                                value={style.buttonTextHover}
+                                onValueChange={(value) => updateStyle(style.id, "buttonTextHover", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
                                   <SelectValue />
