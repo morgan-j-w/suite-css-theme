@@ -1989,10 +1989,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {colors.map((color) => (
-                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col h-[152px]">
+                  <div key={color.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white group flex flex-col">
                     {/* Color swatch - dominant visual element */}
                     <div
-                      className="w-full h-12 md:h-14 cursor-pointer relative transition-all duration-150 ease-out"
+                      className="w-full h-24 cursor-pointer relative transition-all duration-150 ease-out rounded-t-xl"
                       style={{ backgroundColor: color.hex }}
                       onClick={() => {
                         // Trigger color picker
