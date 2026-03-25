@@ -3134,6 +3134,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       <div className="space-y-3">
                         <div>
                           <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
+                          <style>{`
+                            .preview-btn-${style.id}:hover,
+                            .preview-btn-${style.id}:focus {
+                              background-color: ${getColorHexValue(style.buttonBgHover)} !important;
+                              color: ${getColorHexValue(style.buttonTextHover)} !important;
+                            }
+                          `}</style>
                           <div
                             className={style.noPadding ? "p-0 rounded-lg border border-slate-300" : "p-4 rounded-lg border border-slate-300"}
                             style={{ backgroundColor: bgColor, color: textColor }}
@@ -3166,7 +3173,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               .
                             </p>
                             <button
-                              className="mt-3 rounded"
+                              className={`mt-3 rounded preview-btn-${style.id}`}
                               style={{
                                 backgroundColor: buttonBg,
                                 color: buttonText,
