@@ -47,6 +47,7 @@ export default function ThemeGenerator() {
   const [adobeFonts, setAdobeFonts] = useState<Array<string>>([])
   const [selectedAdobeFont, setSelectedAdobeFont] = useState("")
   const [colorImportError, setColorImportError] = useState("")
+  const [colorNameError, setColorNameError] = useState("")
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -355,15 +356,42 @@ export default function ThemeGenerator() {
   }, [styles])
 
   const addColor = () => {
+    // Check if the last color has a name
+    if (colors.length > 0 && colors[colors.length - 1].name.trim() === "") {
+      setColorNameError("Please give the last colour a name before adding another")
+      return
+    }
+    setColorNameError("")
     setColors([...colors, { id: Date.now().toString(), name: "", hex: "#000000" }])
   }
 
+  const validateColorsForStep = (): boolean => {
+    // Check if any color is missing a name
+    const unnamedColor = colors.some(c => c.name.trim() === "")
+    if (unnamedColor) {
+      setColorNameError("All colours must have a name before continuing")
+      return false
+    }
+    setColorNameError("")
+    return true
+  }
+
   const removeColor = (id: string) => {
-    setColors(colors.filter((c) => c.id !== id))
+    const updatedColors = colors.filter((c) => c.id !== id)
+    setColors(updatedColors)
+    // Clear error if no more unnamed colors
+    const hasUnnamed = updatedColors.some(c => c.name.trim() === "")
+    if (!hasUnnamed) {
+      setColorNameError("")
+    }
   }
 
   const updateColor = (id: string, field: "name" | "hex", value: string) => {
     setColors(colors.map((c) => (c.id === id ? { ...c, [field]: value } : c)))
+    // Clear error when user updates color name
+    if (field === "name" && value.trim() !== "") {
+      setColorNameError("")
+    }
   }
 
   const importColorsFromText = () => {
@@ -1833,12 +1861,23 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
                 <button
-                  onClick={() => setCurrentStep(step)}
+                  onClick={() => {
+                    // Validate colors on step 1 before navigation away
+                    if (currentStep === 1 && step > currentStep) {
+                      if (!validateColorsForStep()) {
+                        return
+                      }
+                    }
+                    setCurrentStep(step)
+                  }}
+                  disabled={currentStep === 1 && colorNameError && step > currentStep}
                   className={`w-10 h-10 rounded-full font-semibold flex items-center justify-center transition-all ${
                     step === currentStep
                       ? "text-white shadow-lg"
                       : step < currentStep
                       ? "text-white cursor-pointer"
+                      : currentStep === 1 && colorNameError && step > currentStep
+                      ? "bg-slate-200 text-slate-600 cursor-not-allowed opacity-50"
                       : "bg-slate-200 text-slate-600 cursor-pointer hover:bg-slate-300"
                   }`}
                   style={{
@@ -1967,6 +2006,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </div>
                 ))}
               </div>
+              {colorNameError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm font-medium text-red-700">{colorNameError}</p>
+                </div>
+              )}
               <Button onClick={addColor} variant="outline" className="mt-4 bg-slate-50 hover:bg-slate-100 border-slate-200 w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Add colour
@@ -4084,8 +4128,15 @@ ${styles
           {currentStep === 1 && <div className="flex-1" />}
           {currentStep < 4 && (
             <Button
-              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
-              className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
+              onClick={() => {
+                // Validate colors on step 1 before advancing
+                if (currentStep === 1 && !validateColorsForStep()) {
+                  return
+                }
+                setCurrentStep(Math.min(4, currentStep + 1))
+              }}
+              disabled={currentStep === 1 && colorNameError}
+              className="flex-1 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next →
             </Button>
