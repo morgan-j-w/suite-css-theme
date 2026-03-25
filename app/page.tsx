@@ -3263,6 +3263,52 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   </div>
                                 </div>
                               </div>
+
+                              {/* H4 Settings */}
+                              <div>
+                                <Label className="text-xs font-semibold text-slate-700">Heading 4</Label>
+                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                  <div>
+                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Input
+                                      className="mt-1 text-xs bg-white"
+                                      type="number"
+                                      value={getDisplayValue(style.h4Size, h4Size, "16")}
+                                      onChange={(e) => updateStyle(style.id, "h4Size", `${e.target.value}px`)}
+                                      placeholder="16"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Input
+                                      className="mt-1 text-xs bg-white"
+                                      type="number"
+                                      value={getDisplayValue(style.h4LineHeight, h4LineHeight, "24")}
+                                      onChange={(e) => updateStyle(style.id, "h4LineHeight", `${e.target.value}px`)}
+                                      placeholder="24"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs text-slate-600">Weight</Label>
+                                    <Select
+                                      value={style.h4Weight || h4Weight || "700"}
+                                      onValueChange={(value) => updateStyle(style.id, "h4Weight", value)}
+                                    >
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="300">Light</SelectItem>
+                                        <SelectItem value="400">Regular</SelectItem>
+                                        <SelectItem value="500">Medium</SelectItem>
+                                        <SelectItem value="600">Semibold</SelectItem>
+                                        <SelectItem value="700">Bold</SelectItem>
+                                        <SelectItem value="800">Extrabold</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
 
                             {/* Body Typography */}
@@ -3402,6 +3448,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     h3Size: undefined,
                                     h3LineHeight: undefined,
                                     h3Weight: undefined,
+                                    h4Size: undefined,
+                                    h4LineHeight: undefined,
+                                    h4Weight: undefined,
                                     bodySize: undefined,
                                     bodyLineHeight: undefined,
                                     bodyWeight: undefined,
