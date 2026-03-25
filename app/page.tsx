@@ -1882,9 +1882,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
             
-            <div className="flex gap-6 h-[calc(100vh-180px)]">
+            <div className="flex gap-6">
               {/* Left Column - Controls */}
-              <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col">
 
         {/* Step Indicator */}
         <div className="mb-6">
@@ -1936,7 +1936,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 flex-1 overflow-y-auto">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="space-y-6">
             
             {/* STEP 1: COLOURS */}
@@ -3991,7 +3991,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </div>
               
               {/* Right Column - Live Preview Sidebar */}
-              <div className="w-80 bg-white rounded-lg shadow-sm p-6 overflow-y-auto border border-slate-200">
+              <div className="w-80 bg-white rounded-lg shadow-sm p-6 border border-slate-200 sticky top-8 max-h-[calc(100vh-150px)] overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-4 text-slate-900">Live Preview</h3>
                 <div className="space-y-4">
                   {styles.length === 0 ? (
