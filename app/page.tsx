@@ -1942,7 +1942,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <h2 className="text-2xl font-bold mb-4">Set up your colour palette</h2>
                 <p className="text-slate-600 mb-4">Add the colours you'll use in your email themes. You can paste multiple colours at once.</p>
           {/* Colours section - full width */}
-          <Card className="shadow-sm py-4">
+          <Card className="shadow-sm py-0">
             <CardHeader className="pb-2 pt-0">
               <CardTitle className="text-lg">Colours</CardTitle>
             </CardHeader>
@@ -3861,6 +3861,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         { id: 'facebook', name: 'Facebook' },
                         { id: 'x', name: 'X' },
                         { id: 'linkedin', name: 'LinkedIn' },
+                        { id: 'print', name: 'Print' },
+                        { id: 'new-post', name: 'Email' },
                       ].map((icon) => {
                         const iconStyleMap: Record<string, string> = {
                           'material-rounded': 'material-rounded',
