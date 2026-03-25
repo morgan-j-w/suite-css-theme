@@ -2996,8 +2996,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     key={icon.id}
                                     className="flex items-center justify-center"
                                     style={{
-                                      width: `${parseInt(iconSize) + 8}px`,
-                                      height: `${parseInt(iconSize) + 8}px`,
+                                      width: `${iconSize}px`,
+                                      height: `${iconSize}px`,
                                       backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
                                       borderRadius: '4px'
                                     }}
