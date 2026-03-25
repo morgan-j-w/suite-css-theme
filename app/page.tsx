@@ -2821,9 +2821,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                 return (
                   <div key={style.id} className="p-4 border rounded-lg bg-slate-100">
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid md:grid-cols-3 gap-4">
                       {/* Left side - Controls */}
-                      <div className="space-y-3">
+                      <div className="space-y-3 md:col-span-2">
                         <div className="flex items-center justify-between">
                           <h3 className="font-semibold text-lg">Style {index + 1}</h3>
                           <div className="flex items-center gap-1">
