@@ -1881,9 +1881,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
+            
+            <div className="flex gap-6 h-[calc(100vh-180px)]">
+              {/* Left Column - Controls */}
+              <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Step Indicator */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             {[1, 2, 3, 4, 5].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
@@ -1932,7 +1936,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 flex-1 overflow-y-auto">
           <div className="space-y-6">
             
             {/* STEP 1: COLOURS */}
@@ -3984,8 +3988,120 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </Button>
           )}
         </div>
+              </div>
+              
+              {/* Right Column - Live Preview Sidebar */}
+              <div className="w-80 bg-white rounded-lg shadow-sm p-6 overflow-y-auto border border-slate-200">
+                <h3 className="text-lg font-semibold mb-4 text-slate-900">Live Preview</h3>
+                <div className="space-y-4">
+                  {styles.length === 0 ? (
+                    <p className="text-sm text-slate-500 text-center py-8">Create styles to preview here</p>
+                  ) : (
+                    styles.map((style, index) => {
+                      const bgColor = getColorHexValue(style.background)
+                      const headingColor = getColorHexValue(style.headingColor)
+                      const textColor = getColorHexValue(style.textColor)
+                      const linkColor = getColorHexValue(style.linkColor)
+                      const buttonBg = getColorHexValue(style.buttonBg)
+                      const buttonText = getColorHexValue(style.buttonText)
 
-        {/* Exit Warning Dialog */}
+                      return (
+                        <Card key={style.id} className="overflow-hidden !py-0 border" style={{ backgroundColor: bgColor }}>
+                          <CardContent className="p-3 space-y-2" style={{ color: textColor }}>
+                            {/* Heading */}
+                            <div
+                              className="font-semibold text-sm"
+                              style={{
+                                color: headingColor,
+                                fontFamily: cleanFontValue(style.headingFont || headingFont),
+                                fontSize: `${style.h1Size || h1Size || '18px'}`,
+                                lineHeight: `${style.h1LineHeight || h1LineHeight || '26px'}`,
+                                fontWeight: style.h1Weight || h1Weight || '700',
+                              }}
+                            >
+                              Heading
+                            </div>
+
+                            {/* Body text */}
+                            <p
+                              className="text-xs"
+                              style={{
+                                fontFamily: cleanFontValue(style.bodyFont || bodyFont),
+                                fontSize: `${style.bodySize || bodySize || '14px'}`,
+                                lineHeight: `${style.bodyLineHeight || bodyLineHeight || '20px'}`,
+                                fontWeight: style.bodyWeight || bodyWeight || '400',
+                              }}
+                            >
+                              Body text with{" "}
+                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                                link
+                              </a>
+                            </p>
+
+                            {/* Button */}
+                            <button
+                              className="rounded text-xs w-full mt-2"
+                              style={{
+                                backgroundColor: buttonBg,
+                                color: buttonText,
+                                fontFamily: cleanFontValue(style.buttonFont || buttonFont),
+                                fontSize: `${style.buttonSize || buttonSize || '13px'}`,
+                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || '18px'}`,
+                                fontWeight: style.buttonWeight || buttonWeight || '600',
+                                borderRadius: `${buttonBorderRadius}px`,
+                                padding: `${buttonPaddingTop || "8"}px ${buttonPaddingRight || "12"}px ${buttonPaddingBottom || "8"}px ${buttonPaddingLeft || "12"}px`,
+                              }}
+                            >
+                              Button
+                            </button>
+
+                            {/* Icons */}
+                            <div className="flex gap-1 pt-1">
+                              {[
+                                { id: 'facebook', name: 'Facebook' },
+                                { id: 'x', name: 'X' },
+                                { id: 'linkedin', name: 'LinkedIn' },
+                                { id: 'print', name: 'Print' },
+                                { id: 'new-post', name: 'Email' },
+                              ].map((icon) => {
+                                const iconStyleMap: Record<string, string> = {
+                                  'material-rounded': 'material-rounded',
+                                  'material-outlined': 'material-outlined',
+                                  'material-sharp': 'material-sharp',
+                                }
+                                const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                                const iconColor = style.iconColor || '#000000'
+                                const iconSize = "12"
+                                
+                                return (
+                                  <img
+                                    key={icon.id}
+                                    src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                                    alt={icon.name}
+                                    width={iconSize}
+                                    height={iconSize}
+                                    title={icon.name}
+                                  />
+                                )
+                              })}
+                            </div>
+
+                            {/* Style label */}
+                            <div className="text-xs pt-2 border-t opacity-60" style={{ borderColor: `${textColor}20` }}>
+                              <span className="font-medium">Style {index + 1}</span>
+                              {style.description && <p className="mt-1 leading-snug">{style.description}</p>}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+
+        {/* Step Navigation Buttons */}
+        <div className="flex items-center justify-between mt-6 gap-4">
         <AlertDialog open={showExitWarning} onOpenChange={setShowExitWarning}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -4145,6 +4261,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             <option key={font} value={font} />
           ))}
         </datalist>
+            </div>
             </div>
           <AppFooter />
         </>
