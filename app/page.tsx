@@ -547,6 +547,7 @@ export default function ThemeGenerator() {
   }
 
   const updateStyle = (id: string, field: keyof StyleDefinition, value: string | boolean) => {
+    setEditingStyleId(id)
     setStyles(styles.map((s) => {
       if (s.id === id) {
         const updated = { ...s, [field]: value }
@@ -571,6 +572,7 @@ export default function ThemeGenerator() {
   }
 
   const updateStyleWithSmartDescription = (id: string, field: keyof StyleDefinition, value: string) => {
+    setEditingStyleId(id)
     setStyles(
       styles.map((s) => {
         if (s.id === id) {
@@ -2838,11 +2840,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div 
-                    key={style.id} 
-                    className="p-4 border rounded-lg bg-slate-100 cursor-pointer transition-colors hover:bg-slate-200"
-                    onClick={() => setEditingStyleId(style.id)}
-                  >
+                  <div key={style.id} className="p-4 border rounded-lg bg-slate-100">
                     <div className="grid md:grid-cols-3 gap-4">
                       {/* Left side - Controls */}
                       <div className="space-y-3 md:col-span-2">
@@ -3815,113 +3813,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-        {/* STEP 5: STYLE PREVIEWS */}
+            
+            {/* STEP 5: Complete */}
             {currentStep === 5 && (
               <>
-                <h2 className="text-2xl font-bold mb-4">Preview all created styles</h2>
-                <p className="text-slate-600 mb-4">See how each theme style looks with headings, body text, buttons, and icons.</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {styles.map((style, index) => {
-            const bgColor = getColorHexValue(style.background)
-            const headingColor = getColorHexValue(style.headingColor)
-            const textColor = getColorHexValue(style.textColor)
-            const linkColor = getColorHexValue(style.linkColor)
-            const buttonBg = getColorHexValue(style.buttonBg)
-            const buttonText = getColorHexValue(style.buttonText)
-
-            return (
-              <Card key={style.id} className="overflow-hidden" style={{ backgroundColor: bgColor }}>
-                <CardContent className={`${style.noPadding ? "p-0" : "p-4"}`} style={{ color: textColor }}>
-                  <div className="space-y-2">
-                    <div
-                      className="font-semibold"
-                      style={{
-                        color: headingColor,
-                        fontFamily: cleanFontValue(style.headingFont),
-                        fontSize: `${style.h1Size || h1Size}`,
-                        lineHeight: `${style.h1LineHeight || h1LineHeight}`,
-                        fontWeight: style.h1Weight || h1Weight,
-                      }}
-                    >
-                      Sample heading
-                    </div>
-                    <p
-                      className="text-sm"
-                      style={{
-                        fontFamily: cleanFontValue(style.bodyFont),
-                        fontSize: `${style.bodySize || bodySize}`,
-                        lineHeight: `${style.bodyLineHeight || bodyLineHeight}`,
-                        fontWeight: style.bodyWeight || bodyWeight,
-                      }}
-                    >
-                      This is sample body text with{" "}
-                      <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                        a link
-                      </a>
-                      .
-                    </p>
-                    <button
-                      className="rounded text-sm mt-2"
-                      style={{
-                        backgroundColor: buttonBg,
-                        color: buttonText,
-                        fontFamily: cleanFontValue(style.buttonFont),
-                        fontSize: `${style.buttonSize || buttonSize || "14px"}`,
-                        lineHeight: `${style.buttonLineHeight || buttonLineHeight || "20px"}`,
-                        fontWeight: style.buttonWeight || buttonWeight,
-                        borderRadius: `${buttonBorderRadius}px`,
-                        padding: `${buttonPaddingTop || "8"}px ${buttonPaddingRight || "16"}px ${buttonPaddingBottom || "8"}px ${buttonPaddingLeft || "16"}px`,
-                      }}
-                    >
-                      Sample Button
-                    </button>
-                    {/* Icon Preview */}
-                    <div className="flex gap-2 pt-2">
-                      {[
-                        { id: 'facebook', name: 'Facebook' },
-                        { id: 'x', name: 'X' },
-                        { id: 'linkedin', name: 'LinkedIn' },
-                        { id: 'print', name: 'Print' },
-                        { id: 'new-post', name: 'Email' },
-                      ].map((icon) => {
-                        const iconStyleMap: Record<string, string> = {
-                          'material-rounded': 'material-rounded',
-                          'material-outlined': 'material-outlined',
-                          'material-sharp': 'material-sharp',
-                        }
-                        const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-                        const iconColor = style.iconColor || '#000000'
-                        const iconSize = globalIconSize || "16"
-                        
-                        return (
-                          <div
-                            key={icon.id}
-                            className="flex items-center justify-center"
-                            style={{
-                              width: `${iconSize}px`,
-                              height: `${iconSize}px`,
-                              backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
-                              borderRadius: '4px'
-                            }}
-                            title={icon.name}
-                          >
-                            <img
-                              src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                              alt={icon.name}
-                              width={iconSize}
-                              height={iconSize}
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                <h2 className="text-2xl font-bold mb-4">Theme Complete</h2>
+                <p className="text-slate-600 mb-4">Your theme is ready! View all styles in the live preview on the right.</p>
               </>
             )}
         </div>
