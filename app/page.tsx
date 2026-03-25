@@ -2907,7 +2907,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 }
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.headingColor}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.headingColor) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.headingColor)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.headingColor}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -2934,7 +2944,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.textColor}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.textColor) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.textColor)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.textColor}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -2963,7 +2983,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.linkColor}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.linkColor) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.linkColor)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.linkColor}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -2990,7 +3020,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonBg}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.buttonBg) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.buttonBg)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.buttonBg}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -3017,7 +3057,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonText}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.buttonText) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.buttonText)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.buttonText}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -3044,12 +3094,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={colors.find((c) => c.hex === style.iconColor)?.name || "Black"}>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 max-w-[120px]">
                                     <div
-                                      className="w-4 h-4 rounded border"
+                                      className="w-4 h-4 rounded border shrink-0"
                                       style={{ backgroundColor: style.iconColor || "#000000" }}
                                     />
-                                    <span>
+                                    <span className="truncate text-xs">
                                       {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
                                     </span>
                                   </div>
@@ -3079,7 +3129,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyle(style.id, "buttonBgHover", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonBgHover}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.buttonBgHover) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.buttonBgHover)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.buttonBgHover}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -3106,7 +3166,17 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyle(style.id, "buttonTextHover", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonTextHover}>
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.buttonTextHover) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.buttonTextHover)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.buttonTextHover}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
@@ -4382,8 +4452,18 @@ ${styles
             animation: springPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
           }
           /* Truncate long color names in select triggers */
-          [data-color-select] [role="combobox"] {
-            max-width: 150px;
+          [data-color-select] {
+            width: 100%;
+          }
+          [data-color-select] > div {
+            max-width: 140px;
+            overflow: hidden;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+          }
+          [data-color-select] > div > :last-child {
+            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
