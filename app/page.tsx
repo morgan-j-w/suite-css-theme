@@ -1249,6 +1249,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         headingColor: headingColor.name,
         buttonBg: btnBg.name,
         buttonText: btnText.name,
+        buttonBgHover: btnBg.name,
+        buttonTextHover: btnText.name,
         linkColor: linkColor.name,
         headingFont: headingFont,
         bodyFont: bodyFont,
