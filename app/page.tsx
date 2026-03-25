@@ -3052,7 +3052,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded border border-slate-200">
                             <Checkbox
                               id={`noPadding-${style.id}`}
                               checked={style.noPadding === true}
@@ -3082,13 +3082,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               }}
                             />
                             <div className="flex items-center gap-1">
-                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs text-slate-600 cursor-pointer">
+                              <Label htmlFor={`noPadding-${style.id}`} className="text-sm font-medium text-slate-700 cursor-pointer">
                                 No Padding
                               </Label>
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <HelpCircle className="h-3 w-3 text-slate-400" />
+                                    <HelpCircle className="h-4 w-4 text-slate-500" />
                                   </TooltipTrigger>
                                   <TooltipContent side="right" className="max-w-xs text-xs">
                                     Removes padding from all sides for this style
