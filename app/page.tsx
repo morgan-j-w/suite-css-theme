@@ -73,6 +73,10 @@ export default function ThemeGenerator() {
     const value = styleValue || globalValue || defaultValue
     return value.replace("px", "").replace("px", "") // double replace to handle any edge cases
   }
+
+  const getDisplayFont = (styleValue: string | undefined, globalValue: string | undefined, defaultValue: string = "Arial, sans-serif") => {
+    return styleValue || globalValue || defaultValue
+  }
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -3120,9 +3124,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs text-slate-600">Heading font</Label>
                                 <Input
                                   className="mt-1.5 text-xs bg-slate-50"
-                                  value={style.headingFont || headingFont || ""}
+                                  value={getDisplayFont(style.headingFont, headingFont, "Arial, sans-serif")}
                                   onChange={(e) => updateStyle(style.id, "headingFont", e.target.value)}
-                                  placeholder={headingFont || "Arial, sans-serif"}
+                                  placeholder={getDisplayFont(undefined, headingFont, "Arial, sans-serif")}
                                 />
                               </div>
 
@@ -3317,9 +3321,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs text-slate-600">Body font</Label>
                                 <Input
                                   className="mt-1.5 text-xs bg-slate-50"
-                                  value={style.bodyFont || bodyFont || ""}
+                                  value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
                                   onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
-                                  placeholder={bodyFont || "Arial, sans-serif"}
+                                  placeholder={getDisplayFont(undefined, bodyFont, "Arial, sans-serif")}
                                 />
                               </div>
 
@@ -3376,9 +3380,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs text-slate-600">Button font</Label>
                                 <Input
                                   className="mt-1.5 text-xs bg-slate-50"
-                                  value={style.buttonFont || buttonFont || ""}
+                                  value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
                                   onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
-                                  placeholder={buttonFont || "Arial, sans-serif"}
+                                  placeholder={getDisplayFont(undefined, buttonFont, "Arial, sans-serif")}
                                 />
                               </div>
 
