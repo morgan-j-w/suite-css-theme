@@ -3211,8 +3211,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       </div>
 
                       {/* Right side - Preview */}
-                      <div className="space-y-3">
-                        <div>
+                      <div className="space-y-3 h-full flex flex-col">
+                        <div className="flex-1 flex flex-col">
                           <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
                           <style>{`
                             .preview-btn-${style.id}:hover,
@@ -3222,8 +3222,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             }
                           `}</style>
                           <div
-                            className={style.noPadding ? "p-0 rounded-lg border border-slate-300" : "p-4 rounded-lg border border-slate-300"}
-                            style={{ backgroundColor: bgColor, color: textColor }}
+                            className={style.noPadding ? "p-0 rounded-lg border border-slate-300 flex-1" : "p-4 rounded-lg border border-slate-300 flex-1"}
+                            style={{ backgroundColor: bgColor, color: textColor, display: 'flex', flexDirection: 'column', overflow: 'auto' }}
                           >
                             <div
                               className="header1"
@@ -3236,77 +3236,49 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 paddingBottom: `${titlePaddingBottom || "14"}px`,
                               }}
                             >
-                              Style {index + 1} - Sample heading
+                              Sample heading 1
                             </div>
-                            <p
+
+                            <div
+                              className="header2"
                               style={{
-                                fontFamily: cleanFontValue(style.bodyFont),
-                                fontSize: `${(style.bodySize || bodySize).replace('px', '')}px`,
-                                lineHeight: `${(style.bodyLineHeight || bodyLineHeight).replace('px', '')}px`,
-                                fontWeight: style.bodyWeight || bodyWeight,
+                                color: headingColor,
+                                fontFamily: cleanFontValue(style.headingFont),
+                                fontSize: `${style.h2Size || h2Size}`,
+                                lineHeight: `${style.h2LineHeight || h2LineHeight}`,
+                                fontWeight: style.h2Weight || h2Weight,
+                                paddingBottom: `${titlePaddingBottom || "14"}px`,
                               }}
                             >
-                              This is sample body text.{" "}
-                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                                Here is a link
-                              </a>
-                              .
-                            </p>
-                            <button
-                              className={`mt-3 rounded preview-btn-${style.id}`}
+                              Sample heading 2
+                            </div>
+
+                            <div
+                              className="header3"
                               style={{
-                                backgroundColor: buttonBg,
-                                color: buttonText,
-                                fontFamily: cleanFontValue(style.buttonFont),
-                                fontSize: `${style.buttonSize || buttonSize || "15px"}`,
-                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
-                                fontWeight: style.buttonWeight || buttonWeight,
-                                borderRadius: `${buttonBorderRadius}px`,
-                                padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                                color: headingColor,
+                                fontFamily: cleanFontValue(style.headingFont),
+                                fontSize: `${style.h3Size || h3Size}`,
+                                lineHeight: `${style.h3LineHeight || h3LineHeight}`,
+                                fontWeight: style.h3Weight || h3Weight,
+                                paddingBottom: `${titlePaddingBottom || "14"}px`,
                               }}
                             >
-                              Sample Button
-                            </button>
-                            
-                            {/* Icon Preview */}
-                            <div className="mt-4 flex gap-2">
-                              {[
-                                { id: 'facebook', name: 'Facebook' },
-                                { id: 'x', name: 'X' },
-                                { id: 'linkedin', name: 'LinkedIn' },
-                                { id: 'print', name: 'Print' },
-                                { id: 'new-post', name: 'Email' },
-                              ].map((icon) => {
-                                const iconStyleMap: Record<string, string> = {
-                                  'material-rounded': 'material-rounded',
-                                  'material-outlined': 'material-outlined',
-                                  'material-sharp': 'material-sharp',
-                                }
-                                const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-                                const iconColor = style.iconColor || '#000000'
-                                const iconSize = globalIconSize || "18"
-                                
-                                return (
-                                  <div
-                                    key={icon.id}
-                                    className="flex items-center justify-center"
-                                    style={{
-                                      width: `${iconSize}px`,
-                                      height: `${iconSize}px`,
-                                      backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
-                                      borderRadius: '4px'
-                                    }}
-                                    title={icon.name}
-                                  >
-                                    <img
-                                      src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                      alt={icon.name}
-                                      width={iconSize}
-                                      height={iconSize}
-                                    />
-                                  </div>
-                                )
-                              })}
+                              Sample heading 3
+                            </div>
+
+                            <div
+                              className="header4"
+                              style={{
+                                color: headingColor,
+                                fontFamily: cleanFontValue(style.headingFont),
+                                fontSize: `${style.h4Size || h4Size}`,
+                                lineHeight: `${style.h4LineHeight || h4LineHeight}`,
+                                fontWeight: style.h4Weight || h4Weight,
+                                paddingBottom: `${titlePaddingBottom || "14"}px`,
+                              }}
+                            >
+                              Sample heading 4
                             </div>
                           </div>
                         </div>
