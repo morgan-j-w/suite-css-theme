@@ -2877,8 +2877,18 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 value={style.background}
                                 onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
                               >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
+                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.background}>
+                                  <SelectValue>
+                                    {colors.find((c) => c.name === style.background) && (
+                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                        <div
+                                          className="w-4 h-4 rounded border shrink-0"
+                                          style={{ backgroundColor: colors.find((c) => c.name === style.background)?.hex }}
+                                        />
+                                        <span className="truncate text-xs">{style.background}</span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {colors
