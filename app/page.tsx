@@ -2054,7 +2054,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 1</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2068,7 +2068,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2106,7 +2106,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 2</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2120,7 +2120,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2158,7 +2158,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 3</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2172,7 +2172,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2210,7 +2210,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 4</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2224,7 +2224,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2286,7 +2286,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <Label className="text-sm font-medium">Body copy</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size</Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2300,7 +2300,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height</Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2361,7 +2361,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <Label className="text-sm font-medium">Button</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size</Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2375,7 +2375,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height</Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2428,7 +2428,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Padding</Label>
+                <Label>Padding <span className="text-xs text-gray-400">px</span></Label>
                 <Input
                   className="mt-2"
                   type="number"
@@ -2438,12 +2438,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setThemePadding(value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
-                  placeholder="15 (px)"
+                  placeholder="15"
                 />
                 <p className="text-xs text-muted-foreground mt-2">Used for block padding, image spacing, and content gaps throughout the theme</p>
               </div>
               <div>
-                <Label>Title padding</Label>
+                <Label>Title padding <span className="text-xs text-gray-400">px</span></Label>
                 <Input
                   className="mt-2"
                   type="number"
@@ -2452,7 +2452,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setTitlePaddingBottom(e.target.value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
-                  placeholder="14 (px)"
+                  placeholder="14"
                 />
                 <p className="text-xs text-muted-foreground mt-2">Controls padding below headers in style blocks</p>
               </div>
@@ -2516,13 +2516,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Icon size</Label>
+                  <Label className="text-sm font-medium">Icon size <span className="text-xs text-gray-400">px</span></Label>
                   <Input
                     className="mt-2 w-full"
                     type="number"
                     value={globalIconSize || "18"}
                     onChange={(e) => setGlobalIconSize(e.target.value)}
-                    placeholder="18 (px)"
+                    placeholder="18"
                   />
                 </div>
                 <div>
@@ -2570,7 +2570,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <Label className="text-sm font-medium">Button padding</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Top</Label>
+                    <Label className="text-xs text-muted-foreground">Top <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2582,7 +2582,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Right</Label>
+                    <Label className="text-xs text-muted-foreground">Right <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2594,7 +2594,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Bottom</Label>
+                    <Label className="text-xs text-muted-foreground">Bottom <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2606,7 +2606,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Left</Label>
+                    <Label className="text-xs text-muted-foreground">Left <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2621,7 +2621,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </div>
 
               <div>
-                <Label className="text-sm font-medium">Button border radius</Label>
+                <Label className="text-sm font-medium">Button border radius <span className="text-xs text-gray-400">px</span></Label>
                 <div className="mt-2">
                   <Input
                     type="number"
@@ -3227,7 +3227,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 1</Label>
                                 <div className="grid grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3237,7 +3237,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3273,7 +3273,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 2</Label>
                                 <div className="grid grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3283,7 +3283,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3319,7 +3319,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 3</Label>
                                 <div className="grid grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3329,7 +3329,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3365,7 +3365,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 4</Label>
                                 <div className="grid grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
@@ -3375,7 +3375,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
                                       className="mt-1 text-xs bg-white"
                                       type="number"
