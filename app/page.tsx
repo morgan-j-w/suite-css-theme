@@ -1881,7 +1881,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
-            <div className="max-w-6xl mx-auto">
 
         {/* Step Indicator */}
         <div className="mb-8">
@@ -4146,7 +4145,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             <option key={font} value={font} />
           ))}
         </datalist>
-            </div>
             </div>
           <AppFooter />
         </>
