@@ -28,6 +28,7 @@ import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common
 import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
 import { AppFooter } from "@/components/common/AppFooter"
+import { DevInformationModal } from "@/components/common/DevInformationModal"
 
 // Import hooks
 import { useThemeState } from "@/hooks/useThemeState"
@@ -51,6 +52,11 @@ export default function ThemeGenerator() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
+  const [showDevInfo, setShowDevInfo] = useState(false)
+  const [copiedCss, setCopiedCss] = useState(false)
+  const [copiedHtml, setCopiedHtml] = useState(false)
+  const [copiedMediaQuery, setCopiedMediaQuery] = useState(false)
+  const [copiedImport, setCopiedImport] = useState(false)
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -1580,6 +1586,47 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     setTimeout(() => setCopiedMedia(false), 2000)
   }
 
+  const copyExportCss = async () => {
+    await navigator.clipboard.writeText(generateCSS())
+    setCopiedCss(true)
+    setTimeout(() => setCopiedCss(false), 2000)
+  }
+
+  const copyExportHtml = async () => {
+    const htmlContent = `<div class="read-more-button">
+    <div><!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
+                    stroke="#f" fillcolor="#64ccc9">
+            <w:anchorlock></w:anchorlock>
+            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
+                Read more
+            </center>
+        </v:roundrect>
+        <![endif]-->
+        <a class="btn-cm" href="http://">
+            Read more
+        </a>
+    </div>
+</div>`
+    await navigator.clipboard.writeText(htmlContent)
+    setCopiedHtml(true)
+    setTimeout(() => setCopiedHtml(false), 2000)
+  }
+
+  const copyExportMediaQuery = async () => {
+    const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}}`
+    await navigator.clipboard.writeText(mediaQuery)
+    setCopiedMediaQuery(true)
+    setTimeout(() => setCopiedMediaQuery(false), 2000)
+  }
+
+  const copyImportToClipboard = async () => {
+    await navigator.clipboard.writeText(webfontImports)
+    setCopiedImport(true)
+    setTimeout(() => setCopiedImport(false), 2000)
+  }
+
   const downloadIconsZip = async (styleName: string, styleKey: string) => {
     const zip = new JSZip()
     const iconsData = [
@@ -1773,6 +1820,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             onExit={handleExitFromHeader}
             hasUnsavedChanges={hasUnsavedChanges}
             isSaving={isSaving}
+            onDevInfo={() => setShowDevInfo(true)}
           />
           <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F6F8FB' }}>
             {webfontImports && (
@@ -4244,6 +4292,18 @@ ${styles
           <AppFooter />
         </>
       )}
+      <DevInformationModal
+        isOpen={showDevInfo}
+        onClose={() => setShowDevInfo(false)}
+        onCopyCss={copyExportCss}
+        onCopyHtml={copyExportHtml}
+        onCopyMediaQuery={copyExportMediaQuery}
+        onCopyImport={copyImportToClipboard}
+        copiedCss={copiedCss}
+        copiedHtml={copiedHtml}
+        copiedMediaQuery={copiedMediaQuery}
+        copiedImport={copiedImport}
+      />
       <Toaster />
     </>
   )
