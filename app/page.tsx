@@ -4009,24 +4009,27 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         <Card key={style.id} className="overflow-hidden !py-0 border" style={{ backgroundColor: bgColor }}>
                           <CardContent className="p-3 space-y-3" style={{ color: textColor }}>
                             {/* Style Header */}
-                            <div className="pb-2 border-b" style={{ borderColor: `${textColor}20` }}>
+                            <div className="pb-2">
                               <div
-                                className="font-semibold text-sm"
                                 style={{
                                   color: headingColor,
                                   fontFamily: cleanFontValue(style.headingFont || headingFont),
+                                  fontSize: `${style.h1Size || h1Size || '22px'}`,
+                                  lineHeight: `${style.h1LineHeight || h1LineHeight || '30px'}`,
+                                  fontWeight: style.h1Weight || h1Weight || '700',
+                                  marginBottom: '4px',
                                 }}
                               >
                                 Style {index + 1}
                               </div>
                               {style.description && (
                                 <p
-                                  className="text-xs mt-1"
                                   style={{
                                     fontFamily: cleanFontValue(style.bodyFont || bodyFont),
-                                    fontSize: `${style.bodySize || bodySize || '13px'}`,
-                                    lineHeight: `${style.bodyLineHeight || bodyLineHeight || '18px'}`,
+                                    fontSize: `${style.bodySize || bodySize || '15px'}`,
+                                    lineHeight: `${style.bodyLineHeight || bodyLineHeight || '22px'}`,
                                     fontWeight: style.bodyWeight || bodyWeight || '400',
+                                    margin: 0,
                                   }}
                                 >
                                   {style.description}{" "}
@@ -4039,16 +4042,32 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                             {/* Button */}
                             <button
-                              className="rounded text-xs w-full"
+                              className="rounded w-full transition-colors"
                               style={{
                                 backgroundColor: buttonBg,
                                 color: buttonText,
                                 fontFamily: cleanFontValue(style.buttonFont || buttonFont),
-                                fontSize: `${style.buttonSize || buttonSize || '13px'}`,
-                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || '18px'}`,
+                                fontSize: `${style.buttonSize || buttonSize || '15px'}`,
+                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || '22px'}`,
                                 fontWeight: style.buttonWeight || buttonWeight || '600',
                                 borderRadius: `${buttonBorderRadius}px`,
-                                padding: `${buttonPaddingTop || "8"}px ${buttonPaddingRight || "12"}px ${buttonPaddingBottom || "8"}px ${buttonPaddingLeft || "12"}px`,
+                                padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                                border: 'none',
+                                cursor: 'pointer',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (style.buttonBgHover) {
+                                  const hoverBg = getColorHexValue(style.buttonBgHover)
+                                  if (hoverBg) e.currentTarget.style.backgroundColor = hoverBg
+                                }
+                                if (style.buttonTextHover) {
+                                  const hoverText = getColorHexValue(style.buttonTextHover)
+                                  if (hoverText) e.currentTarget.style.color = hoverText
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = buttonBg
+                                e.currentTarget.style.color = buttonText
                               }}
                             >
                               Button
@@ -4070,7 +4089,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 }
                                 const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
                                 const iconColor = style.iconColor || '#000000'
-                                const iconSize = "12"
+                                const iconSize = globalIconSize || "18"
                                 
                                 return (
                                   <img
