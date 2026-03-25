@@ -3052,7 +3052,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </Select>
                           </div>
 
-                          <div className="flex items-center gap-2 p-3 bg-slate-50 rounded border border-slate-200">
+                          <div className="flex items-center gap-2">
                             <Checkbox
                               id={`noPadding-${style.id}`}
                               checked={style.noPadding === true}
