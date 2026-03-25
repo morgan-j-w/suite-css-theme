@@ -2880,7 +2880,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.background}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.background) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.background)?.hex }}
@@ -2919,7 +2919,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.headingColor}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.headingColor) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.headingColor)?.hex }}
@@ -2956,7 +2956,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.textColor}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.textColor) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.textColor)?.hex }}
@@ -2995,7 +2995,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.linkColor}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.linkColor) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.linkColor)?.hex }}
@@ -3032,7 +3032,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonBg}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.buttonBg) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.buttonBg)?.hex }}
@@ -3069,7 +3069,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonText}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.buttonText) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.buttonText)?.hex }}
@@ -3104,7 +3104,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                               >
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={colors.find((c) => c.hex === style.iconColor)?.name || "Black"}>
-                                  <div className="flex items-center gap-2 max-w-[120px]">
+                                  <div className="flex items-center gap-2 max-w-[200px]">
                                     <div
                                       className="w-4 h-4 rounded border shrink-0"
                                       style={{ backgroundColor: style.iconColor || "#000000" }}
@@ -3141,7 +3141,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonBgHover}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.buttonBgHover) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.buttonBgHover)?.hex }}
@@ -3178,7 +3178,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 <SelectTrigger className="mt-1.5 h-8 text-xs bg-white" data-color-select title={style.buttonTextHover}>
                                   <SelectValue>
                                     {colors.find((c) => c.name === style.buttonTextHover) && (
-                                      <div className="flex items-center gap-2 max-w-[120px]">
+                                      <div className="flex items-center gap-2 max-w-[200px]">
                                         <div
                                           className="w-4 h-4 rounded border shrink-0"
                                           style={{ backgroundColor: colors.find((c) => c.name === style.buttonTextHover)?.hex }}
@@ -4507,7 +4507,7 @@ ${styles
             width: 100%;
           }
           [data-color-select] > div {
-            max-width: 140px;
+            max-width: 200px;
             overflow: hidden;
             display: flex;
             gap: 0.5rem;
