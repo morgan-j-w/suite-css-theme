@@ -4007,40 +4007,39 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                       return (
                         <Card key={style.id} className="overflow-hidden !py-0 border" style={{ backgroundColor: bgColor }}>
-                          <CardContent className="p-3 space-y-2" style={{ color: textColor }}>
-                            {/* Heading */}
-                            <div
-                              className="font-semibold text-sm"
-                              style={{
-                                color: headingColor,
-                                fontFamily: cleanFontValue(style.headingFont || headingFont),
-                                fontSize: `${style.h1Size || h1Size || '18px'}`,
-                                lineHeight: `${style.h1LineHeight || h1LineHeight || '26px'}`,
-                                fontWeight: style.h1Weight || h1Weight || '700',
-                              }}
-                            >
-                              Heading
+                          <CardContent className="p-3 space-y-3" style={{ color: textColor }}>
+                            {/* Style Header */}
+                            <div className="pb-2 border-b" style={{ borderColor: `${textColor}20` }}>
+                              <div
+                                className="font-semibold text-sm"
+                                style={{
+                                  color: headingColor,
+                                  fontFamily: cleanFontValue(style.headingFont || headingFont),
+                                }}
+                              >
+                                Style {index + 1}
+                              </div>
+                              {style.description && (
+                                <p
+                                  className="text-xs mt-1"
+                                  style={{
+                                    fontFamily: cleanFontValue(style.bodyFont || bodyFont),
+                                    fontSize: `${style.bodySize || bodySize || '13px'}`,
+                                    lineHeight: `${style.bodyLineHeight || bodyLineHeight || '18px'}`,
+                                    fontWeight: style.bodyWeight || bodyWeight || '400',
+                                  }}
+                                >
+                                  {style.description}{" "}
+                                  <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                                    body text with link
+                                  </a>
+                                </p>
+                              )}
                             </div>
-
-                            {/* Body text */}
-                            <p
-                              className="text-xs"
-                              style={{
-                                fontFamily: cleanFontValue(style.bodyFont || bodyFont),
-                                fontSize: `${style.bodySize || bodySize || '14px'}`,
-                                lineHeight: `${style.bodyLineHeight || bodyLineHeight || '20px'}`,
-                                fontWeight: style.bodyWeight || bodyWeight || '400',
-                              }}
-                            >
-                              Body text with{" "}
-                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                                link
-                              </a>
-                            </p>
 
                             {/* Button */}
                             <button
-                              className="rounded text-xs w-full mt-2"
+                              className="rounded text-xs w-full"
                               style={{
                                 backgroundColor: buttonBg,
                                 color: buttonText,
@@ -4084,12 +4083,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   />
                                 )
                               })}
-                            </div>
-
-                            {/* Style label */}
-                            <div className="text-xs pt-2 border-t opacity-60" style={{ borderColor: `${textColor}20` }}>
-                              <span className="font-medium">Style {index + 1}</span>
-                              {style.description && <p className="mt-1 leading-snug">{style.description}</p>}
                             </div>
                           </CardContent>
                         </Card>
