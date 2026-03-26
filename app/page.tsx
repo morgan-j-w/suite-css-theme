@@ -2839,7 +2839,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div key={style.id} className="p-4 border rounded-lg">
+                  <div key={style.id} className="p-4 border rounded-lg" style={{ backgroundColor: '#f2f5f9' }}>
                     <div className="w-full">
                       {/* Style Controls */}
                       <div className="space-y-3">
@@ -2888,7 +2888,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           />
                         </div>
 
-                        <div className="flex items-center gap-3 p-3 bg-white rounded border border-slate-200">
+                        <div className="flex items-center gap-3">
                           <Checkbox
                             id={`noPadding-${style.id}`}
                             checked={style.noPadding === true}
