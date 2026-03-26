@@ -1893,7 +1893,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             isSaving={isSaving}
             onDevInfo={() => setShowDevInfo(true)}
           />
-          <div className="min-h-screen pt-4 md:pt-8 px-4 md:px-8" style={{ backgroundColor: '#F6F8FB' }}>
+          <div className="min-h-screen pt-4 md:pt-8 pl-4 md:pl-8" style={{ backgroundColor: '#F6F8FB' }}>
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
