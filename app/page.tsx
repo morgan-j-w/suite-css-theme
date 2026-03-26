@@ -2839,11 +2839,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div key={style.id} className="p-4 border rounded-lg bg-slate-100">
+                  <div key={style.id} className="p-4 border rounded-lg">
                     <div className="w-full">
                       {/* Style Controls */}
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-300">
                           <h3 className="font-semibold text-lg">Style {index + 1}</h3>
                           <div className="flex items-center gap-1">
                             <Button
@@ -2878,7 +2878,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
                         </div>
 
-                        <div>
+                        <div className="pt-3">
                           <Label className="text-xs text-slate-600">Description</Label>
                           <Textarea
                             value={style.description}
