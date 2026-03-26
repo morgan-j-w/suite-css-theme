@@ -2840,9 +2840,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                 return (
                   <div key={style.id} className="p-4 border rounded-lg bg-slate-100">
-                    <div className="grid md:grid-cols-3 gap-4">
-                      {/* Left side - Controls */}
-                      <div className="space-y-3 md:col-span-2">
+                    <div className="w-full">
+                      {/* Style Controls */}
+                      <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <h3 className="font-semibold text-lg">Style {index + 1}</h3>
                           <div className="flex items-center gap-1">
@@ -2886,6 +2886,51 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             placeholder="Style description"
                             className="mt-1.5 h-[78px] bg-white"
                           />
+                        </div>
+
+                        <div className="flex items-center gap-3 p-3 bg-white rounded border border-slate-200">
+                          <Checkbox
+                            id={`noPadding-${style.id}`}
+                            checked={style.noPadding === true}
+                            onCheckedChange={(checked) => {
+                              const updatedStyles = styles.map((s) => {
+                                if (s.id === style.id) {
+                                  const isChecking = checked as boolean
+                                  let newDescription = s.description
+                                  
+                                  if (isChecking) {
+                                    // Add prefix if not already there
+                                    if (!newDescription.startsWith("No padding - ")) {
+                                      newDescription = `No padding - ${newDescription}`
+                                    }
+                                  } else {
+                                    // Remove prefix if present
+                                    if (newDescription.startsWith("No padding - ")) {
+                                      newDescription = newDescription.replace("No padding - ", "")
+                                    }
+                                  }
+                                  
+                                  return { ...s, noPadding: isChecking, description: newDescription }
+                                }
+                                return s
+                              })
+                              setStyles(updatedStyles)
+                            }}
+                            className="h-4 w-4 border border-slate-400 cursor-pointer"
+                          />
+                          <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                            No Padding
+                          </Label>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-slate-500" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs text-xs">
+                                Removes padding from all sides for this style
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
 
                         <div className="space-y-3">
@@ -3570,12 +3615,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                   return {
                                     ...s,
                                     headingFont: undefined,
-                                    bodyFont: undefined,
-                                    buttonFont: undefined,
-                                    h1Size: undefined,
-                                    h1LineHeight: undefined,
-                                    h1Weight: undefined,
-                                    h2Size: undefined,
                                     h2LineHeight: undefined,
                                     h2Weight: undefined,
                                     h3Size: undefined,
