@@ -1893,7 +1893,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             isSaving={isSaving}
             onDevInfo={() => setShowDevInfo(true)}
           />
-          <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F6F8FB' }}>
+          <div className="min-h-screen pt-4 md:pt-8 px-4 md:px-8" style={{ backgroundColor: '#F6F8FB' }}>
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
@@ -3744,9 +3744,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </div>
               
               {/* Right Column - Live Preview Sidebar */}
-              <div ref={previewSidebarRef} className="w-80 bg-white rounded-lg shadow-sm p-6 border border-slate-200 sticky top-8 max-h-[calc(100vh-150px)] overflow-y-auto">
-                <h3 className="text-lg font-semibold mb-4 text-slate-900">Live Preview</h3>
-                <div className="space-y-4">
+              <div ref={previewSidebarRef} className="w-80 bg-white sticky top-[88px] h-[calc(100vh-88px)] overflow-y-auto flex flex-col">
+                <h3 className="text-lg font-semibold text-slate-900 p-6 border-b border-slate-200">Live Preview</h3>
+                <div className="space-y-4 p-6 flex-1">
                   {styles.length === 0 ? (
                     <p className="text-sm text-slate-500 text-center py-8">Create styles to preview here</p>
                   ) : (

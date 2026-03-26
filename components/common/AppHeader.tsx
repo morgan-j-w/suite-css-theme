@@ -13,7 +13,7 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ onSaveTheme, onExit, hasUnsavedChanges, isSaving, onDevInfo }: AppHeaderProps) => {
   return (
-    <header className="text-white shadow-lg p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-4" style={{ backgroundColor: "#21292C" }}>
+    <header className="text-white shadow-lg p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-4 sticky top-0 z-50" style={{ backgroundColor: "#21292C" }}>
       <div className="flex items-center gap-2 md:gap-4">
         <a href="https://swiftdigital.com.au/" target="_blank" rel="noopener noreferrer" className="flex items-center hover:opacity-80 transition-opacity">
           <img 
