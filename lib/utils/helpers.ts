@@ -14,6 +14,21 @@ export const cleanFontValue = (fontValue: string): string => {
   return fontValue.trim().replace(/;$/, "")
 }
 
+export const formatFontForCSS = (fontValue: string): string => {
+  if (!fontValue) return "'Arial', sans-serif"
+  const cleaned = cleanFontValue(fontValue)
+  // Split by comma to handle fallback fonts
+  const fonts = cleaned.split(",").map((font) => {
+    const trimmed = font.trim()
+    // Add single quotes if the font has spaces and isn't already quoted
+    if (trimmed.includes(" ") && !trimmed.startsWith("'") && !trimmed.startsWith('"')) {
+      return `'${trimmed}'`
+    }
+    return trimmed
+  })
+  return fonts.join(", ")
+}
+
 export const getAvailableFonts = (webfontImports: string): string[] => {
   const fonts: Set<string> = new Set()
 
