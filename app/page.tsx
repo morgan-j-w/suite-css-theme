@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, Download, CheckCircle, Loader } from "lucide-react"
+import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -18,16 +18,17 @@ import { useToast } from "@/hooks/use-toast"
 import { ColorDefinition, StyleDefinition } from "@/lib/types"
 
 // Import utilities
-import { generateCSS, getColorHex, getLuminance, getContrastRatio } from "@/lib/styles"
-import { loadFromLocalStorage, saveToLocalStorage, clearAllLocalStorage } from "@/lib/storage"
+import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
+import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { downloadIconsZip } from "@/lib/icons"
-import { shuffleArray, cleanFontValue, getAvailableFonts, fetchGoogleFonts, generateMediaQueries } from "@/lib/utils/helpers"
+import { cleanFontValue, getAvailableFonts } from "@/lib/utils/helpers"
 
 // Import components
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
 import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
 import { AppFooter } from "@/components/common/AppFooter"
+import { DevInformationModal } from "@/components/common/DevInformationModal"
 
 // Import hooks
 import { useThemeState } from "@/hooks/useThemeState"
@@ -40,17 +41,17 @@ export default function ThemeGenerator() {
   const [copied, setCopied] = useState(false)
   const [copiedHtml, setCopiedHtml] = useState(false)
   const [copiedMedia, setCopiedMedia] = useState(false)
-  const [googleFonts, setGoogleFonts] = useState<Array<{ family: string; variants: string[] }>>([])
-  const [loadingGoogleFonts, setLoadingGoogleFonts] = useState(false)
-  const [selectedGoogleFont, setSelectedGoogleFont] = useState("")
-  const [adobeFonts, setAdobeFonts] = useState<Array<string>>([])
-  const [selectedAdobeFont, setSelectedAdobeFont] = useState("")
   const [colorImportError, setColorImportError] = useState("")
+  const [colorNameError, setColorNameError] = useState("")
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
+  const [showDevInfo, setShowDevInfo] = useState(false)
+  const [copiedCss, setCopiedCss] = useState(false)
+  const [copiedImport, setCopiedImport] = useState(false)
+  const [resetStyles, setResetStyles] = useState<Set<string>>(new Set())
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -63,12 +64,9 @@ export default function ThemeGenerator() {
     setExpandedTypography(newSet)
   }
 
-  // Safe value extractors for typography fields
-  const getSafeValue = (value: string | undefined, defaultValue: string = "") => {
-    if (!value) return defaultValue
-    return value.replace("px", "")
-  }
 
+
+  // Safe value extractors for typography fields
   const getDisplayValue = (styleValue: string | undefined, globalValue: string | undefined, defaultValue: string = "0") => {
     const value = styleValue || globalValue || defaultValue
     return value.replace("px", "").replace("px", "") // double replace to handle any edge cases
@@ -268,48 +266,6 @@ export default function ThemeGenerator() {
       }
     }
     checkAuth()
-    
-    const initializeFonts = async () => {
-      try {
-        setLoadingGoogleFonts(true)
-        // Popular Google Fonts list
-        const popularFonts = [
-          "Roboto", "Open Sans", "Lato", "Montserrat", "Oswald", "Source Sans Pro",
-          "Raleway", "Ubuntu", "Inter", "Playfair Display", "Poppins", "Outfit",
-          "Merriweather", "Noto Sans", "Work Sans", "Urbanist", "Manrope", "Sora",
-          "Quicksand", "Nunito", "Jost", "Public Sans", "Lexend", "IBM Plex Sans",
-          "Kanit", "Noto Serif", "Lora", "Dosis", "Comfortaa", "Varela Round",
-          "Righteous", "Pacifico", "Dancing Script", "Caveat", "Lobster", "Great Vibes",
-          "Cinzel", "Bebas Neue", "Abril Fatface", "Archivo", "DM Sans", "Figtree",
-          "Space Mono", "JetBrains Mono", "Courier Prime", "Inconsolata", "Source Code Pro",
-          "Fira Code", "IBM Plex Mono", "Roboto Mono", "Kumbh Sans", "Epilogue",
-        ]
-        setGoogleFonts(popularFonts.map(font => ({ family: font, variants: [] })))
-        setLoadingGoogleFonts(false)
-      } catch (error) {
-        console.error("Failed to load fonts:", error)
-        setLoadingGoogleFonts(false)
-      }
-    }
-    initializeFonts()
-
-    // Initialize Adobe Fonts
-    const adobePopularFonts = [
-      "Adobe Caslon Pro", "Adobe Garamond Pro", "Adobe Jenson Pro",
-      "Arno Pro", "Bembo Pro", "Blackoak", "Book Antiqua",      "Caecilia", "Caslon", "Cronos Pro", "DIN Condensed",
-      "Frutiger", "Futura PT", "Garamond", "Garanica",
-      "Gill Sans", "Gotham", "Grotesk", "Hoefler Text",
-      "Iowan Old Style", "Jaipur", "Knuth", "Letter Gothic",
-      "Lexicon", "Limoglia", "Milo", "Minion Pro",
-      "Myriad Pro", "Newsletter", "Nova", "Optima",
-      "Palatino", "Permanente", "Pion", "Proxima Nova",
-      "Replika", "Sabon", "Sanvito Pro", "Sophia",
-      "Source Han Sans", "Source Han Serif", "Source Code Pro",
-      "Source Sans Pro", "Source Serif Pro", "Strumpf",
-      "Trebuchet", "Univers", "Utopia", "Walbaum",
-      "Warnock Pro", "Williams Caslon", "Woodblock", "Zurich"
-    ]
-    setAdobeFonts(adobePopularFonts)
   }, [])
 
   // Track unsaved changes
@@ -322,9 +278,11 @@ export default function ThemeGenerator() {
     const imports = [googleFontImport, adobeFontImport, customImport]
       .filter(imp => imp.trim() !== "")
       .join("\n")
-    // Only update webfontImports if there's actual content to sync
-    // This preserves user-pasted content when all imports are empty
-    if (imports.trim() !== "") {
+    
+    // Only sync if there's actual content from the individual import fields
+    // AND the current webfontImports either matches the sync result OR is empty
+    // This preserves direct textarea edits that don't match the sync output
+    if (imports.trim() !== "" && (!webfontImports || webfontImports === imports)) {
       setWebfontImports(imports)
     }
   }, [googleFontImport, adobeFontImport, customImport])
@@ -350,15 +308,42 @@ export default function ThemeGenerator() {
   }, [styles])
 
   const addColor = () => {
+    // Check if the last color has a name
+    if (colors.length > 0 && colors[colors.length - 1].name.trim() === "") {
+      setColorNameError("Please give the last colour a name before adding another")
+      return
+    }
+    setColorNameError("")
     setColors([...colors, { id: Date.now().toString(), name: "", hex: "#000000" }])
   }
 
+  const validateColorsForStep = (): boolean => {
+    // Check if any color is missing a name
+    const unnamedColor = colors.some(c => c.name.trim() === "")
+    if (unnamedColor) {
+      setColorNameError("All colours must have a name before continuing")
+      return false
+    }
+    setColorNameError("")
+    return true
+  }
+
   const removeColor = (id: string) => {
-    setColors(colors.filter((c) => c.id !== id))
+    const updatedColors = colors.filter((c) => c.id !== id)
+    setColors(updatedColors)
+    // Clear error if no more unnamed colors
+    const hasUnnamed = updatedColors.some(c => c.name.trim() === "")
+    if (!hasUnnamed) {
+      setColorNameError("")
+    }
   }
 
   const updateColor = (id: string, field: "name" | "hex", value: string) => {
     setColors(colors.map((c) => (c.id === id ? { ...c, [field]: value } : c)))
+    // Clear error when user updates color name
+    if (field === "name" && value.trim() !== "") {
+      setColorNameError("")
+    }
   }
 
   const importColorsFromText = () => {
@@ -427,6 +412,8 @@ export default function ThemeGenerator() {
         headingColor: blackColor?.name || "Black",
         buttonBg: blackColor?.name || "Black",
         buttonText: whiteColor?.name || "White",
+        buttonBgHover: blackColor?.name || "Black",
+        buttonTextHover: whiteColor?.name || "White",
         linkColor: blackColor?.name || "Black",
         headingFont: headingFont || "Arial, sans-serif",
         bodyFont: bodyFont || "Arial, sans-serif",
@@ -498,7 +485,22 @@ export default function ThemeGenerator() {
   }
 
   const updateStyle = (id: string, field: keyof StyleDefinition, value: string | boolean) => {
-    setStyles(styles.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
+    setStyles(styles.map((s) => {
+      if (s.id === id) {
+        const updated = { ...s, [field]: value }
+        
+        // Mirror button hover colors when button colors change (unless manually customized)
+        if (field === "buttonBg" && s.buttonBgHover === s.buttonBg) {
+          updated.buttonBgHover = value as string
+        }
+        if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
+          updated.buttonTextHover = value as string
+        }
+        
+        return updated
+      }
+      return s
+    }))
   }
 
   const generateDescription = (style: StyleDefinition): string => {
@@ -514,6 +516,13 @@ export default function ThemeGenerator() {
           // Auto-update description when any colour field changes
           if (["background", "textColor", "headingColor", "buttonBg", "buttonText", "linkColor"].includes(field)) {
             updated.description = generateDescription(updated)
+          }
+          // Mirror button hover colors when button colors change (unless manually customized)
+          if (field === "buttonBg" && s.buttonBgHover === s.buttonBg) {
+            updated.buttonBgHover = value
+          }
+          if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
+            updated.buttonTextHover = value
           }
           return updated
         }
@@ -744,7 +753,7 @@ export default function ThemeGenerator() {
     const h4WeightVal = h4Weight || "400"
     const paddingValue = themePadding.replace("px", "") || "25"
     const buttonPaddingValue = `${buttonPaddingTop}px ${buttonPaddingRight}px ${buttonPaddingBottom}px ${buttonPaddingLeft}px`
-    const buttonBorderRadiusValue = `${buttonBorderRadius || "4"}px`
+    const buttonBorderRadiusValue = `${buttonBorderRadius || "4px"}`
     const baseCss = `.wrapper [class*="text-style-"] {padding: 5px !Important;}
 .style-selector .info, .style-selector .header1 {font-size:14px !Important;line-height:24px !Important;}
 
@@ -917,6 +926,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const headingColor = getColorHexValue(style.headingColor)
       const btnBg = getColorHexValue(style.buttonBg)
       const btnText = getColorHexValue(style.buttonText)
+      const btnBgHover = getColorHexValue(style.buttonBgHover)
+      const btnTextHover = getColorHexValue(style.buttonTextHover)
       const linkColor = getColorHexValue(style.linkColor)
 
       // Use fallback values for all typography if empty
@@ -962,7 +973,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`
       css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;}\n`
       css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight};}\n`
-      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBg} !important; text-decoration:none;color:${btnText} !important;}\n`
+      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important;}\n`
       
       // Add no padding CSS if noPadding is enabled
       if (style.noPadding) {
@@ -1190,6 +1201,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         headingColor: headingColor.name,
         buttonBg: btnBg.name,
         buttonText: btnText.name,
+        buttonBgHover: btnBg.name,
+        buttonTextHover: btnText.name,
         linkColor: linkColor.name,
         headingFont: headingFont,
         bodyFont: bodyFont,
@@ -1580,38 +1593,45 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     setTimeout(() => setCopiedMedia(false), 2000)
   }
 
-  const downloadIconsZip = async (styleName: string, styleKey: string) => {
-    const zip = new JSZip()
-    const iconsData = [
-      { id: 'facebook', name: 'facebook' },
-      { id: 'x', name: 'twitterx--v1' },
-      { id: 'linkedin', name: 'linkedin' },
-      { id: 'print', name: 'print' },
-      { id: 'new-post', name: 'new-post' },
-    ]
+  const copyExportCss = async () => {
+    await navigator.clipboard.writeText(generateCSS())
+    setCopiedCss(true)
+    setTimeout(() => setCopiedCss(false), 2000)
+  }
 
-    try {
-      for (const icon of iconsData) {
-        const colorHex = iconColor.replace('#', '')
-        const url = `https://img.icons8.com/${styleKey}/96/${colorHex}/${icon.name}.png`
-        const response = await fetch(url)
-        const blob = await response.blob()
-        zip.file(`${icon.id}.png`, blob)
-      }
+  const copyExportHtml = async () => {
+    const htmlContent = `<div class="read-more-button">
+    <div><!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
+                    stroke="#f" fillcolor="#64ccc9">
+            <w:anchorlock></w:anchorlock>
+            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
+                Read more
+            </center>
+        </v:roundrect>
+        <![endif]-->
+        <a class="btn-cm" href="http://">
+            Read more
+        </a>
+    </div>
+</div>`
+    await navigator.clipboard.writeText(htmlContent)
+    setCopiedHtml(true)
+    setTimeout(() => setCopiedHtml(false), 2000)
+  }
 
-      const zipBlob = await zip.generateAsync({ type: 'blob' })
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(zipBlob)
-      const colorHex = iconColor.replace('#', '')
-      link.download = `icons-${styleName.toLowerCase().replace(/\s+/g, '-')}-${colorHex}.zip`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(link.href)
-    } catch (error) {
-      console.error('Error downloading icons:', error)
-      alert('Failed to download icons. Please try again.')
-    }
+  const copyExportMediaQuery = async () => {
+    const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}}`
+    await navigator.clipboard.writeText(mediaQuery)
+    setCopiedMedia(true)
+    setTimeout(() => setCopiedMedia(false), 2000)
+  }
+
+  const copyImportToClipboard = async () => {
+    await navigator.clipboard.writeText(webfontImports)
+    setCopiedImport(true)
+    setTimeout(() => setCopiedImport(false), 2000)
   }
 
   const refreshCSS = () => {
@@ -1773,25 +1793,40 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             onExit={handleExitFromHeader}
             hasUnsavedChanges={hasUnsavedChanges}
             isSaving={isSaving}
+            onDevInfo={() => setShowDevInfo(true)}
           />
-          <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: '#F6F8FB' }}>
+          <div className="min-h-screen pt-4 md:pt-8 pl-4 md:pl-8 pr-4 md:pr-8" style={{ backgroundColor: '#F6F8FB' }}>
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
-            <div className="max-w-6xl mx-auto">
+            
+            <div className="flex gap-6">
+              {/* Left Column - Controls */}
+              <div className="flex-1 flex flex-col">
 
         {/* Step Indicator */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex flex-col items-center flex-1">
                 <button
-                  onClick={() => setCurrentStep(step)}
+                  onClick={() => {
+                    // Validate colors on step 1 before navigation away
+                    if (currentStep === 1 && step > currentStep) {
+                      if (!validateColorsForStep()) {
+                        return
+                      }
+                    }
+                    setCurrentStep(step)
+                  }}
+                  disabled={currentStep === 1 && colorNameError && step > currentStep}
                   className={`w-10 h-10 rounded-full font-semibold flex items-center justify-center transition-all ${
                     step === currentStep
                       ? "text-white shadow-lg"
                       : step < currentStep
                       ? "text-white cursor-pointer"
+                      : currentStep === 1 && colorNameError && step > currentStep
+                      ? "bg-slate-200 text-slate-600 cursor-not-allowed opacity-50"
                       : "bg-slate-200 text-slate-600 cursor-pointer hover:bg-slate-300"
                   }`}
                   style={{
@@ -1827,11 +1862,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <h2 className="text-2xl font-bold mb-4">Set up your colour palette</h2>
                 <p className="text-slate-600 mb-4">Add the colours you'll use in your email themes. You can paste multiple colours at once.</p>
           {/* Colours section - full width */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2 pt-0">
+          <Card className="shadow-sm !py-0">
+            <CardHeader className="pb-2 pt-6">
               <CardTitle className="text-lg">Colours</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-6">
               <div className="mb-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <Label className="text-sm">Paste colours</Label>
@@ -1871,11 +1906,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {colors.map((color) => (
-                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col h-[152px]">
+                  <div key={color.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white group flex flex-col">
                     {/* Color swatch - dominant visual element */}
                     <div
-                      className="w-full h-12 md:h-14 cursor-pointer relative transition-all duration-150 ease-out"
-                      style={{ backgroundColor: color.hex }}
+                      className="w-full cursor-pointer relative transition-all duration-150 ease-out rounded-t-xl"
+                      style={{ backgroundColor: color.hex, height: 'calc(var(--spacing) * 8)' }}
                       onClick={() => {
                         // Trigger color picker
                         const colorInput = document.querySelector(`input[data-color-id="${color.id}"]`) as HTMLInputElement
@@ -1920,6 +1955,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </div>
                 ))}
               </div>
+              {colorNameError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm font-medium text-red-700">{colorNameError}</p>
+                </div>
+              )}
               <Button onClick={addColor} variant="outline" className="mt-4 bg-slate-50 hover:bg-slate-100 border-slate-200 w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Add colour
@@ -1935,14 +1975,15 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <h2 className="text-2xl font-bold mb-4">Configure your typography</h2>
                 <p className="text-slate-600 mb-4">Set up fonts and sizing for headings, body text, and buttons.</p>
 
-          {/* Typography sections - 3 columns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Heading typography */}
-            <Card className="shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Heading typography</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Left Column: Typography Controls (scrollable) */}
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* Heading typography */}
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Heading typography</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
                 <div>
                   <Label>Heading font</Label>
                   <Input
@@ -1963,7 +2004,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 1</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -1977,7 +2018,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2015,7 +2056,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 2</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2029,7 +2070,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2067,7 +2108,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 3</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2081,7 +2122,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2119,7 +2160,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <Label className="text-sm font-medium">Heading 4</Label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
                       <div>
-                        <Label className="text-xs text-muted-foreground">Size</Label>
+                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2133,7 +2174,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         />
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground">Line height</Label>
+                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                         <Input
                           className="mt-1.5 w-full"
                           type="number"
@@ -2195,7 +2236,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <Label className="text-sm font-medium">Body copy</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size</Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2209,7 +2250,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height</Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2270,7 +2311,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   <Label className="text-sm font-medium">Button</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size</Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2284,7 +2325,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height</Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
                       <Input
                         className="mt-1.5 w-full"
                         type="number"
@@ -2319,7 +2360,133 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 </div>
               </CardContent>
             </Card>
-          </div>
+
+                    {/* Webfont imports */}
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Webfont @import</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="relative">
+                          <Textarea
+                            value={webfontImports}
+                            onChange={(e) => setWebfontImports(e.target.value)}
+                            placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
+                            className="font-mono text-sm min-h-[120px] pr-10"
+                            style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
+                          />
+                          {webfontImports && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="absolute top-2 right-2 h-8 w-8 p-0"
+                              onClick={() => {
+                                navigator.clipboard.writeText(webfontImports)
+                                toast({
+                                  description: "Webfont imports copied to clipboard",
+                                })
+                              }}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Right Column: Font Preview (sticky) */}
+                  <div className="lg:col-span-1">
+                    <div className="sticky top-32 z-10">
+                      <Card className="shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Font preview</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2 text-sm">
+                <div>
+                  <div 
+                    style={{
+                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontSize: `${h1Size || '22px'}`,
+                      lineHeight: `${h1LineHeight || '30px'}`,
+                      fontWeight: h1Weight || '700',
+                    }}
+                    className="text-slate-900 font-bold"
+                  >
+                    Heading 1
+                  </div>
+                </div>
+                <div>
+                  <div 
+                    style={{
+                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontSize: `${h2Size || '20px'}`,
+                      lineHeight: `${h2LineHeight || '28px'}`,
+                      fontWeight: h2Weight || '700',
+                    }}
+                    className="text-slate-900 font-bold"
+                  >
+                    Heading 2
+                  </div>
+                </div>
+                <div>
+                  <div 
+                    style={{
+                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontSize: `${h3Size || '18px'}`,
+                      lineHeight: `${h3LineHeight || '26px'}`,
+                      fontWeight: h3Weight || '700',
+                    }}
+                    className="text-slate-900 font-bold"
+                  >
+                    Heading 3
+                  </div>
+                </div>
+                <div>
+                  <div 
+                    style={{
+                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontSize: `${h4Size || '16px'}`,
+                      lineHeight: `${h4LineHeight || '24px'}`,
+                      fontWeight: h4Weight || '700',
+                    }}
+                    className="text-slate-900 font-bold"
+                  >
+                    Heading 4
+                  </div>
+                </div>
+                <div>
+                  <div 
+                    style={{
+                      fontFamily: cleanFontValue(bodyFont) || "Arial, sans-serif",
+                      fontSize: `${bodySize || '15px'}`,
+                      lineHeight: `${bodyLineHeight || '22px'}`,
+                      fontWeight: bodyWeight || '400',
+                    }}
+                    className="text-slate-900 leading-relaxed"
+                  >
+                    Body copy sample text
+                  </div>
+                </div>
+                <button
+                  className="w-full bg-slate-900 text-white transition-colors hover:bg-slate-800"
+                  style={{
+                    fontFamily: cleanFontValue(buttonFont) || "Arial, sans-serif",
+                    fontSize: `${buttonSize || '15px'}`,
+                    lineHeight: `${buttonLineHeight || '22px'}`,
+                    fontWeight: buttonWeight || '600',
+                    padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
+                    borderRadius: buttonBorderRadius || "4px",
+                  }}
+                >
+                  Button
+                </button>
+              </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </div>
+
               </>
             )}
 
@@ -2327,9 +2494,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             {currentStep === 2 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Configure your theme</h2>
-                <p className="text-slate-600 mb-4">Set up article padding, webfont imports, icon settings and button styling for your theme.</p>
+                <p className="text-slate-600 mb-4">Set up article padding, icon settings and button styling for your theme.</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Theme padding */}
           <Card className="shadow-sm">
             <CardHeader className="pb-2">
@@ -2337,7 +2504,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Padding</Label>
+                <Label>Padding <span className="text-xs text-gray-400">px</span></Label>
                 <Input
                   className="mt-2"
                   type="number"
@@ -2347,12 +2514,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setThemePadding(value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
-                  placeholder="15 (px)"
+                  placeholder="15"
                 />
                 <p className="text-xs text-muted-foreground mt-2">Used for block padding, image spacing, and content gaps throughout the theme</p>
               </div>
               <div>
-                <Label>Title padding</Label>
+                <Label>Title padding <span className="text-xs text-gray-400">px</span></Label>
                 <Input
                   className="mt-2"
                   type="number"
@@ -2361,42 +2528,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     setTitlePaddingBottom(e.target.value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
-                  placeholder="14 (px)"
+                  placeholder="14"
                 />
                 <p className="text-xs text-muted-foreground mt-2">Controls padding below headers in style blocks</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Webfont imports */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Webfont imports</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <Textarea
-                  value={webfontImports}
-                  onChange={(e) => setWebfontImports(e.target.value)}
-                  placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
-                  className="font-mono text-sm min-h-[120px] pr-10"
-                  style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
-                />
-                {webfontImports && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="absolute top-2 right-2 h-8 w-8 p-0"
-                    onClick={() => {
-                      navigator.clipboard.writeText(webfontImports)
-                      toast({
-                        description: "Webfont imports copied to clipboard",
-                      })
-                    }}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -2410,6 +2544,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               <div className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium">Icon style</Label>
+                  <p className="text-xs text-slate-500 mt-1 mb-2">Select an icon style for article sharing functionality</p>
                   <Select
                     value={globalIconStyle || "material-sharp"}
                     onValueChange={(value) => setGlobalIconStyle(value)}
@@ -2425,13 +2560,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Icon size</Label>
+                  <Label className="text-sm font-medium">Icon size <span className="text-xs text-gray-400">px</span></Label>
                   <Input
                     className="mt-2 w-full"
                     type="number"
                     value={globalIconSize || "18"}
                     onChange={(e) => setGlobalIconSize(e.target.value)}
-                    placeholder="18 (px)"
+                    placeholder="18"
                   />
                 </div>
                 <div>
@@ -2479,7 +2614,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <Label className="text-sm font-medium">Button padding</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Top</Label>
+                    <Label className="text-xs text-muted-foreground">Top <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2491,7 +2626,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Right</Label>
+                    <Label className="text-xs text-muted-foreground">Right <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2503,7 +2638,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Bottom</Label>
+                    <Label className="text-xs text-muted-foreground">Bottom <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2515,7 +2650,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Left</Label>
+                    <Label className="text-xs text-muted-foreground">Left <span className="text-xs text-gray-400">px</span></Label>
                     <Input
                       className="mt-1"
                       type="number"
@@ -2530,13 +2665,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </div>
 
               <div>
-                <Label className="text-sm font-medium">Button border radius</Label>
+                <Label className="text-sm font-medium">Button border radius <span className="text-xs text-gray-400">px</span></Label>
                 <div className="mt-2">
                   <Input
                     type="number"
-                    value={buttonBorderRadius || "4"}
+                    value={(buttonBorderRadius || "4px").replace("px", "")}
                     onChange={(e) => {
-                      const value = e.target.value
+                      const value = `${e.target.value}px`
                       setButtonBorderRadius(value)
                       setCssRefreshKey(prev => prev + 1)
                     }}
@@ -2552,7 +2687,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     className="font-medium text-white bg-black hover:bg-slate-800"
                     style={{
                       padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
-                      borderRadius: `${buttonBorderRadius || "4"}px`,
+                      borderRadius: buttonBorderRadius || "4px",
                     }}
                   >
                     Sample Button
@@ -2701,13 +2836,14 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div key={style.id} className="p-4 border rounded-lg bg-slate-100">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {/* Left side - Controls */}
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-lg">Style {index + 1}</h3>
-                          <div className="flex items-center gap-1">
+                  <div key={style.id} className="p-4 border rounded-lg bg-slate-50">
+                    <div className="grid md:grid-cols-5 gap-4">
+                      {/* Left Column: Tools */}
+                      <div className="space-y-3 md:col-span-3">
+                        {/* Title and Controls */}
+                        <div className="flex items-center gap-2 w-full">
+                          <h3 className="font-semibold text-lg truncate min-w-0 flex-shrink">Style {index + 1}</h3>
+                          <div className="flex items-center gap-1 ml-auto flex-shrink-0">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -2740,363 +2876,444 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                           </div>
                         </div>
 
+                        {/* Description */}
                         <div>
                           <Label className="text-xs text-slate-600">Description</Label>
                           <Textarea
                             value={style.description}
                             onChange={(e) => updateStyle(style.id, "description", e.target.value)}
                             placeholder="Style description"
-                            className="mt-1.5 h-[78px] bg-white"
+                            className="mt-1.5 min-h-[60px] bg-white"
                           />
                         </div>
 
-                        <div className="space-y-3">
-                          <div className="grid grid-cols-3 gap-3">
-                            <div>
-                              <Label className="text-xs text-slate-600">Background</Label>
-                              <Select
-                                value={style.background}
-                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
-                              >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {colors
-                                    .filter((color) => color.name.trim() !== "")
-                                    .map((color) => (
-                                      <SelectItem key={color.id} value={color.name}>
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="w-4 h-4 rounded border"
-                                            style={{ backgroundColor: color.hex }}
-                                          />
-                                          {color.name}
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div>
-                              <Label className="text-xs text-slate-600">Heading colour</Label>
-                              <Select
-                                value={style.headingColor}
-                                onValueChange={(value) =>
-                                  updateStyleWithSmartDescription(style.id, "headingColor", value)
-                                }
-                              >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {colors
-                                    .filter((color) => color.name.trim() !== "")
-                                    .map((color) => (
-                                      <SelectItem key={color.id} value={color.name}>
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="w-4 h-4 rounded border"
-                                            style={{ backgroundColor: color.hex }}
-                                          />
-                                          {color.name}
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div>
-                              <Label className="text-xs text-slate-600">Text colour</Label>
-                              <Select
-                                value={style.textColor}
-                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
-                              >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {colors
-                                    .filter((color) => color.name.trim() !== "")
-                                    .map((color) => (
-                                      <SelectItem key={color.id} value={color.name}>
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="w-4 h-4 rounded border"
-                                            style={{ backgroundColor: color.hex }}
-                                          />
-                                          {color.name}
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
+                        {/* Color Selectors - 3 Column Grid */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <Label className="text-xs text-slate-600">Background</Label>
+                            <Select
+                              value={style.background}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.background) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.background)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.background}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
 
-                          <div className="grid grid-cols-3 gap-3">
-                            <div>
-                              <Label className="text-xs text-slate-600">Link colour</Label>
-                              <Select
-                                value={style.linkColor}
-                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
-                              >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {colors
-                                    .filter((color) => color.name.trim() !== "")
-                                    .map((color) => (
-                                      <SelectItem key={color.id} value={color.name}>
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="w-4 h-4 rounded border"
-                                            style={{ backgroundColor: color.hex }}
-                                          />
-                                          {color.name}
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div>
-                              <Label className="text-xs text-slate-600">Button background</Label>
-                              <Select
-                                value={style.buttonBg}
-                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
-                              >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {colors
-                                    .filter((color) => color.name.trim() !== "")
-                                    .map((color) => (
-                                      <SelectItem key={color.id} value={color.name}>
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="w-4 h-4 rounded border"
-                                            style={{ backgroundColor: color.hex }}
-                                          />
-                                          {color.name}
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div>
-                              <Label className="text-xs text-slate-600">Button text</Label>
-                              <Select
-                                value={style.buttonText}
-                                onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
-                              >
-                                <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {colors
-                                    .filter((color) => color.name.trim() !== "")
-                                    .map((color) => (
-                                      <SelectItem key={color.id} value={color.name}>
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="w-4 h-4 rounded border"
-                                            style={{ backgroundColor: color.hex }}
-                                          />
-                                          {color.name}
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
+                          <div>
+                            <Label className="text-xs text-slate-600">Text Colour</Label>
+                            <Select
+                              value={style.textColor}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.textColor) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.textColor)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.textColor}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
 
-                        </div>
-                      </div>
-
-                      {/* Right side - Preview */}
-                      <div className="space-y-3">
-                        <div>
-                          <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
-                          <div
-                            className={style.noPadding ? "p-0 rounded-lg border border-slate-300" : "p-4 rounded-lg border border-slate-300"}
-                            style={{ backgroundColor: bgColor, color: textColor }}
-                          >
-                            <div
-                              className="header1"
-                              style={{
-                                color: headingColor,
-                                fontFamily: cleanFontValue(style.headingFont),
-                                fontSize: `${style.h1Size || h1Size}`,
-                                lineHeight: `${style.h1LineHeight || h1LineHeight}`,
-                                fontWeight: style.h1Weight || h1Weight,
-                                paddingBottom: `${titlePaddingBottom || "14"}px`,
-                              }}
+                          <div>
+                            <Label className="text-xs text-slate-600">Heading Colour</Label>
+                            <Select
+                              value={style.headingColor}
+                              onValueChange={(value) =>
+                                updateStyleWithSmartDescription(style.id, "headingColor", value)
+                              }
                             >
-                              Style {index + 1} - Sample heading
-                            </div>
-                            <p
-                              style={{
-                                fontFamily: cleanFontValue(style.bodyFont),
-                                fontSize: `${(style.bodySize || bodySize).replace('px', '')}px`,
-                                lineHeight: `${(style.bodyLineHeight || bodyLineHeight).replace('px', '')}px`,
-                                fontWeight: style.bodyWeight || bodyWeight,
-                              }}
-                            >
-                              This is sample body text.{" "}
-                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                                Here is a link
-                              </a>
-                              .
-                            </p>
-                            <button
-                              className="mt-3 rounded"
-                              style={{
-                                backgroundColor: buttonBg,
-                                color: buttonText,
-                                fontFamily: cleanFontValue(style.buttonFont),
-                                fontSize: `${style.buttonSize || buttonSize || "15px"}`,
-                                lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
-                                fontWeight: style.buttonWeight || buttonWeight,
-                                borderRadius: `${buttonBorderRadius}px`,
-                                padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
-                              }}
-                            >
-                              Sample Button
-                            </button>
-                            
-                            {/* Icon Preview */}
-                            <div className="mt-4 flex gap-2">
-                              {[
-                                { id: 'facebook', name: 'Facebook' },
-                                { id: 'x', name: 'X' },
-                                { id: 'linkedin', name: 'LinkedIn' },
-                                { id: 'print', name: 'Print' },
-                                { id: 'new-post', name: 'Email' },
-                              ].map((icon) => {
-                                const iconStyleMap: Record<string, string> = {
-                                  'material-rounded': 'material-rounded',
-                                  'material-outlined': 'material-outlined',
-                                  'material-sharp': 'material-sharp',
-                                }
-                                const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-                                const iconColor = style.iconColor || '#000000'
-                                const iconSize = globalIconSize || "18"
-                                
-                                return (
-                                  <div
-                                    key={icon.id}
-                                    className="flex items-center justify-center"
-                                    style={{
-                                      width: `${iconSize}px`,
-                                      height: `${iconSize}px`,
-                                      backgroundColor: iconColor === '#ffffff' ? 'rgba(0, 0, 0, 0.2)' : 'transparent',
-                                      borderRadius: '4px'
-                                    }}
-                                    title={icon.name}
-                                  >
-                                    <img
-                                      src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
-                                      alt={icon.name}
-                                      width={iconSize}
-                                      height={iconSize}
-                                    />
-                                  </div>
-                                )
-                              })}
-                            </div>
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.headingColor) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.headingColor)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.headingColor}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
-                        </div>
 
-                        <div className="flex items-end justify-between gap-4">
-                          <div className="flex-1">
+                          <div>
+                            <Label className="text-xs text-slate-600">Link Colour</Label>
+                            <Select
+                              value={style.linkColor}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.linkColor) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.linkColor)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.linkColor}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <Label className="text-xs text-slate-600">Button Background</Label>
+                            <Select
+                              value={style.buttonBg}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.buttonBg) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.buttonBg)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.buttonBg}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="mb-2">
+                            <Label className="text-xs text-slate-600">Button Text</Label>
+                            <Select
+                              value={style.buttonText}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.buttonText) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.buttonText)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.buttonText}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
                             <Label className="text-xs text-slate-600">Icon colour</Label>
                             <Select
                               value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
-                              <SelectTrigger className="mt-1.5 h-8 text-xs bg-white">
-                                <div className="flex items-center gap-2">
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <div className="flex items-center gap-2 max-w-[200px]">
                                   <div
-                                    className="w-4 h-4 rounded border"
+                                    className="w-4 h-4 rounded border shrink-0"
                                     style={{ backgroundColor: style.iconColor || "#000000" }}
                                   />
-                                  <span>
+                                  <span className="truncate text-xs">
                                     {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
                                   </span>
                                 </div>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors
-                                  .filter((color) => color.name.trim() !== "")
-                                  .map((color) => (
-                                    <SelectItem key={color.id} value={color.hex}>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className="w-4 h-4 rounded border"
-                                          style={{ backgroundColor: color.hex }}
-                                        />
-                                        {color.name}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.hex}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <Checkbox
-                              id={`noPadding-${style.id}`}
-                              checked={style.noPadding === true}
-                              onCheckedChange={(checked) => {
-                                const updatedStyles = styles.map((s) => {
-                                  if (s.id === style.id) {
-                                    const isChecking = checked as boolean
-                                    let newDescription = s.description
-                                    
-                                    if (isChecking) {
-                                      // Add prefix if not already there
-                                      if (!newDescription.startsWith("No padding - ")) {
-                                        newDescription = `No padding - ${newDescription}`
-                                      }
-                                    } else {
-                                      // Remove prefix if present
-                                      if (newDescription.startsWith("No padding - ")) {
-                                        newDescription = newDescription.replace("No padding - ", "")
-                                      }
+                          <div>
+                            <Label className="text-xs text-slate-600">Button background hover</Label>
+                            <Select
+                              value={style.buttonBgHover}
+                              onValueChange={(value) => updateStyle(style.id, "buttonBgHover", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.buttonBgHover) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.buttonBgHover)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.buttonBgHover}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <Label className="text-xs text-slate-600">Button text hover</Label>
+                            <Select
+                              value={style.buttonTextHover}
+                              onValueChange={(value) => updateStyle(style.id, "buttonTextHover", value)}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <SelectValue>
+                                  {colors.find((c) => c.name === style.buttonTextHover) && (
+                                    <div className="flex items-center gap-2 max-w-[200px]">
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.buttonTextHover)?.hex }}
+                                      />
+                                      <span className="truncate text-xs">{style.buttonTextHover}</span>
+                                    </div>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* No Padding Checkbox */}
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            id={`noPadding-${style.id}`}
+                            checked={style.noPadding === true}
+                            onCheckedChange={(checked) => {
+                              const updatedStyles = styles.map((s) => {
+                                if (s.id === style.id) {
+                                  const isChecking = checked as boolean
+                                  let newDescription = s.description
+                                  
+                                  if (isChecking) {
+                                    if (!newDescription.startsWith("No padding - ")) {
+                                      newDescription = `No padding - ${newDescription}`
                                     }
-                                    
-                                    return { ...s, noPadding: isChecking, description: newDescription }
+                                  } else {
+                                    if (newDescription.startsWith("No padding - ")) {
+                                      newDescription = newDescription.replace("No padding - ", "")
+                                    }
                                   }
-                                  return s
-                                })
-                                setStyles(updatedStyles)
+                                  
+                                  return { ...s, noPadding: isChecking, description: newDescription }
+                                }
+                                return s
+                              })
+                              setStyles(updatedStyles)
+                            }}
+                            className="h-4 w-4 border border-slate-400 cursor-pointer"
+                          />
+                          <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                            No padding
+                          </Label>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-3 w-3 text-slate-400" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs text-xs">
+                                Removes padding from all sides for this style
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+
+                      {/* Right Column: Preview */}
+                      <div className="min-w-0 md:col-span-2">
+                        <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
+                        <div className={`rounded-lg border ${style.noPadding ? '' : 'p-4'}`} style={{ backgroundColor: bgColor, color: textColor }}>
+                          <div
+                            style={{
+                              color: headingColor,
+                              fontFamily: cleanFontValue(style.headingFont || headingFont) || "Arial, sans-serif",
+                              fontSize: `${style.h1Size || h1Size || '22px'}`,
+                              lineHeight: `${style.h1LineHeight || h1LineHeight || '30px'}`,
+                              fontWeight: style.h1Weight || h1Weight || '700',
+                              paddingBottom: '14px',
+                            }}
+                          >
+                            Style {index + 1} - Sample heading
+                          </div>
+                          {style.description && (
+                            <p
+                              style={{
+                                fontFamily: cleanFontValue(style.bodyFont || bodyFont) || "Arial, sans-serif",
+                                fontSize: `${style.bodySize || bodySize || '15px'}`,
+                                lineHeight: `${style.bodyLineHeight || bodyLineHeight || '22px'}`,
+                                fontWeight: style.bodyWeight || bodyWeight || '400',
+                                margin: 0,
                               }}
-                              className="h-4 w-4 border border-slate-400 cursor-pointer"
-                            />
-                            <div className="flex items-center gap-1">
-                              <Label htmlFor={`noPadding-${style.id}`} className="text-sm font-semibold text-slate-800 cursor-pointer">
-                                No Padding
-                              </Label>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <HelpCircle className="h-4 w-4 text-slate-500" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right" className="max-w-xs text-xs">
-                                    Removes padding from all sides for this style
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
+                            >
+                              {style.description}{" "}
+                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                                body text with link
+                              </a>
+                            </p>
+                          )}
+                          <button
+                            className="mt-3 rounded transition-colors"
+                            style={{
+                              backgroundColor: buttonBg,
+                              color: buttonText,
+                              fontFamily: cleanFontValue(style.buttonFont || buttonFont) || "Arial, sans-serif",
+                              fontSize: `${style.buttonSize || buttonSize || '15px'}`,
+                              lineHeight: `${style.buttonLineHeight || buttonLineHeight || '22px'}`,
+                              fontWeight: style.buttonWeight || buttonWeight || '600',
+                              borderRadius: style.buttonBorderRadius || buttonBorderRadius || '4px',
+                              padding: `${style.buttonPaddingTop || buttonPaddingTop || "10"}px ${style.buttonPaddingRight || buttonPaddingRight || "20"}px ${style.buttonPaddingBottom || buttonPaddingBottom || "10"}px ${style.buttonPaddingLeft || buttonPaddingLeft || "20"}px`,
+                              border: 'none',
+                              cursor: 'pointer',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (style.buttonBgHover) {
+                                const hoverBg = getColorHexValue(style.buttonBgHover)
+                                if (hoverBg) e.currentTarget.style.backgroundColor = hoverBg
+                              }
+                              if (style.buttonTextHover) {
+                                const hoverText = getColorHexValue(style.buttonTextHover)
+                                if (hoverText) e.currentTarget.style.color = hoverText
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = buttonBg
+                              e.currentTarget.style.color = buttonText
+                            }}
+                          >
+                            Sample Button
+                          </button>
+                          <div className="flex gap-1 pt-3">
+                            {[
+                              { id: 'facebook', name: 'Facebook' },
+                              { id: 'x', name: 'X' },
+                              { id: 'linkedin', name: 'LinkedIn' },
+                              { id: 'print', name: 'Print' },
+                              { id: 'new-post', name: 'Email' },
+                            ].map((icon) => {
+                              const iconStyleMap: Record<string, string> = {
+                                'material-rounded': 'material-rounded',
+                                'material-outlined': 'material-outlined',
+                                'material-sharp': 'material-sharp',
+                              }
+                              const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                              const iconColor = style.iconColor || '#000000'
+                              const iconSize = globalIconSize || "18"
+                              
+                              return (
+                                <img
+                                  key={icon.id}
+                                  src={`https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${icon.id === 'x' ? 'twitterx--v1' : icon.id}.png`}
+                                  alt={icon.name}
+                                  width={parseInt(iconSize)}
+                                  height={parseInt(iconSize)}
+                                  title={icon.name}
+                                />
+                              )
+                            })}
                           </div>
                         </div>
                       </div>
@@ -3118,13 +3335,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                       {expandedTypography.has(style.id) && (
                         <div className="mt-4">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             {/* Heading Typography */}
-                            <div className="space-y-4 p-3 bg-white rounded border border-slate-200">
+                            <div className="space-y-6 p-3 bg-white rounded border border-slate-200">
                               <div>
                                 <Label className="text-xs text-slate-600">Heading font</Label>
                                 <Input
-                                  className="mt-1.5 text-xs bg-slate-50"
+                                  className="mt-1.5 text-xs bg-slate-50 w-full"
                                   value={getDisplayFont(style.headingFont, headingFont, "Arial, sans-serif")}
                                   onChange={(e) => updateStyle(style.id, "headingFont", e.target.value)}
                                   placeholder={getDisplayFont(undefined, headingFont, "Arial, sans-serif")}
@@ -3134,11 +3351,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H1 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 1</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h1Size, h1Size, "22")}
                                       onChange={(e) => updateStyle(style.id, "h1Size", `${e.target.value}px`)}
@@ -3146,9 +3363,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h1LineHeight, h1LineHeight, "30")}
                                       onChange={(e) => updateStyle(style.id, "h1LineHeight", `${e.target.value}px`)}
@@ -3161,7 +3378,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       value={style.h1Weight || h1Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
                                     >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -3180,11 +3397,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H2 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 2</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h2Size, h2Size, "20")}
                                       onChange={(e) => updateStyle(style.id, "h2Size", `${e.target.value}px`)}
@@ -3192,9 +3409,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h2LineHeight, h2LineHeight, "28")}
                                       onChange={(e) => updateStyle(style.id, "h2LineHeight", `${e.target.value}px`)}
@@ -3207,7 +3424,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       value={style.h2Weight || h2Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
                                     >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -3226,11 +3443,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H3 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 3</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h3Size, h3Size, "18")}
                                       onChange={(e) => updateStyle(style.id, "h3Size", `${e.target.value}px`)}
@@ -3238,9 +3455,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h3LineHeight, h3LineHeight, "26")}
                                       onChange={(e) => updateStyle(style.id, "h3LineHeight", `${e.target.value}px`)}
@@ -3253,7 +3470,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       value={style.h3Weight || h3Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
                                     >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -3272,11 +3489,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* H4 Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Heading 4</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h4Size, h4Size, "16")}
                                       onChange={(e) => updateStyle(style.id, "h4Size", `${e.target.value}px`)}
@@ -3284,9 +3501,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.h4LineHeight, h4LineHeight, "24")}
                                       onChange={(e) => updateStyle(style.id, "h4LineHeight", `${e.target.value}px`)}
@@ -3299,7 +3516,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       value={style.h4Weight || h4Weight || "700"}
                                       onValueChange={(value) => updateStyle(style.id, "h4Weight", value)}
                                     >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -3317,11 +3534,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </div>
 
                             {/* Body Typography */}
-                            <div className="space-y-4 p-3 bg-white rounded border border-slate-200">
+                            <div className="space-y-6 p-3 bg-white rounded border border-slate-200">
                               <div>
                                 <Label className="text-xs text-slate-600">Body font</Label>
                                 <Input
-                                  className="mt-1.5 text-xs bg-slate-50"
+                                  className="mt-1.5 text-xs bg-slate-50 w-full"
                                   value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
                                   onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
                                   placeholder={getDisplayFont(undefined, bodyFont, "Arial, sans-serif")}
@@ -3331,11 +3548,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               {/* Body Settings */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Body text</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.bodySize, bodySize, "16")}
                                       onChange={(e) => updateStyle(style.id, "bodySize", `${e.target.value}px`)}
@@ -3343,9 +3560,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.bodyLineHeight, bodyLineHeight, "24")}
                                       onChange={(e) => updateStyle(style.id, "bodyLineHeight", `${e.target.value}px`)}
@@ -3358,7 +3575,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       value={style.bodyWeight || bodyWeight || "400"}
                                       onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
                                     >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -3376,11 +3593,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                             </div>
 
                             {/* Button Typography */}
-                            <div className="space-y-4 p-3 bg-white rounded border border-slate-200">
+                            <div className="space-y-6 p-3 bg-white rounded border border-slate-200">
                               <div>
                                 <Label className="text-xs text-slate-600">Button font</Label>
                                 <Input
-                                  className="mt-1.5 text-xs bg-slate-50"
+                                  className="mt-1.5 text-xs bg-slate-50 w-full"
                                   value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
                                   onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
                                   placeholder={getDisplayFont(undefined, buttonFont, "Arial, sans-serif")}
@@ -3388,13 +3605,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               </div>
 
                               {/* Button Settings */}
-                              <div>
+                              <div className="mb-6">
                                 <Label className="text-xs font-semibold text-slate-700">Button text</Label>
-                                <div className="grid grid-cols-3 gap-2 mt-1.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5 mb-6">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size</Label>
+                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.buttonSize, buttonSize, "15")}
                                       onChange={(e) => updateStyle(style.id, "buttonSize", `${e.target.value}px`)}
@@ -3402,9 +3619,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height</Label>
+                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
                                     <Input
-                                      className="mt-1 text-xs bg-white"
+                                      className="mt-1 text-xs bg-white w-full"
                                       type="number"
                                       value={getDisplayValue(style.buttonLineHeight, buttonLineHeight, "22")}
                                       onChange={(e) => updateStyle(style.id, "buttonLineHeight", `${e.target.value}px`)}
@@ -3417,7 +3634,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       value={style.buttonWeight || buttonWeight || "600"}
                                       onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
                                     >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white">
+                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -3430,6 +3647,65 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                       </SelectContent>
                                     </Select>
                                   </div>
+                                </div>
+
+                                {/* Button Padding */}
+                                <div className="mb-6">
+                                  <Label className="text-xs font-semibold text-slate-700">Button padding <span className="text-xs text-gray-400">px</span></Label>
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1.5">
+                                    <div>
+                                      <Label className="text-xs text-slate-600">Top</Label>
+                                      <Input
+                                        className="mt-1 text-xs bg-white w-full"
+                                        type="number"
+                                        value={getDisplayValue(style.buttonPaddingTop, buttonPaddingTop, "10")}
+                                        onChange={(e) => updateStyle(style.id, "buttonPaddingTop", `${e.target.value}px`)}
+                                        placeholder="10"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label className="text-xs text-slate-600">Right</Label>
+                                      <Input
+                                        className="mt-1 text-xs bg-white w-full"
+                                        type="number"
+                                        value={getDisplayValue(style.buttonPaddingRight, buttonPaddingRight, "20")}
+                                        onChange={(e) => updateStyle(style.id, "buttonPaddingRight", `${e.target.value}px`)}
+                                        placeholder="20"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label className="text-xs text-slate-600">Bottom</Label>
+                                      <Input
+                                        className="mt-1 text-xs bg-white w-full"
+                                        type="number"
+                                        value={getDisplayValue(style.buttonPaddingBottom, buttonPaddingBottom, "10")}
+                                        onChange={(e) => updateStyle(style.id, "buttonPaddingBottom", `${e.target.value}px`)}
+                                        placeholder="10"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label className="text-xs text-slate-600">Left</Label>
+                                      <Input
+                                        className="mt-1 text-xs bg-white w-full"
+                                        type="number"
+                                        value={getDisplayValue(style.buttonPaddingLeft, buttonPaddingLeft, "20")}
+                                        onChange={(e) => updateStyle(style.id, "buttonPaddingLeft", `${e.target.value}px`)}
+                                        placeholder="20"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Button Border Radius */}
+                                <div>
+                                  <Label className="text-xs font-semibold text-slate-700">Button border radius</Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={(getDisplayValue(style.buttonBorderRadius, buttonBorderRadius, "4")).replace("px", "")}
+                                    onChange={(e) => updateStyle(style.id, "buttonBorderRadius", `${e.target.value}px`)}
+                                    placeholder="4"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -3462,17 +3738,43 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                     buttonSize: undefined,
                                     buttonLineHeight: undefined,
                                     buttonWeight: undefined,
+                                    buttonBorderRadius: undefined,
+                                    buttonPaddingTop: undefined,
+                                    buttonPaddingRight: undefined,
+                                    buttonPaddingBottom: undefined,
+                                    buttonPaddingLeft: undefined,
                                   }
                                 }
                                 return s
                               })
                               setStyles(updatedStyles)
+                              
+                              // Show check icon feedback
+                              const newSet = new Set(resetStyles)
+                              newSet.add(style.id)
+                              setResetStyles(newSet)
+                              
+                              // Auto-clear after 2 seconds
+                              setTimeout(() => {
+                                setResetStyles((prev) => {
+                                  const updated = new Set(prev)
+                                  updated.delete(style.id)
+                                  return updated
+                                })
+                              }, 2000)
                             }}
                             variant="outline"
                             size="sm"
                             className="w-full mt-4"
                           >
-                            Reset to global settings
+                            {resetStyles.has(style.id) ? (
+                              <>
+                                <Check className="h-4 w-4 mr-2" />
+                                Reset!
+                              </>
+                            ) : (
+                              "Reset to global settings"
+                            )}
                           </Button>
                         </div>
                       )}
@@ -3491,540 +3793,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
               </>
             )}
 
-        {/* STEP 5: EXPORT - HIDDEN FOR CLIENT-FACING VERSION */}
-            {false && currentStep === 5 && (
-              <>
-                <h2 className="text-2xl font-bold mb-4">Export your CSS</h2>
-                <p className="text-slate-600 mb-4">Review all your styles and export the generated CSS.</p>
 
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Complete Style Preview - 4 columns wide */}
-          <Card className="lg:col-span-4">
-            <CardHeader>
-              <CardTitle>Complete Style Preview</CardTitle>
-              <CardDescription>View all your styles together</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 max-h-[600px] overflow-y-auto pr-2">
-                {styles.map((style, index) => {
-                  const bgColor = colors.find((c) => c.name === style.background)?.hex || "#ffffff"
-                  const headingColor = colors.find((c) => c.name === style.headingColor)?.hex || "#000000"
-                  const textColor = colors.find((c) => c.name === style.textColor)?.hex || "#000000"
-                  const linkColor = colors.find((c) => c.name === style.linkColor)?.hex || "#0000ff"
-                  const buttonBg = colors.find((c) => c.name === style.buttonBg)?.hex || "#000000"
-                  const buttonText = colors.find((c) => c.name === style.buttonText)?.hex || "#ffffff"
-
-                  return (
-                    <div
-                      key={style.id}
-                      className={style.noPadding ? "border rounded-lg p-0" : "border rounded-lg p-4"}
-                      style={{
-                        backgroundColor: bgColor,
-                        color: textColor,
-                      }}
-                    >
-                      <h3
-                        className="text-lg font-semibold"
-                        style={{
-                          color: headingColor,
-                          fontFamily: cleanFontValue(style.headingFont),
-                          fontSize: `${style.h1Size || h1Size}`,
-                          lineHeight: `${style.h1LineHeight || h1LineHeight}`,
-                          fontWeight: style.h1Weight || h1Weight,
-                          paddingBottom: `${titlePaddingBottom || "14"}px`,
-                        }}
-                      >
-                        Style {index + 1}
-                      </h3>
-                      <p
-                        className="text-sm mb-3"
-                        style={{
-                          fontFamily: cleanFontValue(style.bodyFont),
-                          fontSize: `${style.bodySize || bodySize}`,
-                          lineHeight: `${style.bodyLineHeight || bodyLineHeight}`,
-                          fontWeight: style.bodyWeight || bodyWeight,
-                        }}
-                      >
-                        Sample body text with{" "}
-                        <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
-                          a link
-                        </a>
-                        .
-                      </p>
-                      <button
-                        className="rounded"
-                        style={{
-                          backgroundColor: buttonBg,
-                          color: buttonText,
-                          fontFamily: cleanFontValue(style.buttonFont),
-                          fontSize: `${style.buttonSize || buttonSize || "15px"}`,
-                          lineHeight: `${style.buttonLineHeight || buttonLineHeight || "22px"}`,
-                          fontWeight: style.buttonWeight || buttonWeight,
-                          borderRadius: `${buttonBorderRadius}px`,
-                          padding: `${buttonPaddingTop || "10"}px ${buttonPaddingRight || "20"}px ${buttonPaddingBottom || "10"}px ${buttonPaddingLeft || "20"}px`,
-                        }}
-                      >
-                        Button
-                      </button>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Generated CSS - 8 columns wide */}
-          <Card className="lg:col-span-8">
-            <CardHeader>
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <CardTitle>Generated CSS</CardTitle>
-                  <CardDescription>Copy and paste this CSS</CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={copyToClipboard} variant="outline" size="sm" className="shrink-0">
-                    {copied ? (
-                      <>
-                        <Check className="h-4 w-4 mr-2" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-[600px] overflow-y-auto">
-                <SyntaxHighlightedCSS key={cssRefreshKey} css={generateCSS()} />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sample HTML */}
-        <Card className="mt-6">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <CardTitle>Sample Theme HTML</CardTitle>
-                <CardDescription className="pb-2">Copy this HTML structure and update the icon image URLs to match your color palette</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={copyHtmlToClipboard} variant="outline" size="sm" className="shrink-0">
-                  {copiedHtml ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="max-h-[500px] overflow-y-auto">
-              <SyntaxHighlightedHTML html={`<div class="read-more-button">
-    <div><!--[if mso]>
-        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
-                    stroke="#f" fillcolor="#64ccc9">
-            <w:anchorlock></w:anchorlock>
-            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
-                Read more
-            </center>
-        </v:roundrect>
-        <![endif]-->
-        <a class="btn-cm" href="http://">
-            Read more
-        </a>
-    </div>
-</div>
-
-<div class="grid-templates">
-        <div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="contenttable mso-full-width skip-mso" style="width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 1-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="mobileBlock" valign="top" align="left"> 
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-2 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">  
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-3 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-
-
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-4 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-<div class="icon-templates">
-${styles
-  .map(
-    (style, index) => {
-      const iconStyleMap: Record<string, string> = {
-        'material-rounded': 'material-rounded',
-        'material-outlined': 'material-outlined',
-        'material-sharp': 'material-sharp',
-      }
-      const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-      const iconColor = style.iconColor || '#000000'
-      const iconSize = globalIconSize || '16'
-      const iconIds: Record<string, string> = {
-        facebook: 'facebook',
-        x: 'twitterx--v1',
-        linkedin: 'linkedin',
-        print: 'print',
-        email: 'new-post'
-      }
-      
-      return `    <div class="text-style-${index + 1}"><br> 
-        <a title="Share on Facebook" class="sd-facebook" style="text-decoration: none;" href="{!FACEBOOK_SHARE_DOC!}">
-            <img alt="Facebook" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.facebook}.png" width="${iconSize}">
-        </a>
-        <a title="Share on X" class="sd-twitter" style="text-decoration: none;" href="{!TWITTER_SHARE_DOC!}">
-            <img alt="X" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.x}.png" width="${iconSize}">
-        </a>
-        <a title="Share on LinkedIn" class="sd-linkedin" style="text-decoration: none;" href="{!LINKEDIN_SHARE_DOC!}">
-            <img alt="LinkedIn" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.linkedin}.png" width="${iconSize}">
-        </a>
-        <a title="Print" class="sd-print" style="text-decoration: none;" href="{!PRINT_SHARE_DOC!}">
-            <img alt="Print" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.print}.png" width="${iconSize}">
-        </a>
-        <a title="Send as Email" class="sd-email" style="text-decoration: none;" href="{!EMAIL_SHARE_DOC!}">
-            <img alt="Email" src="https://img.icons8.com/${mappedStyle}/96/${iconColor.replace('#', '')}/${iconIds.email}.png" width="${iconSize}">
-        </a>
-    </div>`
-    }
-  )
-  .join("\n")}
-</div>`} />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Mobile Responsive Media Query */}
-        <Card className="mt-6">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <CardTitle>Sample Media Query</CardTitle>
-                <CardDescription className="pb-2">Add this @media query to handle mobile responsiveness for your email template</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={copyMediaToClipboard} variant="outline" size="sm" className="shrink-0">
-                  {copiedMedia ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="max-h-[500px] overflow-y-auto break-words">
-              <SyntaxHighlightedCSS css="@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}" />
-            </div>
-          </CardContent>
-        </Card>
-              </>
-            )}
         </div>
         </div>
 
         {/* Step Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8 gap-4">
+        <div className="flex items-center justify-between mt-2 gap-4">
           {currentStep > 1 && (
             <Button
               onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
@@ -4037,8 +3811,15 @@ ${styles
           {currentStep === 1 && <div className="flex-1" />}
           {currentStep < 4 && (
             <Button
-              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
-              className="flex-1 bg-primary text-primary-foreground hover:opacity-90"
+              onClick={() => {
+                // Validate colors on step 1 before advancing
+                if (currentStep === 1 && !validateColorsForStep()) {
+                  return
+                }
+                setCurrentStep(Math.min(4, currentStep + 1))
+              }}
+              disabled={currentStep === 1 && colorNameError}
+              className="flex-1 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next →
             </Button>
@@ -4095,8 +3876,11 @@ ${styles
             </Button>
           )}
         </div>
+              </div>
+            </div>
 
-        {/* Exit Warning Dialog */}
+        {/* Step Navigation Buttons */}
+        <div className="flex items-center justify-between mt-6 gap-4">
         <AlertDialog open={showExitWarning} onOpenChange={setShowExitWarning}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -4194,6 +3978,23 @@ ${styles
           .animate-spring-pop {
             animation: springPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
           }
+          /* Truncate long color names in select triggers */
+          [data-color-select] {
+            width: 100%;
+          }
+          [data-color-select] > div {
+            max-width: 200px;
+            overflow: hidden;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+          }
+          [data-color-select] > div > :last-child {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         `}</style>
         <AlertDialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
           <AlertDialogContent className="max-w-md">
@@ -4244,6 +4045,18 @@ ${styles
           <AppFooter />
         </>
       )}
+      <DevInformationModal
+        isOpen={showDevInfo}
+        onClose={() => setShowDevInfo(false)}
+        onCopyCss={copyExportCss}
+        onCopyHtml={copyExportHtml}
+        onCopyMediaQuery={copyExportMediaQuery}
+        onCopyImport={copyImportToClipboard}
+        copiedCss={copiedCss}
+        copiedHtml={copiedHtml}
+        copiedMediaQuery={copiedMedia}
+        copiedImport={copiedImport}
+      />
       <Toaster />
     </>
   )

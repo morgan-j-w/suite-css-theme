@@ -38,7 +38,7 @@ export const useThemeState = () => {
   const [buttonPaddingRight, setButtonPaddingRight] = useState("20")
   const [buttonPaddingBottom, setButtonPaddingBottom] = useState("10")
   const [buttonPaddingLeft, setButtonPaddingLeft] = useState("20")
-  const [buttonBorderRadius, setButtonBorderRadius] = useState("4")
+  const [buttonBorderRadius, setButtonBorderRadius] = useState("4px")
   const [titlePaddingBottom, setTitlePaddingBottom] = useState("14")
 
   const [googleFontImport, setGoogleFontImport] = useState("")
@@ -90,7 +90,7 @@ export const useThemeState = () => {
     setButtonPaddingRight(loadFromLocalStorage("buttonPaddingRight", "20") as string)
     setButtonPaddingBottom(loadFromLocalStorage("buttonPaddingBottom", "10") as string)
     setButtonPaddingLeft(loadFromLocalStorage("buttonPaddingLeft", "20") as string)
-    setButtonBorderRadius(loadFromLocalStorage("buttonBorderRadius", "4") as string)
+    setButtonBorderRadius(loadFromLocalStorage("buttonBorderRadius", "4px") as string)
     setTitlePaddingBottom(loadFromLocalStorage("titlePaddingBottom", "14") as string)
     setGoogleFontImport(loadFromLocalStorage("googleFontImport", "") as string)
     setAdobeFontsKitId(loadFromLocalStorage("adobeFontsKitId", "") as string)

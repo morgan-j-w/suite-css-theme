@@ -8,11 +8,12 @@ interface AppHeaderProps {
   onExit: () => void
   hasUnsavedChanges?: boolean
   isSaving?: boolean
+  onDevInfo?: () => void
 }
 
-export const AppHeader = ({ onSaveTheme, onExit, hasUnsavedChanges, isSaving }: AppHeaderProps) => {
+export const AppHeader = ({ onSaveTheme, onExit, hasUnsavedChanges, isSaving, onDevInfo }: AppHeaderProps) => {
   return (
-    <header className="text-white shadow-lg p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-4" style={{ backgroundColor: "#21292C" }}>
+    <header className="text-white shadow-lg p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-4 sticky top-0 z-50" style={{ backgroundColor: "#21292C" }}>
       <div className="flex items-center gap-2 md:gap-4">
         <a href="https://swiftdigital.com.au/" target="_blank" rel="noopener noreferrer" className="flex items-center hover:opacity-80 transition-opacity">
           <img 
@@ -21,9 +22,19 @@ export const AppHeader = ({ onSaveTheme, onExit, hasUnsavedChanges, isSaving }: 
             className="h-8 md:h-12 w-auto"
           />
         </a>
-        <h1 className="text-lg md:text-3xl font-bold">CSS Theme Generator</h1>
+        <h1 className="text-lg md:text-3xl font-bold">Theme Generator</h1>
       </div>
       <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+        {onDevInfo && (
+          <Button 
+            onClick={onDevInfo} 
+            variant="outline" 
+            className="text-slate-700 hover:bg-slate-50 text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto bg-white border-slate-300 disabled:opacity-50"
+            disabled={isSaving}
+          >
+            Dev information
+          </Button>
+        )}
         <Button 
           onClick={onExit} 
           variant="outline" 
