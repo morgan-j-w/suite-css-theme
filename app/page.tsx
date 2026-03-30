@@ -2241,7 +2241,7 @@ ${iconTemplates}</div>`
                     setColorImportError("")
                   }}
                   className="min-h-[100px] text-sm font-mono"
-                  style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#E6EDF3' }}
                 />
                 {colorImportError && (
                   <p className="text-sm text-red-500">{colorImportError}</p>
@@ -2776,7 +2776,7 @@ ${iconTemplates}</div>`
                             onChange={(e) => setWebfontImports(e.target.value)}
                             placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
                             className="font-mono text-sm min-h-[120px] pr-10"
-                            style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
+                            style={{ backgroundColor: '#FFFFFF', borderColor: '#E6EDF3' }}
                           />
                           {webfontImports && (
                             <Button
@@ -2809,7 +2809,7 @@ ${iconTemplates}</div>`
                             onChange={(e) => setAdobeFontsKitId(e.target.value)}
                             placeholder="e.g., abc1234 (from your Adobe Fonts kit link)"
                             className="font-mono text-sm"
-                            style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
+                            style={{ backgroundColor: '#FFFFFF', borderColor: '#E6EDF3' }}
                           />
                           {adobeFontsKitId && (
                             <Button
@@ -3358,20 +3358,22 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Text Colour</Label>
+                            <Label className="text-xs text-slate-600">Heading Colour</Label>
                             <Select
-                              value={style.textColor}
-                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
+                              value={style.headingColor}
+                              onValueChange={(value) =>
+                                updateStyleWithSmartDescription(style.id, "headingColor", value)
+                              }
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
-                                  {colors.find((c) => c.name === style.textColor) && (
+                                  {colors.find((c) => c.name === style.headingColor) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
                                       <div
                                         className="w-4 h-4 rounded border shrink-0"
-                                        style={{ backgroundColor: colors.find((c) => c.name === style.textColor)?.hex }}
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.headingColor)?.hex }}
                                       />
-                                      <span className="truncate text-xs">{style.textColor}</span>
+                                      <span className="truncate text-xs">{style.headingColor}</span>
                                     </div>
                                   )}
                                 </SelectValue>
@@ -3390,22 +3392,20 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Heading Colour</Label>
+                            <Label className="text-xs text-slate-600">Text Colour</Label>
                             <Select
-                              value={style.headingColor}
-                              onValueChange={(value) =>
-                                updateStyleWithSmartDescription(style.id, "headingColor", value)
-                              }
+                              value={style.textColor}
+                              onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
-                                  {colors.find((c) => c.name === style.headingColor) && (
+                                  {colors.find((c) => c.name === style.textColor) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
                                       <div
                                         className="w-4 h-4 rounded border shrink-0"
-                                        style={{ backgroundColor: colors.find((c) => c.name === style.headingColor)?.hex }}
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.textColor)?.hex }}
                                       />
-                                      <span className="truncate text-xs">{style.headingColor}</span>
+                                      <span className="truncate text-xs">{style.textColor}</span>
                                     </div>
                                   )}
                                 </SelectValue>
@@ -3771,12 +3771,14 @@ ${iconTemplates}</div>`
 
                       {expandedTypography.has(style.id) && (
                         <div className="mt-4">
-                          <div className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Heading Typography Column */}
+                            <div className="space-y-6">
                             {/* Heading 1 */}
                             <div>
                               <Label className="text-xs text-slate-600">Heading 1 font</Label>
                               <Input
-                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h1Font, h1Font, "Arial, sans-serif")}
                                 onChange={(e) => updateStyle(style.id, "h1Font", e.target.value)}
                                 onBlur={(e) => updateStyle(style.id, "h1Font", formatFontForCSS(e.target.value))}
@@ -3829,7 +3831,7 @@ ${iconTemplates}</div>`
                             <div>
                               <Label className="text-xs text-slate-600">Heading 2 font</Label>
                               <Input
-                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h2Font, h2Font, "Arial, sans-serif")}
                                 onChange={(e) => updateStyle(style.id, "h2Font", e.target.value)}
                                 onBlur={(e) => updateStyle(style.id, "h2Font", formatFontForCSS(e.target.value))}
@@ -3882,7 +3884,7 @@ ${iconTemplates}</div>`
                             <div>
                               <Label className="text-xs text-slate-600">Heading 3 font</Label>
                               <Input
-                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h3Font, h3Font, "Arial, sans-serif")}
                                 onChange={(e) => updateStyle(style.id, "h3Font", e.target.value)}
                                 onBlur={(e) => updateStyle(style.id, "h3Font", formatFontForCSS(e.target.value))}
@@ -3935,7 +3937,7 @@ ${iconTemplates}</div>`
                             <div>
                               <Label className="text-xs text-slate-600">Heading 4 font</Label>
                               <Input
-                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h4Font, h4Font, "Arial, sans-serif")}
                                 onChange={(e) => updateStyle(style.id, "h4Font", e.target.value)}
                                 onBlur={(e) => updateStyle(style.id, "h4Font", formatFontForCSS(e.target.value))}
@@ -3983,12 +3985,15 @@ ${iconTemplates}</div>`
                                 </div>
                               </div>
                             </div>
+                          </div>
 
+                          {/* Body Typography Column */}
+                          <div className="space-y-6">
                             {/* Body */}
                             <div className="pt-2 border-t">
                               <Label className="text-xs text-slate-600">Body font</Label>
                               <Input
-                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
                                 onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
                                 onBlur={(e) => updateStyle(style.id, "bodyFont", formatFontForCSS(e.target.value))}
@@ -4036,12 +4041,15 @@ ${iconTemplates}</div>`
                                 </div>
                               </div>
                             </div>
+                          </div>
 
+                          {/* Button Typography Column */}
+                          <div className="space-y-6">
                             {/* Button */}
                             <div className="pt-6 border-t">
                               <Label className="text-xs text-slate-600">Button font</Label>
                               <Input
-                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
                                 onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
                                 onBlur={(e) => updateStyle(style.id, "buttonFont", formatFontForCSS(e.target.value))}
@@ -4149,8 +4157,9 @@ ${iconTemplates}</div>`
                               </div>
                             </div>
                           </div>
+                          </div>
 
-                          <Button
+                        <Button
                             onClick={() => {
                               const updatedStyles = styles.map((s) => {
                                 if (s.id === style.id) {
