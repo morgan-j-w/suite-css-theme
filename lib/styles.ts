@@ -1,11 +1,15 @@
 import { StyleDefinition, ColorDefinition } from "./types"
+import { formatFontForCSS } from "./utils/helpers"
 
 export const generateCSS = (
   styles: StyleDefinition[],
   colors: ColorDefinition[],
   {
     bodyFont = "Arial, sans-serif",
-    headingFont = "Arial, sans-serif",
+    h1Font = "Arial, sans-serif",
+    h2Font = "Arial, sans-serif",
+    h3Font = "Arial, sans-serif",
+    h4Font = "Arial, sans-serif",
     buttonFont = "Arial, sans-serif",
     bodySize = "15px",
     bodyLineHeight = "22px",
@@ -36,6 +40,14 @@ export const generateCSS = (
   const buttonPaddingValue = `${buttonPaddingTop}px ${buttonPaddingRight}px ${buttonPaddingBottom}px ${buttonPaddingLeft}px`
   const buttonBorderRadiusValue = `${buttonBorderRadius || "4"}px`
 
+  // Format fonts for CSS with proper single quotes
+  const bodyFontFormatted = formatFontForCSS(bodyFont)
+  const h1FontFormatted = formatFontForCSS(h1Font)
+  const h2FontFormatted = formatFontForCSS(h2Font)
+  const h3FontFormatted = formatFontForCSS(h3Font)
+  const h4FontFormatted = formatFontForCSS(h4Font)
+  const buttonFontFormatted = formatFontForCSS(buttonFont)
+
   const baseCss = `.wrapper [class*="text-style-"] {padding: 5px !Important;}
 .style-selector .info, .style-selector .header1 {font-size:14px !Important;line-height:24px !Important;}
 
@@ -50,9 +62,9 @@ export const generateCSS = (
 /*end of gutter style*/
 /* Defaults */
 
-#layout table td {font-family: ${bodyFont}; }
+#layout table td {font-family: ${bodyFontFormatted}; }
 
-#layout table, #layout label {font-family: ${bodyFont}; font-size:${bodySize};line-height:${bodyLineHeight}; font-weight: ${bodyWeight};}
+#layout table, #layout label {font-family: ${bodyFontFormatted}; font-size:${bodySize};line-height:${bodyLineHeight}; font-weight: ${bodyWeight};}
 
 #layout .block[data-sd-content=website]{padding:5px ${paddingValue}px}
 
@@ -65,7 +77,7 @@ export const generateCSS = (
 #layout label {font-weight: 400;}
 
 #layout .allow [data-sd-content=website] td{/* Style of website link TDs*/
-padding:0 8px;font-family: ${bodyFont}; text-align:center;border-left:1px solid #999999;border-right:1px solid #999999;}
+padding:0 8px;font-family: ${bodyFontFormatted}; text-align:center;border-left:1px solid #999999;border-right:1px solid #999999;}
 
 #layout .allow [data-sd-content=website] td:first-child{border-left:none;}
 
@@ -84,12 +96,12 @@ padding-bottom:10px;}
 padding-bottom:18px;padding-top:0px;padding-left:0px;padding-right:0px;}
 
 .figcaption{/* Applies to images, videos and articles with images*/
-padding:10px ${paddingValue}px 10px ${paddingValue}px;font-size:12px; line-height: 19px; text-align: left; text-decoration: none; font-family: ${bodyFont}; }
+padding:10px ${paddingValue}px 10px ${paddingValue}px;font-size:12px; line-height: 19px; text-align: left; text-decoration: none; font-family: ${bodyFontFormatted}; }
 
 .figcaption a { text-decoration: none;}
 
 .main, .intro{/* body text of blocks */
-font-family: ${bodyFont}; }
+font-family: ${bodyFontFormatted}; }
 
 .header{/* Provides consistent heading height across different email clients*/
 }
@@ -104,7 +116,7 @@ padding-right:6px;}
 #layout .block[data-image-position=left] tr.figure-container:last-child td, #layout .block[data-image-position=right] tr.figure-container:last-child td{padding-bottom:${paddingValue}px;}
 
 .calendar-body td, .calendar-body th{/* Styles of calendar table*/
-border-top:1px solid #ddd;font-family: ${bodyFont}; border-bottom:1px solid #ddd;padding:2px 0}
+border-top:1px solid #ddd;font-family: ${bodyFontFormatted}; border-bottom:1px solid #ddd;padding:2px 0}
 
 /*hybrid*/
 #layout .block[data-sd-content=article]:not([data-image-position]) .block-body > tbody > tr > td, #layout .block[data-sd-content=article][data-image-position=top] .block-body > tbody > tr:not(.media-container) > td, #layout .block[data-sd-content=article][data-image-position=bottom] .block-body > tbody > tr:not(.media-container) > td{/*set all elements in article to have padding left and right except image*/
@@ -144,7 +156,7 @@ padding: ${paddingValue}px}
 
 .btn-cm{/* All buttons styles */
 background-color:#00677f; border: 0px;
-color:#ffffff;display:inline-block;font-family: ${buttonFont}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
+color:#ffffff;display:inline-block;font-family: ${buttonFontFormatted}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
 
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
 
@@ -166,10 +178,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 #layout .block[data-sd-content="links"] {}
 #layout .block[data-sd-content="links"] .block-body .header-container .header {} 
 
-.header1{font-family: ${headingFont}; font-size:${h1Size};line-height:${h1LineHeight}; font-weight: ${h1Weight};}
-.header2{font-family: ${headingFont}; font-size:${h2Size};line-height:${h2LineHeight}; font-weight: ${h2Weight};}
-.header3{font-family: ${headingFont}; font-size:${h3Size};line-height:${h3LineHeight}; font-weight: ${h3Weight};}
-.header4{font-family: ${headingFont}; font-size:${h4Size};line-height:${h4LineHeight}; font-weight: ${h4Weight};}
+.header1{font-family: ${h1FontFormatted}; font-size:${h1Size};line-height:${h1LineHeight}; font-weight: ${h1Weight};}
+.header2{font-family: ${h2FontFormatted}; font-size:${h2Size};line-height:${h2LineHeight}; font-weight: ${h2Weight};}
+.header3{font-family: ${h3FontFormatted}; font-size:${h3Size};line-height:${h3LineHeight}; font-weight: ${h3Weight};}
+.header4{font-family: ${h4FontFormatted}; font-size:${h4Size};line-height:${h4LineHeight}; font-weight: ${h4Weight};}
 
 #layout .block[data-image-position="right"] .share-article, #layout .block[data-image-position="left"] .share-article {padding-top: ${paddingValue}px !Important;}
 
@@ -205,9 +217,12 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     const btnSize = style.buttonSize || buttonSize || "15px"
     const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
     const btnWeight = style.buttonWeight || buttonWeight || "400"
-    const headingFontVal = style.headingFont || headingFont || "Arial, sans-serif"
-    const bodyFontVal = style.bodyFont || bodyFont || "Arial, sans-serif"
-    const btnFont = style.buttonFont || buttonFont || "Arial, sans-serif"
+    const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
+    const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
+    const h3FontVal = formatFontForCSS(style.h3Font || h3Font || "Arial, sans-serif")
+    const h4FontVal = formatFontForCSS(style.h4Font || h4Font || "Arial, sans-serif")
+    const bodyFontVal = formatFontForCSS(style.bodyFont || bodyFont || "Arial, sans-serif")
+    const btnFont = formatFontForCSS(style.buttonFont || buttonFont || "Arial, sans-serif")
 
     const descriptionPrefix = style.noPadding ? 'No padding - ' : ''
     const capitalizeFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
@@ -217,13 +232,13 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     css += `${className} {background-color:${bgColor};color:${textColor};font-family: ${bodyFontVal}; font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-weight: ${bodyWeightVal};}\n`
     css += `${className} .main{color:${textColor};font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-family: ${bodyFontVal}; }\n`
     css += `${className}, ${className} .add-to-calendar-container td:first-child, ${className} .main, ${className} .sd-list-date, ${className} .sd-list-description, ${className} .calendar-body table td, ${className} .calendar-body table th, ${className} .figcaption, ${className} .intro,  ${className} label, ${className} td {color:${textColor}; font-family: ${bodyFontVal}; }\n`
-    css += `${className} .header1, ${className} .header2, ${className} .header3, ${className} .header4{font-family: ${headingFontVal};  color: ${headingColor};}\n`
+    css += `${className} .header1, ${className} .header2, ${className} .header3, ${className} .header4{color: ${headingColor};}\n`
     css += `${className} td.share-article {padding-top: 0px !Important;}\n`
     css += `${className} .figcaption {color: ${textColor};}\n`
-    css += `${className} .header1{font-family: ${headingFontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}\n`
-    css += `${className} .header2{font-family: ${headingFontVal};font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}\n`
-    css += `${className} .header3{font-family: ${headingFontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}\n`
-    css += `${className} .header4{font-family: ${headingFontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}\n`
+    css += `${className} .header1{font-family: ${h1FontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}\n`
+    css += `${className} .header2{font-family: ${h2FontVal};font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}\n`
+    css += `${className} .header3{font-family: ${h3FontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}\n`
+    css += `${className} .header4{font-family: ${h4FontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}\n`
     css += `${className} .figcaption a, ${className} a{color:${linkColor};text-decoration:underline;}\n`
     css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
     css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`

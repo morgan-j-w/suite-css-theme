@@ -14,7 +14,10 @@ export interface StyleDefinition {
   buttonBg: string
   buttonText: string
   linkColor: string
-  headingFont: string
+  h1Font: string
+  h2Font: string
+  h3Font: string
+  h4Font: string
   bodyFont: string
   buttonFont: string
   h1Size: string

@@ -11,7 +11,10 @@ export const useThemeState = () => {
   ])
 
   const [styles, setStyles] = useState<StyleDefinition[]>([])
-  const [headingFont, setHeadingFont] = useState("Arial, sans-serif")
+  const [h1Font, setH1Font] = useState("Arial, sans-serif")
+  const [h2Font, setH2Font] = useState("Arial, sans-serif")
+  const [h3Font, setH3Font] = useState("Arial, sans-serif")
+  const [h4Font, setH4Font] = useState("Arial, sans-serif")
   const [bodyFont, setBodyFont] = useState("Arial, sans-serif")
   const [buttonFont, setButtonFont] = useState("Arial, sans-serif")
   const [themePadding, setThemePadding] = useState("25px")
@@ -63,7 +66,10 @@ export const useThemeState = () => {
         { id: "2", name: "Black", hex: "#000000" },
       ]) as ColorDefinition[],
     )
-    setHeadingFont(loadFromLocalStorage("headingFont", "Arial, sans-serif") as string)
+    setH1Font(loadFromLocalStorage("h1Font", "Arial, sans-serif") as string)
+    setH2Font(loadFromLocalStorage("h2Font", "Arial, sans-serif") as string)
+    setH3Font(loadFromLocalStorage("h3Font", "Arial, sans-serif") as string)
+    setH4Font(loadFromLocalStorage("h4Font", "Arial, sans-serif") as string)
     setBodyFont(loadFromLocalStorage("bodyFont", "Arial, sans-serif") as string)
     setButtonFont(loadFromLocalStorage("buttonFont", "Arial, sans-serif") as string)
     const savedPadding = loadFromLocalStorage("themePadding", "25px") as string
@@ -107,8 +113,14 @@ export const useThemeState = () => {
     setColors,
     styles,
     setStyles,
-    headingFont,
-    setHeadingFont,
+    h1Font,
+    setH1Font,
+    h2Font,
+    setH2Font,
+    h3Font,
+    setH3Font,
+    h4Font,
+    setH4Font,
     bodyFont,
     setBodyFont,
     buttonFont,

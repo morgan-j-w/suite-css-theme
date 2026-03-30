@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Toaster } from "@/components/ui/sonner"
 import { useToast } from "@/hooks/use-toast"
 
@@ -21,7 +21,7 @@ import { ColorDefinition, StyleDefinition } from "@/lib/types"
 import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { downloadIconsZip } from "@/lib/icons"
-import { cleanFontValue, getAvailableFonts } from "@/lib/utils/helpers"
+import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
 
 // Import components
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
@@ -69,7 +69,7 @@ export default function ThemeGenerator() {
   // Safe value extractors for typography fields
   const getDisplayValue = (styleValue: string | undefined, globalValue: string | undefined, defaultValue: string = "0") => {
     const value = styleValue || globalValue || defaultValue
-    return value.replace("px", "").replace("px", "") // double replace to handle any edge cases
+    return value.replace("px", "")
   }
 
   const getDisplayFont = (styleValue: string | undefined, globalValue: string | undefined, defaultValue: string = "Arial, sans-serif") => {
@@ -83,8 +83,14 @@ export default function ThemeGenerator() {
     setColors,
     styles,
     setStyles,
-    headingFont,
-    setHeadingFont,
+    h1Font,
+    setH1Font,
+    h2Font,
+    setH2Font,
+    h3Font,
+    setH3Font,
+    h4Font,
+    setH4Font,
     bodyFont,
     setBodyFont,
     buttonFont,
@@ -213,7 +219,10 @@ export default function ThemeGenerator() {
 
   // localStorage sync effects
   useEffect(() => { saveToLocalStorage("themeColors", colors) }, [colors])
-  useEffect(() => { saveToLocalStorage("headingFont", headingFont) }, [headingFont])
+  useEffect(() => { saveToLocalStorage("h1Font", h1Font) }, [h1Font])
+  useEffect(() => { saveToLocalStorage("h2Font", h2Font) }, [h2Font])
+  useEffect(() => { saveToLocalStorage("h3Font", h3Font) }, [h3Font])
+  useEffect(() => { saveToLocalStorage("h4Font", h4Font) }, [h4Font])
   useEffect(() => { saveToLocalStorage("bodyFont", bodyFont) }, [bodyFont])
   useEffect(() => { saveToLocalStorage("buttonFont", buttonFont) }, [buttonFont])
   useEffect(() => { saveToLocalStorage("themePadding", themePadding) }, [themePadding])
@@ -245,6 +254,9 @@ export default function ThemeGenerator() {
   useEffect(() => { localStorage.setItem("adobeFontImport", adobeFontImport) }, [adobeFontImport])
   useEffect(() => { localStorage.setItem("webfontImports", webfontImports) }, [webfontImports])
   useEffect(() => { localStorage.setItem("customImport", customImport) }, [customImport])
+  useEffect(() => { saveToLocalStorage("adobeFontsKitId", adobeFontsKitId) }, [adobeFontsKitId])
+  useEffect(() => { saveToLocalStorage("globalIconStyle", globalIconStyle) }, [globalIconStyle])
+  useEffect(() => { saveToLocalStorage("globalIconSize", globalIconSize) }, [globalIconSize])
   useEffect(() => { saveToLocalStorage("themeStyles", styles) }, [styles])
 
   // Initialize client and fonts list
@@ -271,7 +283,7 @@ export default function ThemeGenerator() {
   // Track unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(true)
-  }, [colors, styles, headingFont, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, adobeFontsKitId, adobeFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
+  }, [colors, styles, h1Font, h2Font, h3Font, h4Font, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, adobeFontsKitId, adobeFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
 
   // Sync all font imports into webfontImports (only if the sync result has content)
   useEffect(() => {
@@ -401,12 +413,17 @@ export default function ThemeGenerator() {
     const whiteColor = colors.find(c => c.hex === "#ffffff") || colors[0]
     const blackColor = colors.find(c => c.hex === "#000000") || colors[1]
     
+    const bgName = whiteColor?.name || "White"
+    const headingName = blackColor?.name || "Black"
+    const buttonName = blackColor?.name || "Black"
+    const description = `${bgName} background with ${headingName.toLowerCase()} headings and ${buttonName.toLowerCase()} buttons`
+    
     setStyles([
       ...styles,
       {
         id: Date.now().toString(),
         name: `Style ${styleNumber}`,
-        description: "",
+        description: description,
         background: whiteColor?.name || "White",
         textColor: blackColor?.name || "Black",
         headingColor: blackColor?.name || "Black",
@@ -415,7 +432,10 @@ export default function ThemeGenerator() {
         buttonBgHover: blackColor?.name || "Black",
         buttonTextHover: whiteColor?.name || "White",
         linkColor: blackColor?.name || "Black",
-        headingFont: headingFont || "Arial, sans-serif",
+        h1Font: h1Font || "Arial, sans-serif",
+        h2Font: h2Font || "Arial, sans-serif",
+        h3Font: h3Font || "Arial, sans-serif",
+        h4Font: h4Font || "Arial, sans-serif",
         bodyFont: bodyFont || "Arial, sans-serif",
         buttonFont: buttonFont || "Arial, sans-serif",
         h1Size: h1Size || "22px",
@@ -531,7 +551,7 @@ export default function ThemeGenerator() {
     )
   }
 
-  const updateAllStylesFonts = (fontType: "heading" | "body" | "button", value: string) => {
+  const updateAllStylesFonts = (fontType: "h1" | "h2" | "h3" | "h4" | "body" | "button", value: string) => {
     setStyles(
       styles.map((s) => ({
         ...s,
@@ -732,10 +752,13 @@ export default function ThemeGenerator() {
     let css = ""
     
     // Add base CSS with placeholders replaced
-    // Ensure fonts have fallback values
-    const bodyFontVal = bodyFont || "Arial, sans-serif"
-    const headingFontVal = headingFont || "Arial, sans-serif"
-    const buttonFontVal = buttonFont || "Arial, sans-serif"
+    // Ensure fonts have fallback values and proper CSS formatting
+    const bodyFontVal = formatFontForCSS(bodyFont || "Arial, sans-serif")
+    const h1FontVal = formatFontForCSS(h1Font || "Arial, sans-serif")
+    const h2FontVal = formatFontForCSS(h2Font || "Arial, sans-serif")
+    const h3FontVal = formatFontForCSS(h3Font || "Arial, sans-serif")
+    const h4FontVal = formatFontForCSS(h4Font || "Arial, sans-serif")
+    const buttonFontVal = formatFontForCSS(buttonFont || "Arial, sans-serif")
     const bodySizeVal = bodySize || "15px"
     const bodyLineHeightVal = bodyLineHeight || "22px"
     const bodyWeightVal = bodyWeight || "400"
@@ -904,10 +927,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 #layout .block[data-sd-content="links"] {}
 #layout .block[data-sd-content="links"] .block-body .header-container .header {} 
 
-.header1{font-family: ${headingFontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}
-.header2{font-family: ${headingFontVal}; font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}
-.header3{font-family: ${headingFontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}
-.header4{font-family: ${headingFontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}
+.header1{font-family: ${h1FontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}
+.header2{font-family: ${h2FontVal}; font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}
+.header3{font-family: ${h3FontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}
+.header4{font-family: ${h4FontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}
 
 
 
@@ -949,9 +972,12 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const btnSize = style.buttonSize || buttonSize || "15px"
       const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
       const btnWeight = style.buttonWeight || buttonWeight || "400"
-      const headingFontVal = style.headingFont || headingFont || "Arial, sans-serif"
-      const bodyFontVal = style.bodyFont || bodyFont || "Arial, sans-serif"
-      const btnFont = style.buttonFont || buttonFont || "Arial, sans-serif"
+      const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
+      const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
+      const h3FontVal = formatFontForCSS(style.h3Font || h3Font || "Arial, sans-serif")
+      const h4FontVal = formatFontForCSS(style.h4Font || h4Font || "Arial, sans-serif")
+      const bodyFontVal = formatFontForCSS(style.bodyFont || bodyFont || "Arial, sans-serif")
+      const btnFont = formatFontForCSS(style.buttonFont || buttonFont || "Arial, sans-serif")
 
       const descriptionPrefix = style.noPadding ? 'No padding - ' : ''
       const capitalizeFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
@@ -961,13 +987,13 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} {background-color:${bgColor};color:${textColor};font-family: ${bodyFontVal}; font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-weight: ${bodyWeightVal};}\n`
       css += `${className} .main{color:${textColor};font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-family: ${bodyFontVal}; }\n`
       css += `${className}, ${className} .add-to-calendar-container td:first-child, ${className} .main, ${className} .sd-list-date, ${className} .sd-list-description, ${className} .calendar-body table td, ${className} .calendar-body table th, ${className} .figcaption, ${className} .intro,  ${className} label, ${className} td {color:${textColor}; font-family: ${bodyFontVal}; }\n`
-      css += `${className} .header1, ${className} .header2, ${className} .header3, ${className} .header4{font-family: ${headingFontVal};  color: ${headingColor};}\n`
+      css += `${className} .header1, ${className} .header2, ${className} .header3, ${className} .header4{color: ${headingColor};}\n`
       css += `${className} td.share-article {padding-top: 0px !Important;}\n`
       css += `${className} .figcaption {color: ${textColor};}\n`
-      css += `${className} .header1{font-family: ${headingFontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}\n`
-      css += `${className} .header2{font-family: ${headingFontVal};font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}\n`
-      css += `${className} .header3{font-family: ${headingFontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}\n`
-      css += `${className} .header4{font-family: ${headingFontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}\n`
+      css += `${className} .header1{font-family: ${h1FontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}\n`
+      css += `${className} .header2{font-family: ${h2FontVal};font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}\n`
+      css += `${className} .header3{font-family: ${h3FontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}\n`
+      css += `${className} .header4{font-family: ${h4FontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}\n`
       css += `${className} .figcaption a, ${className} a{color:${linkColor};text-decoration:underline;}\n`
       css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
       css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`
@@ -1037,7 +1063,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
                   buttonBg: btnBg.name,
                   buttonText: btnText.name,
                   linkColor: linkColor.name,
-                  headingFont: headingFont,
+                  h1Font: h1Font,
+                  h2Font: h2Font,
+                  h3Font: h3Font,
+                  h4Font: h4Font,
                   bodyFont: bodyFont,
                   buttonFont: buttonFont,
                   h1Size: h1Size,
@@ -1116,7 +1145,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
           buttonBg: btnBg.name,
           buttonText: btnText.name,
           linkColor: linkColor.name,
-          headingFont: headingFont,
+          h1Font: h1Font,
+          h2Font: h2Font,
+          h3Font: h3Font,
+          h4Font: h4Font,
           bodyFont: bodyFont,
           buttonFont: buttonFont,
           h1Size: h1Size,
@@ -1204,7 +1236,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         buttonBgHover: btnBg.name,
         buttonTextHover: btnText.name,
         linkColor: linkColor.name,
-        headingFont: headingFont,
+        h1Font: h1Font,
+        h2Font: h2Font,
+        h3Font: h3Font,
+        h4Font: h4Font,
         bodyFont: bodyFont,
         buttonFont: buttonFont,
         h1Size: h1Size,
@@ -1600,6 +1635,35 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   }
 
   const copyExportHtml = async () => {
+    const iconStyleMap: Record<string, string> = {
+      'material-rounded': 'material-rounded',
+      'material-outlined': 'material-outlined',
+      'material-sharp': 'material-sharp',
+    }
+    const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+    const iconSize = globalIconSize || "18"
+
+    const shareIcons = [
+      { name: 'Facebook', id: 'facebook', variable: 'FACEBOOK_SHARE_DOC' },
+      { name: 'X', id: 'twitterx--v1', variable: 'TWITTER_SHARE_DOC' },
+      { name: 'LinkedIn', id: 'linkedin', variable: 'LINKEDIN_SHARE_DOC' },
+      { name: 'Print', id: 'print', variable: 'PRINT_SHARE_DOC' },
+      { name: 'Email', id: 'new-post', variable: 'EMAIL_SHARE_DOC' },
+    ]
+
+    // Generate icon templates for each style
+    let iconTemplates = ''
+    styles.forEach((style, index) => {
+      const iconColor = (style.iconColor || "#000000").replace('#', '')
+      iconTemplates += `    <div class="text-style-${index + 1}"><br>\n`
+      shareIcons.forEach(icon => {
+        iconTemplates += `        <a title="${icon.name}" class="sd-${icon.id === 'twitterx--v1' ? 'twitter' : icon.id}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
+        iconTemplates += `            <img alt="${icon.name}" src="https://img.icons8.com/${mappedStyle}/96/${iconColor}/${icon.id}.png" width="${iconSize}">\n`
+        iconTemplates += `        </a>\n`
+      })
+      iconTemplates += `    </div>\n`
+    })
+
     const htmlContent = `<div class="read-more-button">
     <div><!--[if mso]>
         <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
@@ -1615,14 +1679,291 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             Read more
         </a>
     </div>
-</div>`
+</div>
+
+<div class="grid-templates">
+    <div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
+        <table cellspacing="0" cellpadding="0" border="0" align="center">
+            <tbody>
+            <tr>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="contenttable mso-full-width skip-mso" style="width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 1-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="template grid grid-2 allow-top allow-bottom allow-move allow-delete">
+        <table cellspacing="0" cellpadding="0" border="0" align="center">
+            <tbody>
+            <tr>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Gutter --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="template grid grid-3 allow-top allow-bottom allow-move allow-delete">
+        <table cellspacing="0" cellpadding="0" border="0" align="center">
+            <tbody>
+            <tr>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Gutter --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Gutter --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="template grid grid-4 allow-top allow-bottom allow-move allow-delete">
+        <table cellspacing="0" cellpadding="0" border="0" align="center">
+            <tbody>
+            <tr>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Gutter --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Gutter --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Gutter --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock mccontentBlock" valign="top" align="left">
+                    <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="mobileBlock" valign="top" align="left">
+                    <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
+                        <tbody>
+                        <tr>
+                            <td><!-- Margin --></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="icon-templates">
+${iconTemplates}</div>`
     await navigator.clipboard.writeText(htmlContent)
     setCopiedHtml(true)
     setTimeout(() => setCopiedHtml(false), 2000)
   }
 
   const copyExportMediaQuery = async () => {
-    const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}}`
+    const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
     await navigator.clipboard.writeText(mediaQuery)
     setCopiedMedia(true)
     setTimeout(() => setCopiedMedia(false), 2000)
@@ -1648,7 +1989,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       saveToLocalStorage("savedTheme", {
         colors,
         styles,
-        headingFont,
+        h1Font,
+        h2Font,
+        h3Font,
+        h4Font,
         bodyFont,
         buttonFont,
         themePadding,
@@ -1718,7 +2062,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     ) {
       // Clear localStorage
       localStorage.removeItem("themeColors")
-      localStorage.removeItem("headingFont")
+      localStorage.removeItem("h1Font")
+      localStorage.removeItem("h2Font")
+      localStorage.removeItem("h3Font")
+      localStorage.removeItem("h4Font")
       localStorage.removeItem("bodyFont")
       localStorage.removeItem("buttonFont")
       localStorage.removeItem("h1Size")
@@ -1745,7 +2092,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         { id: "1", name: "White", hex: "#FFFFFF" },
         { id: "2", name: "Black", hex: "#000000" },
       ])
-      setHeadingFont("")
+      setH1Font("")
+      setH2Font("")
+      setH3Font("")
+      setH4Font("")
       setBodyFont("")
       setButtonFont("")
       setH1Size("")
@@ -1770,7 +2120,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     }
   }
 
-  // Show password form if not authenticated
+  // Show password form if not authenticated (client-side only)
   if (isClient && !isAuthenticated) {
     return (
       <PasswordModal
@@ -1785,16 +2135,14 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
   return (
     <>
-      {isClient && (
-        <>
-          {/* Header Bar - Full Width */}
-          <AppHeader 
-            onSaveTheme={handleSaveThemeFromHeader} 
-            onExit={handleExitFromHeader}
-            hasUnsavedChanges={hasUnsavedChanges}
-            isSaving={isSaving}
-            onDevInfo={() => setShowDevInfo(true)}
-          />
+      {/* Header Bar - Full Width */}
+      <AppHeader 
+        onSaveTheme={handleSaveThemeFromHeader} 
+        onExit={handleExitFromHeader}
+        hasUnsavedChanges={hasUnsavedChanges}
+        isSaving={isSaving}
+        onDevInfo={() => setShowDevInfo(true)}
+      />
           <div className="min-h-screen pt-4 md:pt-8 pl-4 md:pl-8 pr-4 md:pr-8" style={{ backgroundColor: '#F6F8FB' }}>
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
@@ -1983,228 +2331,275 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       <CardHeader className="pb-2">
                         <CardTitle className="text-lg">Heading typography</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent className="space-y-6">
+                {/* Heading 1 */}
                 <div>
-                  <Label>Heading font</Label>
+                  <Label>Heading 1 font</Label>
                   <Input
-                    className="mt-1"
-                    value={headingFont || "Arial, sans-serif"}
+                    className="mt-1 mb-3"
+                    value={h1Font || "Arial, sans-serif"}
                     onChange={(e) => {
                       const value = e.target.value
-                      setHeadingFont(value)
-                      updateAllStylesFonts("heading", value)
+                      setH1Font(value)
+                      updateAllStylesFonts("h1", value)
                     }}
-                    placeholder="e.g., 'Hubot Sans', sans-serif;"
-                    list="available-fonts"
+                    onBlur={(e) => {
+                      const formatted = formatFontForCSS(e.target.value)
+                      setH1Font(formatted)
+                      updateAllStylesFonts("h1", formatted)
+                    }}
+                    placeholder="e.g., 'Hubot Sans', sans-serif"
                   />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h1Size || "22px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH1Size(value)
+                          updateAllStylesH1Size(value)
+                        }}
+                        placeholder="22"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h1LineHeight || "30px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH1LineHeight(value)
+                          updateAllStylesH1LineHeight(value)
+                        }}
+                        placeholder="30"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Weight</Label>
+                      <Select value={h1Weight} onValueChange={(value) => {
+                        setH1Weight(value)
+                        updateAllStylesH1Weight(value)
+                      }}>
+                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fontWeightOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium">Heading 1</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h1Size || "22px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH1Size(value)
-                            updateAllStylesH1Size(value)
-                          }}
-                          placeholder="22"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h1LineHeight || "30px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH1LineHeight(value)
-                            updateAllStylesH1LineHeight(value)
-                          }}
-                          placeholder="30"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Weight</Label>
-                        <Select value={h1Weight} onValueChange={(value) => {
-                          setH1Weight(value)
-                          updateAllStylesH1Weight(value)
-                        }}>
-                          <SelectTrigger className="mt-1.5 h-9 w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {fontWeightOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                {/* Heading 2 */}
+                <div>
+                  <Label>Heading 2 font</Label>
+                  <Input
+                    className="mt-1 mb-3"
+                    value={h2Font || "Arial, sans-serif"}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setH2Font(value)
+                      updateAllStylesFonts("h2", value)
+                    }}
+                    onBlur={(e) => {
+                      const formatted = formatFontForCSS(e.target.value)
+                      setH2Font(formatted)
+                      updateAllStylesFonts("h2", formatted)
+                    }}
+                    placeholder="e.g., 'Hubot Sans', sans-serif"
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h2Size || "20px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH2Size(value)
+                          updateAllStylesH2Size(value)
+                        }}
+                        placeholder="20"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h2LineHeight || "28px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH2LineHeight(value)
+                          updateAllStylesH2LineHeight(value)
+                        }}
+                        placeholder="28"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Weight</Label>
+                      <Select value={h2Weight} onValueChange={(value) => {
+                        setH2Weight(value)
+                        updateAllStylesH2Weight(value)
+                      }}>
+                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fontWeightOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
+                </div>
 
-                  <div>
-                    <Label className="text-sm font-medium">Heading 2</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h2Size || "20px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH2Size(value)
-                            updateAllStylesH2Size(value)
-                          }}
-                          placeholder="20"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h2LineHeight || "28px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH2LineHeight(value)
-                            updateAllStylesH2LineHeight(value)
-                          }}
-                          placeholder="28"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Weight</Label>
-                        <Select value={h2Weight} onValueChange={(value) => {
-                          setH2Weight(value)
-                          updateAllStylesH2Weight(value)
-                        }}>
-                          <SelectTrigger className="mt-1.5 h-9 w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {fontWeightOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                {/* Heading 3 */}
+                <div>
+                  <Label>Heading 3 font</Label>
+                  <Input
+                    className="mt-1 mb-3"
+                    value={h3Font || "Arial, sans-serif"}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setH3Font(value)
+                      updateAllStylesFonts("h3", value)
+                    }}
+                    onBlur={(e) => {
+                      const formatted = formatFontForCSS(e.target.value)
+                      setH3Font(formatted)
+                      updateAllStylesFonts("h3", formatted)
+                    }}
+                    placeholder="e.g., 'Hubot Sans', sans-serif"
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h3Size || "18px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH3Size(value)
+                          updateAllStylesH3Size(value)
+                        }}
+                        placeholder="18"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h3LineHeight || "26px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH3LineHeight(value)
+                          updateAllStylesH3LineHeight(value)
+                        }}
+                        placeholder="26"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Weight</Label>
+                      <Select value={h3Weight} onValueChange={(value) => {
+                        setH3Weight(value)
+                        updateAllStylesH3Weight(value)
+                      }}>
+                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fontWeightOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
+                </div>
 
-                  <div>
-                    <Label className="text-sm font-medium">Heading 3</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h3Size || "18px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH3Size(value)
-                            updateAllStylesH3Size(value)
-                          }}
-                          placeholder="18"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h3LineHeight || "26px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH3LineHeight(value)
-                            updateAllStylesH3LineHeight(value)
-                          }}
-                          placeholder="26"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Weight</Label>
-                        <Select value={h3Weight} onValueChange={(value) => {
-                          setH3Weight(value)
-                          updateAllStylesH3Weight(value)
-                        }}>
-                          <SelectTrigger className="mt-1.5 h-9 w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {fontWeightOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                {/* Heading 4 */}
+                <div>
+                  <Label>Heading 4 font</Label>
+                  <Input
+                    className="mt-1 mb-3"
+                    value={h4Font || "Arial, sans-serif"}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setH4Font(value)
+                      updateAllStylesFonts("h4", value)
+                    }}
+                    onBlur={(e) => {
+                      const formatted = formatFontForCSS(e.target.value)
+                      setH4Font(formatted)
+                      updateAllStylesFonts("h4", formatted)
+                    }}
+                    placeholder="e.g., 'Hubot Sans', sans-serif"
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h4Size || "16px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH4Size(value)
+                          updateAllStylesH4Size(value)
+                        }}
+                        placeholder="16"
+                      />
                     </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Heading 4</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1.5">
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h4Size || "16px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH4Size(value)
-                            updateAllStylesH4Size(value)
-                          }}
-                          placeholder="16"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                        <Input
-                          className="mt-1.5 w-full"
-                          type="number"
-                          value={(h4LineHeight || "22px").replace("px", "")}
-                          onChange={(e) => {
-                            const value = `${e.target.value}px`
-                            setH4LineHeight(value)
-                            updateAllStylesH4LineHeight(value)
-                          }}
-                          placeholder="22"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Weight</Label>
-                        <Select value={h4Weight} onValueChange={(value) => {
-                          setH4Weight(value)
-                          updateAllStylesH4Weight(value)
-                        }}>
-                          <SelectTrigger className="mt-1.5 h-9 w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {fontWeightOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Input
+                        className="mt-1.5 w-full"
+                        type="number"
+                        value={(h4LineHeight || "22px").replace("px", "")}
+                        onChange={(e) => {
+                          const value = `${e.target.value}px`
+                          setH4LineHeight(value)
+                          updateAllStylesH4LineHeight(value)
+                        }}
+                        placeholder="22"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Weight</Label>
+                      <Select value={h4Weight} onValueChange={(value) => {
+                        setH4Weight(value)
+                        updateAllStylesH4Weight(value)
+                      }}>
+                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fontWeightOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
@@ -2227,8 +2622,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       setBodyFont(value)
                       updateAllStylesFonts("body", value)
                     }}
+                    onBlur={(e) => {
+                      const formatted = formatFontForCSS(e.target.value)
+                      setBodyFont(formatted)
+                      updateAllStylesFonts("body", formatted)
+                    }}
                     placeholder="e.g., 'Roboto', sans-serif;"
-                    list="available-fonts"
                   />
                 </div>
 
@@ -2302,8 +2701,12 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       setButtonFont(value)
                       updateAllStylesFonts("button", value)
                     }}
+                    onBlur={(e) => {
+                      const formatted = formatFontForCSS(e.target.value)
+                      setButtonFont(formatted)
+                      updateAllStylesFonts("button", formatted)
+                    }}
                     placeholder="e.g., 'Inter', sans-serif;"
-                    list="available-fonts"
                   />
                 </div>
 
@@ -2393,6 +2796,39 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                         </div>
                       </CardContent>
                     </Card>
+
+                    {/* Adobe Fonts Kit ID */}
+                    <Card className="shadow-sm">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Adobe Fonts Kit ID</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="relative">
+                          <Input
+                            value={adobeFontsKitId}
+                            onChange={(e) => setAdobeFontsKitId(e.target.value)}
+                            placeholder="e.g., abc1234 (from your Adobe Fonts kit link)"
+                            className="font-mono text-sm"
+                            style={{ backgroundColor: '#F9FBFD', borderColor: '#E6EDF3' }}
+                          />
+                          {adobeFontsKitId && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="absolute top-1 right-2 h-8 w-8 p-0"
+                              onClick={() => {
+                                navigator.clipboard.writeText(adobeFontsKitId)
+                                toast({
+                                  description: "Adobe Fonts Kit ID copied to clipboard",
+                                })
+                              }}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
 
                   {/* Right Column: Font Preview (sticky) */}
@@ -2400,13 +2836,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                     <div className="sticky top-32 z-10">
                       <Card className="shadow-sm">
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-lg">Font preview</CardTitle>
+                          <label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</label>
                         </CardHeader>
                         <CardContent className="space-y-2 text-sm">
                 <div>
                   <div 
                     style={{
-                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontFamily: cleanFontValue(h1Font) || "Arial, sans-serif",
                       fontSize: `${h1Size || '22px'}`,
                       lineHeight: `${h1LineHeight || '30px'}`,
                       fontWeight: h1Weight || '700',
@@ -2419,7 +2855,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <div>
                   <div 
                     style={{
-                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontFamily: cleanFontValue(h2Font) || "Arial, sans-serif",
                       fontSize: `${h2Size || '20px'}`,
                       lineHeight: `${h2LineHeight || '28px'}`,
                       fontWeight: h2Weight || '700',
@@ -2432,7 +2868,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <div>
                   <div 
                     style={{
-                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontFamily: cleanFontValue(h3Font) || "Arial, sans-serif",
                       fontSize: `${h3Size || '18px'}`,
                       lineHeight: `${h3LineHeight || '26px'}`,
                       fontWeight: h3Weight || '700',
@@ -2445,7 +2881,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <div>
                   <div 
                     style={{
-                      fontFamily: cleanFontValue(headingFont) || "Arial, sans-serif",
+                      fontFamily: cleanFontValue(h4Font) || "Arial, sans-serif",
                       fontSize: `${h4Size || '16px'}`,
                       lineHeight: `${h4LineHeight || '24px'}`,
                       fontWeight: h4Weight || '700',
@@ -2496,7 +2932,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 <h2 className="text-2xl font-bold mb-4">Configure your theme</h2>
                 <p className="text-slate-600 mb-4">Set up article padding, icon settings and button styling for your theme.</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Theme padding */}
           <Card className="shadow-sm">
             <CardHeader className="pb-2">
@@ -2763,7 +3199,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                               className="text-sm font-semibold mb-1 pointer-events-none"
                               style={{
                                 color: getColorHexValue(combo.headingColor),
-                                fontFamily: cleanFontValue(combo.headingFont),
+                                fontFamily: cleanFontValue(combo.h1Font),
                               }}
                             >
                               Sample heading
@@ -2837,9 +3273,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                 return (
                   <div key={style.id} className="p-4 border rounded-lg bg-slate-50">
-                    <div className="grid md:grid-cols-5 gap-4">
+                    <div className="grid lg:grid-cols-5 gap-4">
                       {/* Left Column: Tools */}
-                      <div className="space-y-3 md:col-span-3">
+                      <div className="space-y-3 lg:col-span-3">
                         {/* Title and Controls */}
                         <div className="flex items-center gap-2 w-full">
                           <h3 className="font-semibold text-lg truncate min-w-0 flex-shrink">Style {index + 1}</h3>
@@ -3224,13 +3660,13 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                       </div>
 
                       {/* Right Column: Preview */}
-                      <div className="min-w-0 md:col-span-2">
+                      <div className="min-w-0 lg:col-span-2">
                         <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
                         <div className={`rounded-lg border ${style.noPadding ? '' : 'p-4'}`} style={{ backgroundColor: bgColor, color: textColor }}>
                           <div
                             style={{
                               color: headingColor,
-                              fontFamily: cleanFontValue(style.headingFont || headingFont) || "Arial, sans-serif",
+                              fontFamily: cleanFontValue(style.h1Font || h1Font) || "Arial, sans-serif",
                               fontSize: `${style.h1Size || h1Size || '22px'}`,
                               lineHeight: `${style.h1LineHeight || h1LineHeight || '30px'}`,
                               fontWeight: style.h1Weight || h1Weight || '700',
@@ -3335,378 +3771,381 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
                       {expandedTypography.has(style.id) && (
                         <div className="mt-4">
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            {/* Heading Typography */}
-                            <div className="space-y-6 p-3 bg-white rounded border border-slate-200">
-                              <div>
-                                <Label className="text-xs text-slate-600">Heading font</Label>
-                                <Input
-                                  className="mt-1.5 text-xs bg-slate-50 w-full"
-                                  value={getDisplayFont(style.headingFont, headingFont, "Arial, sans-serif")}
-                                  onChange={(e) => updateStyle(style.id, "headingFont", e.target.value)}
-                                  placeholder={getDisplayFont(undefined, headingFont, "Arial, sans-serif")}
-                                />
+                          <div className="space-y-6">
+                            {/* Heading 1 */}
+                            <div>
+                              <Label className="text-xs text-slate-600">Heading 1 font</Label>
+                              <Input
+                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                value={getDisplayFont(style.h1Font, h1Font, "Arial, sans-serif")}
+                                onChange={(e) => updateStyle(style.id, "h1Font", e.target.value)}
+                                onBlur={(e) => updateStyle(style.id, "h1Font", formatFontForCSS(e.target.value))}
+                                placeholder={getDisplayFont(undefined, h1Font, "Arial, sans-serif")}
+                              />
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h1Size, h1Size, "22")}
+                                    onChange={(e) => updateStyle(style.id, "h1Size", `${e.target.value}px`)}
+                                    placeholder="22"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h1LineHeight, h1LineHeight, "30")}
+                                    onChange={(e) => updateStyle(style.id, "h1LineHeight", `${e.target.value}px`)}
+                                    placeholder="30"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Weight</Label>
+                                  <Select
+                                    value={style.h1Weight || h1Weight || "700"}
+                                    onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="300">Light</SelectItem>
+                                      <SelectItem value="400">Regular</SelectItem>
+                                      <SelectItem value="500">Medium</SelectItem>
+                                      <SelectItem value="600">Semibold</SelectItem>
+                                      <SelectItem value="700">Bold</SelectItem>
+                                      <SelectItem value="800">Extrabold</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
+                            </div>
 
-                              {/* H1 Settings */}
-                              <div>
-                                <Label className="text-xs font-semibold text-slate-700">Heading 1</Label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.h1Size, h1Size, "22")}
-                                      onChange={(e) => updateStyle(style.id, "h1Size", `${e.target.value}px`)}
-                                      placeholder="22"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.h1LineHeight, h1LineHeight, "30")}
-                                      onChange={(e) => updateStyle(style.id, "h1LineHeight", `${e.target.value}px`)}
-                                      placeholder="30"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Weight</Label>
-                                    <Select
-                                      value={style.h1Weight || h1Weight || "700"}
-                                      onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
-                                    >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="300">Light</SelectItem>
-                                        <SelectItem value="400">Regular</SelectItem>
-                                        <SelectItem value="500">Medium</SelectItem>
-                                        <SelectItem value="600">Semibold</SelectItem>
-                                        <SelectItem value="700">Bold</SelectItem>
-                                        <SelectItem value="800">Extrabold</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
+                            {/* Heading 2 */}
+                            <div>
+                              <Label className="text-xs text-slate-600">Heading 2 font</Label>
+                              <Input
+                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                value={getDisplayFont(style.h2Font, h2Font, "Arial, sans-serif")}
+                                onChange={(e) => updateStyle(style.id, "h2Font", e.target.value)}
+                                onBlur={(e) => updateStyle(style.id, "h2Font", formatFontForCSS(e.target.value))}
+                                placeholder={getDisplayFont(undefined, h2Font, "Arial, sans-serif")}
+                              />
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h2Size, h2Size, "20")}
+                                    onChange={(e) => updateStyle(style.id, "h2Size", `${e.target.value}px`)}
+                                    placeholder="20"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h2LineHeight, h2LineHeight, "28")}
+                                    onChange={(e) => updateStyle(style.id, "h2LineHeight", `${e.target.value}px`)}
+                                    placeholder="28"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Weight</Label>
+                                  <Select
+                                    value={style.h2Weight || h2Weight || "700"}
+                                    onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="300">Light</SelectItem>
+                                      <SelectItem value="400">Regular</SelectItem>
+                                      <SelectItem value="500">Medium</SelectItem>
+                                      <SelectItem value="600">Semibold</SelectItem>
+                                      <SelectItem value="700">Bold</SelectItem>
+                                      <SelectItem value="800">Extrabold</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Heading 3 */}
+                            <div>
+                              <Label className="text-xs text-slate-600">Heading 3 font</Label>
+                              <Input
+                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                value={getDisplayFont(style.h3Font, h3Font, "Arial, sans-serif")}
+                                onChange={(e) => updateStyle(style.id, "h3Font", e.target.value)}
+                                onBlur={(e) => updateStyle(style.id, "h3Font", formatFontForCSS(e.target.value))}
+                                placeholder={getDisplayFont(undefined, h3Font, "Arial, sans-serif")}
+                              />
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h3Size, h3Size, "18")}
+                                    onChange={(e) => updateStyle(style.id, "h3Size", `${e.target.value}px`)}
+                                    placeholder="18"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h3LineHeight, h3LineHeight, "26")}
+                                    onChange={(e) => updateStyle(style.id, "h3LineHeight", `${e.target.value}px`)}
+                                    placeholder="26"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Weight</Label>
+                                  <Select
+                                    value={style.h3Weight || h3Weight || "700"}
+                                    onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="300">Light</SelectItem>
+                                      <SelectItem value="400">Regular</SelectItem>
+                                      <SelectItem value="500">Medium</SelectItem>
+                                      <SelectItem value="600">Semibold</SelectItem>
+                                      <SelectItem value="700">Bold</SelectItem>
+                                      <SelectItem value="800">Extrabold</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Heading 4 */}
+                            <div>
+                              <Label className="text-xs text-slate-600">Heading 4 font</Label>
+                              <Input
+                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                value={getDisplayFont(style.h4Font, h4Font, "Arial, sans-serif")}
+                                onChange={(e) => updateStyle(style.id, "h4Font", e.target.value)}
+                                onBlur={(e) => updateStyle(style.id, "h4Font", formatFontForCSS(e.target.value))}
+                                placeholder={getDisplayFont(undefined, h4Font, "Arial, sans-serif")}
+                              />
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h4Size, h4Size, "16")}
+                                    onChange={(e) => updateStyle(style.id, "h4Size", `${e.target.value}px`)}
+                                    placeholder="16"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.h4LineHeight, h4LineHeight, "24")}
+                                    onChange={(e) => updateStyle(style.id, "h4LineHeight", `${e.target.value}px`)}
+                                    placeholder="24"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Weight</Label>
+                                  <Select
+                                    value={style.h4Weight || h4Weight || "700"}
+                                    onValueChange={(value) => updateStyle(style.id, "h4Weight", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="300">Light</SelectItem>
+                                      <SelectItem value="400">Regular</SelectItem>
+                                      <SelectItem value="500">Medium</SelectItem>
+                                      <SelectItem value="600">Semibold</SelectItem>
+                                      <SelectItem value="700">Bold</SelectItem>
+                                      <SelectItem value="800">Extrabold</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Body */}
+                            <div className="pt-2 border-t">
+                              <Label className="text-xs text-slate-600">Body font</Label>
+                              <Input
+                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
+                                onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
+                                onBlur={(e) => updateStyle(style.id, "bodyFont", formatFontForCSS(e.target.value))}
+                                placeholder={getDisplayFont(undefined, bodyFont, "Arial, sans-serif")}
+                              />
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.bodySize, bodySize, "16")}
+                                    onChange={(e) => updateStyle(style.id, "bodySize", `${e.target.value}px`)}
+                                    placeholder="16"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.bodyLineHeight, bodyLineHeight, "24")}
+                                    onChange={(e) => updateStyle(style.id, "bodyLineHeight", `${e.target.value}px`)}
+                                    placeholder="24"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Weight</Label>
+                                  <Select
+                                    value={style.bodyWeight || bodyWeight || "400"}
+                                    onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="300">Light</SelectItem>
+                                      <SelectItem value="400">Regular</SelectItem>
+                                      <SelectItem value="500">Medium</SelectItem>
+                                      <SelectItem value="600">Semibold</SelectItem>
+                                      <SelectItem value="700">Bold</SelectItem>
+                                      <SelectItem value="800">Extrabold</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Button */}
+                            <div className="pt-6 border-t">
+                              <Label className="text-xs text-slate-600">Button font</Label>
+                              <Input
+                                className="mt-1 mb-3 text-xs bg-slate-50 w-full"
+                                value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
+                                onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
+                                onBlur={(e) => updateStyle(style.id, "buttonFont", formatFontForCSS(e.target.value))}
+                                placeholder={getDisplayFont(undefined, buttonFont, "Arial, sans-serif")}
+                              />
+                              <div className="grid grid-cols-3 gap-2 mb-6">
+                                <div>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.buttonSize, buttonSize, "15")}
+                                    onChange={(e) => updateStyle(style.id, "buttonSize", `${e.target.value}px`)}
+                                    placeholder="15"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Input
+                                    className="mt-1 text-xs bg-white w-full"
+                                    type="number"
+                                    value={getDisplayValue(style.buttonLineHeight, buttonLineHeight, "22")}
+                                    onChange={(e) => updateStyle(style.id, "buttonLineHeight", `${e.target.value}px`)}
+                                    placeholder="22"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-slate-600">Weight</Label>
+                                  <Select
+                                    value={style.buttonWeight || buttonWeight || "600"}
+                                    onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
+                                  >
+                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="300">Light</SelectItem>
+                                      <SelectItem value="400">Regular</SelectItem>
+                                      <SelectItem value="500">Medium</SelectItem>
+                                      <SelectItem value="600">Semibold</SelectItem>
+                                      <SelectItem value="700">Bold</SelectItem>
+                                      <SelectItem value="800">Extrabold</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                 </div>
                               </div>
 
-                              {/* H2 Settings */}
-                              <div>
-                                <Label className="text-xs font-semibold text-slate-700">Heading 2</Label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
+                              {/* Button Padding */}
+                              <div className="mb-6">
+                                <Label className="text-xs font-semibold text-slate-700">Button padding <span className="text-xs text-gray-400">px</span></Label>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1.5">
                                   <div>
-                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                    <Label className="text-xs text-slate-600">Top</Label>
                                     <Input
                                       className="mt-1 text-xs bg-white w-full"
                                       type="number"
-                                      value={getDisplayValue(style.h2Size, h2Size, "20")}
-                                      onChange={(e) => updateStyle(style.id, "h2Size", `${e.target.value}px`)}
+                                      value={getDisplayValue(style.buttonPaddingTop, buttonPaddingTop, "10")}
+                                      onChange={(e) => updateStyle(style.id, "buttonPaddingTop", `${e.target.value}px`)}
+                                      placeholder="10"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs text-slate-600">Right</Label>
+                                    <Input
+                                      className="mt-1 text-xs bg-white w-full"
+                                      type="number"
+                                      value={getDisplayValue(style.buttonPaddingRight, buttonPaddingRight, "20")}
+                                      onChange={(e) => updateStyle(style.id, "buttonPaddingRight", `${e.target.value}px`)}
                                       placeholder="20"
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                    <Label className="text-xs text-slate-600">Bottom</Label>
                                     <Input
                                       className="mt-1 text-xs bg-white w-full"
                                       type="number"
-                                      value={getDisplayValue(style.h2LineHeight, h2LineHeight, "28")}
-                                      onChange={(e) => updateStyle(style.id, "h2LineHeight", `${e.target.value}px`)}
-                                      placeholder="28"
+                                      value={getDisplayValue(style.buttonPaddingBottom, buttonPaddingBottom, "10")}
+                                      onChange={(e) => updateStyle(style.id, "buttonPaddingBottom", `${e.target.value}px`)}
+                                      placeholder="10"
                                     />
                                   </div>
                                   <div>
-                                    <Label className="text-xs text-slate-600">Weight</Label>
-                                    <Select
-                                      value={style.h2Weight || h2Weight || "700"}
-                                      onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
-                                    >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="300">Light</SelectItem>
-                                        <SelectItem value="400">Regular</SelectItem>
-                                        <SelectItem value="500">Medium</SelectItem>
-                                        <SelectItem value="600">Semibold</SelectItem>
-                                        <SelectItem value="700">Bold</SelectItem>
-                                        <SelectItem value="800">Extrabold</SelectItem>
-                                      </SelectContent>
-                                    </Select>
+                                    <Label className="text-xs text-slate-600">Left</Label>
+                                    <Input
+                                      className="mt-1 text-xs bg-white w-full"
+                                      type="number"
+                                      value={getDisplayValue(style.buttonPaddingLeft, buttonPaddingLeft, "20")}
+                                      onChange={(e) => updateStyle(style.id, "buttonPaddingLeft", `${e.target.value}px`)}
+                                      placeholder="20"
+                                    />
                                   </div>
                                 </div>
                               </div>
 
-                              {/* H3 Settings */}
+                              {/* Button Border Radius */}
                               <div>
-                                <Label className="text-xs font-semibold text-slate-700">Heading 3</Label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.h3Size, h3Size, "18")}
-                                      onChange={(e) => updateStyle(style.id, "h3Size", `${e.target.value}px`)}
-                                      placeholder="18"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.h3LineHeight, h3LineHeight, "26")}
-                                      onChange={(e) => updateStyle(style.id, "h3LineHeight", `${e.target.value}px`)}
-                                      placeholder="26"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Weight</Label>
-                                    <Select
-                                      value={style.h3Weight || h3Weight || "700"}
-                                      onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
-                                    >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="300">Light</SelectItem>
-                                        <SelectItem value="400">Regular</SelectItem>
-                                        <SelectItem value="500">Medium</SelectItem>
-                                        <SelectItem value="600">Semibold</SelectItem>
-                                        <SelectItem value="700">Bold</SelectItem>
-                                        <SelectItem value="800">Extrabold</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* H4 Settings */}
-                              <div>
-                                <Label className="text-xs font-semibold text-slate-700">Heading 4</Label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.h4Size, h4Size, "16")}
-                                      onChange={(e) => updateStyle(style.id, "h4Size", `${e.target.value}px`)}
-                                      placeholder="16"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.h4LineHeight, h4LineHeight, "24")}
-                                      onChange={(e) => updateStyle(style.id, "h4LineHeight", `${e.target.value}px`)}
-                                      placeholder="24"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Weight</Label>
-                                    <Select
-                                      value={style.h4Weight || h4Weight || "700"}
-                                      onValueChange={(value) => updateStyle(style.id, "h4Weight", value)}
-                                    >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="300">Light</SelectItem>
-                                        <SelectItem value="400">Regular</SelectItem>
-                                        <SelectItem value="500">Medium</SelectItem>
-                                        <SelectItem value="600">Semibold</SelectItem>
-                                        <SelectItem value="700">Bold</SelectItem>
-                                        <SelectItem value="800">Extrabold</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Body Typography */}
-                            <div className="space-y-6 p-3 bg-white rounded border border-slate-200">
-                              <div>
-                                <Label className="text-xs text-slate-600">Body font</Label>
+                                <Label className="text-xs font-semibold text-slate-700">Button border radius</Label>
                                 <Input
-                                  className="mt-1.5 text-xs bg-slate-50 w-full"
-                                  value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
-                                  onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
-                                  placeholder={getDisplayFont(undefined, bodyFont, "Arial, sans-serif")}
+                                  className="mt-1 text-xs bg-white w-full"
+                                  type="number"
+                                  value={(getDisplayValue(style.buttonBorderRadius, buttonBorderRadius, "4")).replace("px", "")}
+                                  onChange={(e) => updateStyle(style.id, "buttonBorderRadius", `${e.target.value}px`)}
+                                  placeholder="4"
                                 />
-                              </div>
-
-                              {/* Body Settings */}
-                              <div>
-                                <Label className="text-xs font-semibold text-slate-700">Body text</Label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5">
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.bodySize, bodySize, "16")}
-                                      onChange={(e) => updateStyle(style.id, "bodySize", `${e.target.value}px`)}
-                                      placeholder="16"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.bodyLineHeight, bodyLineHeight, "24")}
-                                      onChange={(e) => updateStyle(style.id, "bodyLineHeight", `${e.target.value}px`)}
-                                      placeholder="24"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Weight</Label>
-                                    <Select
-                                      value={style.bodyWeight || bodyWeight || "400"}
-                                      onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
-                                    >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="300">Light</SelectItem>
-                                        <SelectItem value="400">Regular</SelectItem>
-                                        <SelectItem value="500">Medium</SelectItem>
-                                        <SelectItem value="600">Semibold</SelectItem>
-                                        <SelectItem value="700">Bold</SelectItem>
-                                        <SelectItem value="800">Extrabold</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Button Typography */}
-                            <div className="space-y-6 p-3 bg-white rounded border border-slate-200">
-                              <div>
-                                <Label className="text-xs text-slate-600">Button font</Label>
-                                <Input
-                                  className="mt-1.5 text-xs bg-slate-50 w-full"
-                                  value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
-                                  onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
-                                  placeholder={getDisplayFont(undefined, buttonFont, "Arial, sans-serif")}
-                                />
-                              </div>
-
-                              {/* Button Settings */}
-                              <div className="mb-6">
-                                <Label className="text-xs font-semibold text-slate-700">Button text</Label>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-1.5 mb-6">
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.buttonSize, buttonSize, "15")}
-                                      onChange={(e) => updateStyle(style.id, "buttonSize", `${e.target.value}px`)}
-                                      placeholder="15"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                    <Input
-                                      className="mt-1 text-xs bg-white w-full"
-                                      type="number"
-                                      value={getDisplayValue(style.buttonLineHeight, buttonLineHeight, "22")}
-                                      onChange={(e) => updateStyle(style.id, "buttonLineHeight", `${e.target.value}px`)}
-                                      placeholder="22"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-slate-600">Weight</Label>
-                                    <Select
-                                      value={style.buttonWeight || buttonWeight || "600"}
-                                      onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
-                                    >
-                                      <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="300">Light</SelectItem>
-                                        <SelectItem value="400">Regular</SelectItem>
-                                        <SelectItem value="500">Medium</SelectItem>
-                                        <SelectItem value="600">Semibold</SelectItem>
-                                        <SelectItem value="700">Bold</SelectItem>
-                                        <SelectItem value="800">Extrabold</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                </div>
-
-                                {/* Button Padding */}
-                                <div className="mb-6">
-                                  <Label className="text-xs font-semibold text-slate-700">Button padding <span className="text-xs text-gray-400">px</span></Label>
-                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1.5">
-                                    <div>
-                                      <Label className="text-xs text-slate-600">Top</Label>
-                                      <Input
-                                        className="mt-1 text-xs bg-white w-full"
-                                        type="number"
-                                        value={getDisplayValue(style.buttonPaddingTop, buttonPaddingTop, "10")}
-                                        onChange={(e) => updateStyle(style.id, "buttonPaddingTop", `${e.target.value}px`)}
-                                        placeholder="10"
-                                      />
-                                    </div>
-                                    <div>
-                                      <Label className="text-xs text-slate-600">Right</Label>
-                                      <Input
-                                        className="mt-1 text-xs bg-white w-full"
-                                        type="number"
-                                        value={getDisplayValue(style.buttonPaddingRight, buttonPaddingRight, "20")}
-                                        onChange={(e) => updateStyle(style.id, "buttonPaddingRight", `${e.target.value}px`)}
-                                        placeholder="20"
-                                      />
-                                    </div>
-                                    <div>
-                                      <Label className="text-xs text-slate-600">Bottom</Label>
-                                      <Input
-                                        className="mt-1 text-xs bg-white w-full"
-                                        type="number"
-                                        value={getDisplayValue(style.buttonPaddingBottom, buttonPaddingBottom, "10")}
-                                        onChange={(e) => updateStyle(style.id, "buttonPaddingBottom", `${e.target.value}px`)}
-                                        placeholder="10"
-                                      />
-                                    </div>
-                                    <div>
-                                      <Label className="text-xs text-slate-600">Left</Label>
-                                      <Input
-                                        className="mt-1 text-xs bg-white w-full"
-                                        type="number"
-                                        value={getDisplayValue(style.buttonPaddingLeft, buttonPaddingLeft, "20")}
-                                        onChange={(e) => updateStyle(style.id, "buttonPaddingLeft", `${e.target.value}px`)}
-                                        placeholder="20"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Button Border Radius */}
-                                <div>
-                                  <Label className="text-xs font-semibold text-slate-700">Button border radius</Label>
-                                  <Input
-                                    className="mt-1 text-xs bg-white w-full"
-                                    type="number"
-                                    value={(getDisplayValue(style.buttonBorderRadius, buttonBorderRadius, "4")).replace("px", "")}
-                                    onChange={(e) => updateStyle(style.id, "buttonBorderRadius", `${e.target.value}px`)}
-                                    placeholder="4"
-                                  />
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -3717,7 +4156,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                                 if (s.id === style.id) {
                                   return {
                                     ...s,
-                                    headingFont: undefined,
+                                    h1Font: undefined,
+                                    h2Font: undefined,
+                                    h3Font: undefined,
+                                    h4Font: undefined,
                                     bodyFont: undefined,
                                     buttonFont: undefined,
                                     h1Size: undefined,
@@ -3831,7 +4273,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                 saveToLocalStorage("savedTheme", {
                   colors,
                   styles,
-                  headingFont,
+                  h1Font,
+                  h2Font,
+                  h3Font,
+                  h4Font,
                   bodyFont,
                   buttonFont,
                   themePadding,
@@ -3907,7 +4352,10 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
                   saveToLocalStorage("savedTheme", {
                     colors,
                     styles,
-                    headingFont,
+                    h1Font,
+                    h2Font,
+                    h3Font,
+                    h4Font,
                     bodyFont,
                     buttonFont,
                     themePadding,
@@ -4043,8 +4491,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </div>
             </div>
           <AppFooter />
-        </>
-      )}
       <DevInformationModal
         isOpen={showDevInfo}
         onClose={() => setShowDevInfo(false)}
