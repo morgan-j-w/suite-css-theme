@@ -45,8 +45,6 @@ export const useThemeState = () => {
   const [titlePaddingBottom, setTitlePaddingBottom] = useState("14")
 
   const [googleFontImport, setGoogleFontImport] = useState("")
-  const [adobeFontsKitId, setAdobeFontsKitId] = useState("")
-  const [adobeFontImport, setAdobeFontImport] = useState("")
   const [customImport, setCustomImport] = useState("")
   const [webfontImports, setWebfontImports] = useState("")
   const [bulkColorText, setBulkColorText] = useState("")
@@ -99,8 +97,6 @@ export const useThemeState = () => {
     setButtonBorderRadius(loadFromLocalStorage("buttonBorderRadius", "4px") as string)
     setTitlePaddingBottom(loadFromLocalStorage("titlePaddingBottom", "14") as string)
     setGoogleFontImport(loadFromLocalStorage("googleFontImport", "") as string)
-    setAdobeFontsKitId(loadFromLocalStorage("adobeFontsKitId", "") as string)
-    setAdobeFontImport(loadFromLocalStorage("adobeFontImport", "") as string)
     setCustomImport(loadFromLocalStorage("customImport", "") as string)
     setWebfontImports(loadFromLocalStorage("webfontImports", "") as string)
     setStyles(loadFromLocalStorage("themeStyles", []) as StyleDefinition[])
@@ -177,10 +173,6 @@ export const useThemeState = () => {
     setTitlePaddingBottom,
     googleFontImport,
     setGoogleFontImport,
-    adobeFontsKitId,
-    setAdobeFontsKitId,
-    adobeFontImport,
-    setAdobeFontImport,
     customImport,
     setCustomImport,
     webfontImports,
