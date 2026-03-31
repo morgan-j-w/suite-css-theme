@@ -38,23 +38,6 @@ export const DevInformationModal = ({
         </DialogHeader>
         <div className="grid grid-cols-1 gap-4">
           <Button
-            onClick={onCopyCss}
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 h-12"
-          >
-            {copiedCss ? (
-              <>
-                <Check className="h-4 w-4 text-green-600" />
-                <span>Copied CSS!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                <span>Copy CSS</span>
-              </>
-            )}
-          </Button>
-          <Button
             onClick={onCopyHtml}
             variant="outline"
             className="w-full flex items-center justify-center gap-2 h-12"
@@ -67,24 +50,7 @@ export const DevInformationModal = ({
             ) : (
               <>
                 <Copy className="h-4 w-4" />
-                <span>Copy HTML</span>
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={onCopyMediaQuery}
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 h-12"
-          >
-            {copiedMediaQuery ? (
-              <>
-                <Check className="h-4 w-4 text-green-600" />
-                <span>Copied Media Query!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                <span>Copy Media Query</span>
+                <span>Export HTML</span>
               </>
             )}
           </Button>
@@ -101,7 +67,41 @@ export const DevInformationModal = ({
             ) : (
               <>
                 <Copy className="h-4 w-4" />
-                <span>Copy @import</span>
+                <span>Export @import</span>
+              </>
+            )}
+          </Button>
+          <Button
+            onClick={onCopyCss}
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2 h-12"
+          >
+            {copiedCss ? (
+              <>
+                <Check className="h-4 w-4 text-green-600" />
+                <span>Copied CSS!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                <span>Export CSS</span>
+              </>
+            )}
+          </Button>
+          <Button
+            onClick={onCopyMediaQuery}
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2 h-12"
+          >
+            {copiedMediaQuery ? (
+              <>
+                <Check className="h-4 w-4 text-green-600" />
+                <span>Copied Media Query!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                <span>Export media query</span>
               </>
             )}
           </Button>

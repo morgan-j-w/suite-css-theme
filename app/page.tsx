@@ -147,10 +147,6 @@ export default function ThemeGenerator() {
     setTitlePaddingBottom,
     googleFontImport,
     setGoogleFontImport,
-    adobeFontsKitId,
-    setAdobeFontsKitId,
-    adobeFontImport,
-    setAdobeFontImport,
     customImport,
     setCustomImport,
     webfontImports,
@@ -251,10 +247,8 @@ export default function ThemeGenerator() {
   useEffect(() => { saveToLocalStorage("buttonBorderRadius", buttonBorderRadius) }, [buttonBorderRadius])
   useEffect(() => { saveToLocalStorage("titlePaddingBottom", titlePaddingBottom) }, [titlePaddingBottom])
   useEffect(() => { localStorage.setItem("googleFontImport", googleFontImport) }, [googleFontImport])
-  useEffect(() => { localStorage.setItem("adobeFontImport", adobeFontImport) }, [adobeFontImport])
   useEffect(() => { localStorage.setItem("webfontImports", webfontImports) }, [webfontImports])
   useEffect(() => { localStorage.setItem("customImport", customImport) }, [customImport])
-  useEffect(() => { saveToLocalStorage("adobeFontsKitId", adobeFontsKitId) }, [adobeFontsKitId])
   useEffect(() => { saveToLocalStorage("globalIconStyle", globalIconStyle) }, [globalIconStyle])
   useEffect(() => { saveToLocalStorage("globalIconSize", globalIconSize) }, [globalIconSize])
   useEffect(() => { saveToLocalStorage("themeStyles", styles) }, [styles])
@@ -283,11 +277,11 @@ export default function ThemeGenerator() {
   // Track unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(true)
-  }, [colors, styles, h1Font, h2Font, h3Font, h4Font, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, adobeFontsKitId, adobeFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
+  }, [colors, styles, h1Font, h2Font, h3Font, h4Font, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
 
   // Sync all font imports into webfontImports (only if the sync result has content)
   useEffect(() => {
-    const imports = [googleFontImport, adobeFontImport, customImport]
+    const imports = [googleFontImport, customImport]
       .filter(imp => imp.trim() !== "")
       .join("\n")
     
@@ -297,7 +291,7 @@ export default function ThemeGenerator() {
     if (imports.trim() !== "" && (!webfontImports || webfontImports === imports)) {
       setWebfontImports(imports)
     }
-  }, [googleFontImport, adobeFontImport, customImport])
+  }, [googleFontImport, customImport])
 
   // Inject webfont imports into document head
   useEffect(() => {
@@ -2021,8 +2015,6 @@ ${iconTemplates}</div>`
         buttonBorderRadius,
         titlePaddingBottom,
         googleFontImport,
-        adobeFontsKitId,
-        adobeFontImport,
         customImport,
         webfontImports,
         globalIconStyle,
@@ -2774,7 +2766,7 @@ ${iconTemplates}</div>`
                           <Textarea
                             value={webfontImports}
                             onChange={(e) => setWebfontImports(e.target.value)}
-                            placeholder="Paste @import links from Google Fonts or Adobe Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
+                            placeholder="Paste @import links from Google Fonts here (e.g., @import url('https://fonts.googleapis.com/...');)"
                             className="font-mono text-sm min-h-[120px] pr-10"
                             style={{ backgroundColor: '#FFFFFF', borderColor: '#E6EDF3' }}
                           />
@@ -2797,38 +2789,7 @@ ${iconTemplates}</div>`
                       </CardContent>
                     </Card>
 
-                    {/* Adobe Fonts Kit ID */}
-                    <Card className="shadow-sm">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Adobe Fonts Kit ID</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="relative">
-                          <Input
-                            value={adobeFontsKitId}
-                            onChange={(e) => setAdobeFontsKitId(e.target.value)}
-                            placeholder="e.g., abc1234 (from your Adobe Fonts kit link)"
-                            className="font-mono text-sm"
-                            style={{ backgroundColor: '#FFFFFF', borderColor: '#E6EDF3' }}
-                          />
-                          {adobeFontsKitId && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="absolute top-1 right-2 h-8 w-8 p-0"
-                              onClick={() => {
-                                navigator.clipboard.writeText(adobeFontsKitId)
-                                toast({
-                                  description: "Adobe Fonts Kit ID copied to clipboard",
-                                })
-                              }}
-                            >
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+
                   </div>
 
                   {/* Right Column: Font Preview (sticky) */}
@@ -3324,7 +3285,7 @@ ${iconTemplates}</div>`
                         </div>
 
                         {/* Color Selectors - 3 Column Grid */}
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                           <div>
                             <Label className="text-xs text-slate-600">Background</Label>
                             <Select
@@ -4314,8 +4275,6 @@ ${iconTemplates}</div>`
                   buttonBorderRadius,
                   titlePaddingBottom,
                   googleFontImport,
-                  adobeFontsKitId,
-                  adobeFontImport,
                   customImport,
                   webfontImports,
                   globalIconStyle,
@@ -4393,8 +4352,6 @@ ${iconTemplates}</div>`
                     buttonBorderRadius,
                     titlePaddingBottom,
                     googleFontImport,
-                    adobeFontsKitId,
-                    adobeFontImport,
                     customImport,
                     webfontImports,
                     globalIconStyle,
