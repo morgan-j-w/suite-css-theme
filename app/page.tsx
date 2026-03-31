@@ -75,6 +75,18 @@ export default function ThemeGenerator() {
   const getDisplayFont = (styleValue: string | undefined, globalValue: string | undefined, defaultValue: string = "Arial, sans-serif") => {
     return styleValue || globalValue || defaultValue
   }
+
+  const getWeightLabel = (value: string | undefined) => {
+    const weightMap: { [key: string]: string } = {
+      "300": "Light",
+      "400": "Regular",
+      "500": "Medium",
+      "600": "Semibold",
+      "700": "Bold",
+      "800": "Extrabold",
+    }
+    return weightMap[value || ""] || value || ""
+  }
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -3773,7 +3785,7 @@ ${iconTemplates}</div>`
                                     onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
                                   >
                                     <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                      <SelectValue />
+                                      <SelectValue placeholder={getWeightLabel(style.h1Weight || h1Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="300">Light</SelectItem>
@@ -3826,7 +3838,7 @@ ${iconTemplates}</div>`
                                     onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
                                   >
                                     <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                      <SelectValue />
+                                      <SelectValue placeholder={getWeightLabel(style.h2Weight || h2Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="300">Light</SelectItem>
@@ -3879,7 +3891,7 @@ ${iconTemplates}</div>`
                                     onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
                                   >
                                     <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                      <SelectValue />
+                                      <SelectValue placeholder={getWeightLabel(style.h3Weight || h3Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="300">Light</SelectItem>
@@ -3932,7 +3944,7 @@ ${iconTemplates}</div>`
                                     onValueChange={(value) => updateStyle(style.id, "h4Weight", value)}
                                   >
                                     <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                      <SelectValue />
+                                      <SelectValue placeholder={getWeightLabel(style.h4Weight || h4Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="300">Light</SelectItem>
@@ -3988,7 +4000,7 @@ ${iconTemplates}</div>`
                                     onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
                                   >
                                     <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                      <SelectValue />
+                                      <SelectValue placeholder={getWeightLabel(style.bodyWeight || bodyWeight || "400")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="300">Light</SelectItem>
@@ -4044,7 +4056,7 @@ ${iconTemplates}</div>`
                                     onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
                                   >
                                     <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
-                                      <SelectValue />
+                                      <SelectValue placeholder={getWeightLabel(style.buttonWeight || buttonWeight || "600")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="300">Light</SelectItem>
