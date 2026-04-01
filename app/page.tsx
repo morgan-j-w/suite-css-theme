@@ -2186,7 +2186,7 @@ ${iconTemplates}</div>`
                 themeName={themeName}
                 onThemeNameChange={setThemeName}
                 savedTimeAgo={savedTimeAgo}
-                usedInTemplates={12}
+                usedInDocuments={8}
                 isDirty={hasUnsavedChanges}
               />
             </div>

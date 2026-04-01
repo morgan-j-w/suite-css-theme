@@ -30,7 +30,7 @@ export default function ThemeContextPanelDemo() {
           themeName={themeName}
           onThemeNameChange={handleThemeNameChange}
           savedTimeAgo={savedTime}
-          usedInTemplates={12}
+          usedInDocuments={8}
           isDirty={isDirty}
         />
 
