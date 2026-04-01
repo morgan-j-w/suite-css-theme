@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -46,6 +46,7 @@ export default function ThemeGenerator() {
   const [colorNameError, setColorNameError] = useState("")
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const isInitializedRef = useRef(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
@@ -54,7 +55,7 @@ export default function ThemeGenerator() {
   const [copiedImport, setCopiedImport] = useState(false)
   const [resetStyles, setResetStyles] = useState<Set<string>>(new Set())
   const [themeName, setThemeName] = useState("Untitled Theme")
-  const [savedTimeAgo, setSavedTimeAgo] = useState("Never saved")
+  const [savedTimeAgo, setSavedTimeAgo] = useState("")
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -312,9 +313,19 @@ export default function ThemeGenerator() {
     checkAuth()
   }, [])
 
-  // Track unsaved changes
+  // Initialize the component after data is loaded from localStorage
   useEffect(() => {
-    setHasUnsavedChanges(true)
+    // Use setTimeout to ensure all other useEffects have run and loaded data from localStorage
+    setTimeout(() => {
+      isInitializedRef.current = true
+    }, 0)
+  }, [])
+
+  // Track unsaved changes (only after initial load)
+  useEffect(() => {
+    if (isInitializedRef.current) {
+      setHasUnsavedChanges(true)
+    }
   }, [colors, styles, h1Font, h2Font, h3Font, h4Font, bodyFont, buttonFont, themePadding, h1Size, h1LineHeight, h1Weight, h2Size, h2LineHeight, h2Weight, h3Size, h3LineHeight, h3Weight, h4Size, h4LineHeight, h4Weight, bodySize, bodyLineHeight, bodyWeight, buttonSize, buttonLineHeight, buttonWeight, buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft, buttonBorderRadius, titlePaddingBottom, googleFontImport, customImport, webfontImports, globalIconStyle, globalIconSize])
 
   // Sync all font imports into webfontImports (only if the sync result has content)

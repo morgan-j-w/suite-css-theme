@@ -38,7 +38,7 @@ export const ThemeContextPanel = ({
         {/* Theme Name Section */}
         <div>
           {isEditing ? (
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center w-full">
               <Input
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
@@ -50,7 +50,7 @@ export const ThemeContextPanel = ({
                   }
                 }}
                 onBlur={handleSaveName}
-                className="text-lg font-bold bg-white"
+                className="text-lg font-bold bg-white min-w-96"
                 autoFocus
               />
             </div>
@@ -73,7 +73,7 @@ export const ThemeContextPanel = ({
         <div className="flex items-center gap-3 w-full lg:w-auto lg:justify-end">
           {/* Usage Pill */}
           <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded-full">
-            Theme used in <span className="ml-1 font-semibold text-slate-900">{usedInDocuments}</span> document{usedInDocuments !== 1 ? "s" : ""}
+            Theme used in <span className="ml-1 mr-1 font-semibold text-slate-900">{usedInDocuments}</span>document{usedInDocuments !== 1 ? "s" : ""}
           </span>
 
           {/* Status Pill */}
@@ -82,12 +82,12 @@ export const ThemeContextPanel = ({
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
               Unsaved changes
             </span>
-          ) : (
+          ) : savedTimeAgo ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">
               <Check className="h-3.5 w-3.5" />
               {savedTimeAgo}
             </span>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
