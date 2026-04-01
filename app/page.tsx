@@ -29,6 +29,7 @@ import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
 import { AppFooter } from "@/components/common/AppFooter"
 import { DevInformationModal } from "@/components/common/DevInformationModal"
+import { ThemeContextPanel } from "@/components/common/ThemeContextPanel"
 
 // Import hooks
 import { useThemeState } from "@/hooks/useThemeState"
@@ -52,6 +53,8 @@ export default function ThemeGenerator() {
   const [copiedCss, setCopiedCss] = useState(false)
   const [copiedImport, setCopiedImport] = useState(false)
   const [resetStyles, setResetStyles] = useState<Set<string>>(new Set())
+  const [themeName, setThemeName] = useState("Untitled Theme")
+  const [savedTimeAgo, setSavedTimeAgo] = useState("Never saved")
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -227,6 +230,7 @@ export default function ThemeGenerator() {
 
   // localStorage sync effects
   useEffect(() => { saveToLocalStorage("themeColors", colors) }, [colors])
+  useEffect(() => { localStorage.setItem("themeName", themeName) }, [themeName])
   useEffect(() => { saveToLocalStorage("h1Font", h1Font) }, [h1Font])
   useEffect(() => { saveToLocalStorage("h2Font", h2Font) }, [h2Font])
   useEffect(() => { saveToLocalStorage("h3Font", h3Font) }, [h3Font])
@@ -268,6 +272,28 @@ export default function ThemeGenerator() {
   // Initialize client and fonts list
   useEffect(() => {
     setIsClient(true)
+    
+    // Load theme name and saved time from localStorage
+    const savedThemeName = localStorage.getItem("themeName")
+    if (savedThemeName) {
+      setThemeName(savedThemeName)
+    }
+    
+    const lastSaved = localStorage.getItem("lastSavedTime")
+    if (lastSaved) {
+      const lastSavedDate = new Date(lastSaved)
+      const now = new Date()
+      const diffMs = now.getTime() - lastSavedDate.getTime()
+      const diffMins = Math.floor(diffMs / 60000)
+      if (diffMins < 1) {
+        setSavedTimeAgo("Saved just now")
+      } else if (diffMins < 60) {
+        setSavedTimeAgo(`Saved ${diffMins} min${diffMins !== 1 ? 's' : ''} ago`)
+      } else {
+        const diffHours = Math.floor(diffMins / 60)
+        setSavedTimeAgo(`Saved ${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`)
+      }
+    }
     
     // Check if already authenticated via cookie
     const checkAuth = async () => {
@@ -2033,6 +2059,8 @@ ${iconTemplates}</div>`
         globalIconSize,
       })
       setHasUnsavedChanges(false)
+      localStorage.setItem("lastSavedTime", new Date().toISOString())
+      setSavedTimeAgo("Saved just now")
       setShowSuccessModal(true)
       toast({
         title: "Success",
@@ -2151,6 +2179,18 @@ ${iconTemplates}</div>`
             {webfontImports && (
               <style dangerouslySetInnerHTML={{ __html: webfontImports }} />
             )}
+            
+            {/* Theme Context Panel - Full Width */}
+            <div className="mb-8 -mx-4 md:-mx-8 px-4 md:px-8">
+              <ThemeContextPanel
+                themeName={themeName}
+                onThemeNameChange={setThemeName}
+                savedTimeAgo={savedTimeAgo}
+                usedInTemplates={12}
+                isDirty={hasUnsavedChanges}
+                onDirtyStateChange={setHasUnsavedChanges}
+              />
+            </div>
             
             <div className="flex gap-6">
               {/* Left Column - Controls */}
