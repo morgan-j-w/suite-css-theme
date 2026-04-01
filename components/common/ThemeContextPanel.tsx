@@ -34,7 +34,7 @@ export const ThemeContextPanel = ({
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
       {/* Theme Name and Metadata Row */}
-      <div className="flex items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6">
         {/* Theme Name Section */}
         <div>
           {isEditing ? (
@@ -70,7 +70,7 @@ export const ThemeContextPanel = ({
         </div>
 
         {/* Metadata Row - Right Aligned */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full lg:w-auto lg:justify-end">
           {/* Usage Pill */}
           <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded-full">
             Used in <span className="ml-1 font-semibold text-slate-900">{usedInTemplates}</span> template{usedInTemplates !== 1 ? "s" : ""}
