@@ -70,24 +70,24 @@ export const ThemeContextPanel = ({
         </div>
 
         {/* Metadata Row - Right Aligned */}
-        <div className="flex items-center gap-2 sm:gap-3 whitespace-nowrap">
-          <span className="text-sm text-slate-600">
-            Used in <span className="font-medium text-slate-900">{usedInTemplates}</span> template{usedInTemplates !== 1 ? "s" : ""}
+        <div className="flex items-center gap-3">
+          {/* Usage Pill */}
+          <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded-full">
+            Used in <span className="ml-1 font-semibold text-slate-900">{usedInTemplates}</span> template{usedInTemplates !== 1 ? "s" : ""}
           </span>
-          <span className="text-slate-300">|</span>
-          <span className="flex items-center gap-2 text-sm text-slate-600">
-            {isDirty ? (
-              <>
-                <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
-                Unsaved changes
-              </>
-            ) : (
-              <>
-                <Check className="h-4 w-4 text-emerald-600" />
-                {savedTimeAgo}
-              </>
-            )}
-          </span>
+
+          {/* Status Pill */}
+          {isDirty ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
+              Unsaved changes
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">
+              <Check className="h-3.5 w-3.5" />
+              {savedTimeAgo}
+            </span>
+          )}
         </div>
       </div>
     </div>
