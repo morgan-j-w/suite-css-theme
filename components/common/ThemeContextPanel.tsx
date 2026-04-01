@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Check } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 interface ThemeContextPanelProps {
@@ -71,14 +72,17 @@ export const ThemeContextPanel = ({
           Used in <span className="font-medium text-slate-900">{usedInTemplates}</span> template{usedInTemplates !== 1 ? "s" : ""}
         </span>
         <span className="text-slate-300">|</span>
-        <span className="text-sm text-slate-600">
+        <span className="flex items-center gap-2 text-sm text-slate-600">
           {isDirty ? (
             <>
-              <span className="inline-block h-2 w-2 rounded-full bg-amber-500 mr-2" />
+              <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
               Unsaved changes
             </>
           ) : (
-            savedTimeAgo
+            <>
+              <Check className="h-4 w-4 text-emerald-600" />
+              {savedTimeAgo}
+            </>
           )}
         </span>
       </div>
