@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check } from "lucide-react"
+import { Check, Pencil } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 interface ThemeContextPanelProps {
@@ -58,10 +58,11 @@ export const ThemeContextPanel = ({
               setEditValue(themeName)
               setIsEditing(true)
             }}
-            className="text-2xl font-bold text-slate-900 hover:text-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded px-2 py-1 -mx-2"
+            className="group flex items-center gap-2 text-2xl font-bold text-slate-900 hover:text-slate-700 rounded-lg px-3 py-2 -mx-3 transition-all hover:bg-slate-100"
             title="Click to rename"
           >
             {themeName}
+            <Pencil className="h-5 w-5 text-slate-400 group-hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-all" />
           </button>
         )}
       </div>
