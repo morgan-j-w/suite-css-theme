@@ -2188,7 +2188,6 @@ ${iconTemplates}</div>`
                 savedTimeAgo={savedTimeAgo}
                 usedInTemplates={12}
                 isDirty={hasUnsavedChanges}
-                onDirtyStateChange={setHasUnsavedChanges}
               />
             </div>
             

@@ -32,7 +32,6 @@ export default function ThemeContextPanelDemo() {
           savedTimeAgo={savedTime}
           usedInTemplates={12}
           isDirty={isDirty}
-          onDirtyStateChange={setIsDirty}
         />
 
         {/* Instructions */}
@@ -49,22 +48,18 @@ export default function ThemeContextPanelDemo() {
               <li>
                 <strong className="text-slate-900">Press Escape</strong> to cancel editing
               </li>
-              <li>
-                <strong className="text-slate-900">Click "Toggle Dirty State"</strong> to simulate unsaved changes
-              </li>
             </ul>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
             <h2 className="text-lg font-semibold text-blue-900 mb-4">Design Features</h2>
             <ul className="space-y-2 text-sm text-blue-900">
-              <li>✨ Polished, modern admin interface aesthetic</li>
-              <li>✨ Soft-bordered white panel on light grey background</li>
+              <li>✨ Clean, minimal design</li>
               <li>✨ Large, bold theme name with inline editing</li>
-              <li>✨ Small, muted metadata arranged horizontally</li>
-              <li>✨ Responsive layout (stacks on mobile)</li>
-              <li>✨ Visual indicators for saved state and unsaved changes</li>
-              <li>✨ Clean, clutter-free design</li>
+              <li>✨ Status line shows usage and save state</li>
+              <li>✨ Amber dot indicator for unsaved changes</li>
+              <li>✨ Shows clean "Saved just now" when synced</li>
+              <li>✨ Responsive layout</li>
             </ul>
           </div>
         </div>
