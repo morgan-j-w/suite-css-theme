@@ -1691,7 +1691,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       { name: 'X', id: 'twitterx--v1', variable: 'TWITTER_SHARE_DOC' },
       { name: 'LinkedIn', id: 'linkedin', variable: 'LINKEDIN_SHARE_DOC' },
       { name: 'Print', id: 'print', variable: 'PRINT_SHARE_DOC' },
-      { name: 'Email', id: 'new-post', variable: 'EMAIL_SHARE_DOC' },
+      { name: 'Email', id: 'forward', variable: 'EMAIL_SHARE_DOC' },
     ]
 
     // Generate icon templates for each style
