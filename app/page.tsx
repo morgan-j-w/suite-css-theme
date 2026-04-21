@@ -1700,7 +1700,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       const iconColor = (style.iconColor || "#000000").replace('#', '')
       iconTemplates += `    <div class="text-style-${index + 1}"><br>\n`
       shareIcons.forEach(icon => {
-        iconTemplates += `        <a title="${icon.name}" class="sd-${icon.id === 'twitterx--v1' ? 'twitter' : icon.id}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
+        const classId = icon.id === 'twitterx--v1' ? 'twitter' : icon.id === 'new-post' ? 'forward' : icon.id
+        iconTemplates += `        <a title="${icon.name}" class="sd-${classId}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
         iconTemplates += `            <img alt="${icon.name}" src="https://img.icons8.com/${mappedStyle}/96/${iconColor}/${icon.id}.png" width="${iconSize}">\n`
         iconTemplates += `        </a>\n`
       })
