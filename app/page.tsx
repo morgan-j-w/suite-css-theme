@@ -4007,47 +4007,50 @@ ${iconTemplates}</div>`
                             </Select>
                           </div>
 
-                          <div className="flex items-center gap-2 pt-5">
-                            <Checkbox
-                              id={`noPadding-${style.id}`}
-                              checked={style.noPadding === true}
-                              onCheckedChange={(checked) => {
-                                const updatedStyles = styles.map((s) => {
-                                  if (s.id === style.id) {
-                                    const isChecking = checked as boolean
-                                    let newDescription = s.description
-                                    
-                                    if (isChecking) {
-                                      if (!newDescription.startsWith("No padding - ")) {
-                                        newDescription = `No padding - ${newDescription}`
+                          <div>
+                            <Label className="text-xs text-slate-600">Style padding</Label>
+                            <div className="flex items-center gap-2 mt-3">
+                              <Checkbox
+                                id={`noPadding-${style.id}`}
+                                checked={style.noPadding === true}
+                                onCheckedChange={(checked) => {
+                                  const updatedStyles = styles.map((s) => {
+                                    if (s.id === style.id) {
+                                      const isChecking = checked as boolean
+                                      let newDescription = s.description
+                                      
+                                      if (isChecking) {
+                                        if (!newDescription.startsWith("No padding - ")) {
+                                          newDescription = `No padding - ${newDescription}`
+                                        }
+                                      } else {
+                                        if (newDescription.startsWith("No padding - ")) {
+                                          newDescription = newDescription.replace("No padding - ", "")
+                                        }
                                       }
-                                    } else {
-                                      if (newDescription.startsWith("No padding - ")) {
-                                        newDescription = newDescription.replace("No padding - ", "")
-                                      }
+                                      
+                                      return { ...s, noPadding: isChecking, description: newDescription }
                                     }
-                                    
-                                    return { ...s, noPadding: isChecking, description: newDescription }
-                                  }
-                                  return s
-                                })
-                                setStyles(updatedStyles)
-                              }}
-                              className="h-4 w-4 border border-slate-400 cursor-pointer"
-                            />
-                            <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                              No padding
-                            </Label>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <HelpCircle className="h-3 w-3 text-slate-400" />
-                                </TooltipTrigger>
-                                <TooltipContent side="right" className="max-w-xs text-xs">
-                                  Removes padding from all sides for this style
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                                    return s
+                                  })
+                                  setStyles(updatedStyles)
+                                }}
+                                className="h-4 w-4 border border-slate-400 cursor-pointer"
+                              />
+                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                                No padding
+                              </Label>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3 w-3 text-slate-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs text-xs">
+                                    Removes padding from all sides for this style
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </div>
                         </div>
                       </div>
