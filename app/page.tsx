@@ -591,8 +591,8 @@ export default function ThemeGenerator() {
         if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
           updated.buttonTextHover = value as string
         }
-        // Mirror button border color hover when button background hover changes
-        if (field === "buttonBgHover" && s.buttonBorderColorHover === s.buttonBgHover) {
+        // Always sync button border color hover when button background hover changes
+        if (field === "buttonBgHover") {
           updated.buttonBorderColorHover = value as string
         }
         
@@ -623,8 +623,8 @@ export default function ThemeGenerator() {
           if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
             updated.buttonTextHover = value
           }
-          // Mirror button border color hover when button background hover changes
-          if (field === "buttonBgHover" && s.buttonBorderColorHover === s.buttonBgHover) {
+          // Always sync button border color hover when button background hover changes
+          if (field === "buttonBgHover") {
             updated.buttonBorderColorHover = value
           }
           return updated
@@ -3670,8 +3670,9 @@ ${iconTemplates}</div>`
                           />
                         </div>
 
-                        {/* Color Selectors - 3 Column Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {/* Color Selectors - 4 Column Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                          {/* Row 1 */}
                           <div>
                             <Label className="text-xs text-slate-600">Background</Label>
                             <Select
@@ -3802,6 +3803,7 @@ ${iconTemplates}</div>`
                             </Select>
                           </div>
 
+                          {/* Row 2 */}
                           <div>
                             <Label className="text-xs text-slate-600">Button background</Label>
                             <Select
@@ -3834,7 +3836,7 @@ ${iconTemplates}</div>`
                             </Select>
                           </div>
 
-                          <div className="mb-2">
+                          <div>
                             <Label className="text-xs text-slate-600">Button text</Label>
                             <Select
                               value={style.buttonText}
@@ -3867,25 +3869,39 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Icon colour</Label>
+                            <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                            <Input
+                              className="mt-1.5 text-xs bg-white w-full"
+                              type="number"
+                              value={getDisplayValue(style.buttonBorderWidth, "", "0")}
+                              onChange={(e) => updateStyle(style.id, "buttonBorderWidth", e.target.value)}
+                              placeholder="0"
+                              min="0"
+                            />
+                          </div>
+
+                          <div>
+                            <Label className="text-xs text-slate-600">Button border colour</Label>
                             <Select
-                              value={style.iconColor || "#000000"}
-                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
+                              value={style.buttonBorderColor || "#000000"}
+                              onValueChange={(value) => {
+                                updateStyle(style.id, "buttonBorderColor", value)
+                              }}
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <div className="flex items-center gap-2 max-w-[200px]">
                                   <div
                                     className="w-4 h-4 rounded border shrink-0"
-                                    style={{ backgroundColor: style.iconColor || "#000000" }}
+                                    style={{ backgroundColor: style.buttonBorderColor || "#000000" }}
                                   />
                                   <span className="truncate text-xs">
-                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                    {colors.find((c) => c.hex === style.buttonBorderColor)?.name || colors.find((c) => c.name === style.buttonBorderColor)?.name || "Black"}
                                   </span>
                                 </div>
                               </SelectTrigger>
                               <SelectContent>
                                 {colors.filter((color) => color.name.trim() !== "").map((color) => (
-                                  <SelectItem key={color.id} value={color.hex}>
+                                  <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
                                       {color.name}
@@ -3896,6 +3912,7 @@ ${iconTemplates}</div>`
                             </Select>
                           </div>
 
+                          {/* Row 3 */}
                           <div>
                             <Label className="text-xs text-slate-600">Button background hover</Label>
                             <Select
@@ -3959,44 +3976,27 @@ ${iconTemplates}</div>`
                               </SelectContent>
                             </Select>
                           </div>
-                        </div>
-
-                        {/* Button Border Controls & No Padding */}
-                        <div className="grid grid-cols-3 gap-4">
-                          <div>
-                            <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
-                            <Input
-                              className="mt-1.5 text-xs bg-white w-full"
-                              type="number"
-                              value={getDisplayValue(style.buttonBorderWidth, "", "0")}
-                              onChange={(e) => updateStyle(style.id, "buttonBorderWidth", e.target.value)}
-                              placeholder="0"
-                              min="0"
-                            />
-                          </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button border colour</Label>
+                            <Label className="text-xs text-slate-600">Icon colour</Label>
                             <Select
-                              value={style.buttonBorderColor || "#000000"}
-                              onValueChange={(value) => {
-                                updateStyle(style.id, "buttonBorderColor", value)
-                              }}
+                              value={style.iconColor || "#000000"}
+                              onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <div className="flex items-center gap-2 max-w-[200px]">
                                   <div
                                     className="w-4 h-4 rounded border shrink-0"
-                                    style={{ backgroundColor: style.buttonBorderColor || "#000000" }}
+                                    style={{ backgroundColor: style.iconColor || "#000000" }}
                                   />
                                   <span className="truncate text-xs">
-                                    {colors.find((c) => c.hex === style.buttonBorderColor)?.name || colors.find((c) => c.name === style.buttonBorderColor)?.name || "Black"}
+                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
                                   </span>
                                 </div>
                               </SelectTrigger>
                               <SelectContent>
                                 {colors.filter((color) => color.name.trim() !== "").map((color) => (
-                                  <SelectItem key={color.id} value={color.name}>
+                                  <SelectItem key={color.id} value={color.hex}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
                                       {color.name}
@@ -4007,47 +4007,50 @@ ${iconTemplates}</div>`
                             </Select>
                           </div>
 
-                          <div className="flex items-center gap-2 pt-5">
-                            <Checkbox
-                              id={`noPadding-${style.id}`}
-                              checked={style.noPadding === true}
-                              onCheckedChange={(checked) => {
-                                const updatedStyles = styles.map((s) => {
-                                  if (s.id === style.id) {
-                                    const isChecking = checked as boolean
-                                    let newDescription = s.description
-                                    
-                                    if (isChecking) {
-                                      if (!newDescription.startsWith("No padding - ")) {
-                                        newDescription = `No padding - ${newDescription}`
+                          <div>
+                            <Label className="text-xs text-slate-600">Style padding</Label>
+                            <div className="flex items-center gap-2 mt-3">
+                              <Checkbox
+                                id={`noPadding-${style.id}`}
+                                checked={style.noPadding === true}
+                                onCheckedChange={(checked) => {
+                                  const updatedStyles = styles.map((s) => {
+                                    if (s.id === style.id) {
+                                      const isChecking = checked as boolean
+                                      let newDescription = s.description
+                                      
+                                      if (isChecking) {
+                                        if (!newDescription.startsWith("No padding - ")) {
+                                          newDescription = `No padding - ${newDescription}`
+                                        }
+                                      } else {
+                                        if (newDescription.startsWith("No padding - ")) {
+                                          newDescription = newDescription.replace("No padding - ", "")
+                                        }
                                       }
-                                    } else {
-                                      if (newDescription.startsWith("No padding - ")) {
-                                        newDescription = newDescription.replace("No padding - ", "")
-                                      }
+                                      
+                                      return { ...s, noPadding: isChecking, description: newDescription }
                                     }
-                                    
-                                    return { ...s, noPadding: isChecking, description: newDescription }
-                                  }
-                                  return s
-                                })
-                                setStyles(updatedStyles)
-                              }}
-                              className="h-4 w-4 border border-slate-400 cursor-pointer"
-                            />
-                            <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                              No padding
-                            </Label>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <HelpCircle className="h-3 w-3 text-slate-400" />
-                                </TooltipTrigger>
-                                <TooltipContent side="right" className="max-w-xs text-xs">
-                                  Removes padding from all sides for this style
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                                    return s
+                                  })
+                                  setStyles(updatedStyles)
+                                }}
+                                className="h-4 w-4 border border-slate-400 cursor-pointer"
+                              />
+                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                                No padding
+                              </Label>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3 w-3 text-slate-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-xs text-xs">
+                                    Removes padding from all sides for this style
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </div>
                         </div>
                       </div>
