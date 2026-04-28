@@ -514,6 +514,9 @@ export default function ThemeGenerator() {
         buttonWeight: buttonWeight || "400",
         noPadding: false,
         iconColor: "#000000",
+        buttonBorderWidth: "0",
+        buttonBorderColor: blackColor?.name || "Black",
+        buttonBorderColorHover: blackColor?.name || "Black",
       },
     ])
     
@@ -588,6 +591,10 @@ export default function ThemeGenerator() {
         if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
           updated.buttonTextHover = value as string
         }
+        // Mirror button border color hover when button background hover changes
+        if (field === "buttonBgHover" && s.buttonBorderColorHover === s.buttonBgHover) {
+          updated.buttonBorderColorHover = value as string
+        }
         
         return updated
       }
@@ -615,6 +622,10 @@ export default function ThemeGenerator() {
           }
           if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
             updated.buttonTextHover = value
+          }
+          // Mirror button border color hover when button background hover changes
+          if (field === "buttonBgHover" && s.buttonBorderColorHover === s.buttonBgHover) {
+            updated.buttonBorderColorHover = value
           }
           return updated
         }
@@ -849,6 +860,9 @@ export default function ThemeGenerator() {
     const paddingValue = themePadding.replace("px", "") || "25"
     const buttonPaddingValue = `${buttonPaddingTop}px ${buttonPaddingRight}px ${buttonPaddingBottom}px ${buttonPaddingLeft}px`
     const buttonBorderRadiusValue = `${buttonBorderRadius || "4px"}`
+    
+    // Get first style's button background color for default button styling
+    const firstStyleButtonBg = styles.length > 0 ? getColorHexValue(styles[0].buttonBg || buttonBg) : "#00677f"
     const baseCss = `.wrapper [class*="text-style-"] {padding: 5px !Important;}
 .style-selector .info, .style-selector .header1 {font-size:14px !Important;line-height:24px !Important;}
 
@@ -973,7 +987,7 @@ padding: ${paddingValue}px}
 
 
 .btn-cm{/* All buttons styles */
-background-color:#00677f; border: 0px;
+background-color:${firstStyleButtonBg}; border: 0px;
 color:#ffffff;display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
 
 
@@ -1044,6 +1058,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const btnSize = style.buttonSize || buttonSize || "15px"
       const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
       const btnWeight = style.buttonWeight || buttonWeight || "400"
+      const btnBorderWidth = style.buttonBorderWidth || "0"
+      const btnBorderColor = getColorHexValue(style.buttonBorderColor || style.buttonBg)
+      const btnBorderColorHover = getColorHexValue(style.buttonBorderColorHover || style.buttonBgHover)
       const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
       const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
       const h3FontVal = formatFontForCSS(style.h3Font || h3Font || "Arial, sans-serif")
@@ -1070,8 +1087,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
       css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`
       css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;}\n`
-      css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight};}\n`
-      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important;}\n`
+      css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; border: ${btnBorderWidth}px solid ${btnBorderColor};}\n`
+      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important; border-color: ${btnBorderColorHover} !important;}\n`
       
       // Add no padding CSS if noPadding is enabled
       if (style.noPadding) {
@@ -3688,7 +3705,7 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Heading Colour</Label>
+                            <Label className="text-xs text-slate-600">Heading colour</Label>
                             <Select
                               value={style.headingColor}
                               onValueChange={(value) =>
@@ -3722,7 +3739,7 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Text Colour</Label>
+                            <Label className="text-xs text-slate-600">Text colour</Label>
                             <Select
                               value={style.textColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
@@ -3754,7 +3771,7 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Link Colour</Label>
+                            <Label className="text-xs text-slate-600">Link colour</Label>
                             <Select
                               value={style.linkColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
@@ -3786,7 +3803,7 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button Background</Label>
+                            <Label className="text-xs text-slate-600">Button background</Label>
                             <Select
                               value={style.buttonBg}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
@@ -3818,7 +3835,7 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div className="mb-2">
-                            <Label className="text-xs text-slate-600">Button Text</Label>
+                            <Label className="text-xs text-slate-600">Button text</Label>
                             <Select
                               value={style.buttonText}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
@@ -3944,48 +3961,94 @@ ${iconTemplates}</div>`
                           </div>
                         </div>
 
-                        {/* No Padding Checkbox */}
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            id={`noPadding-${style.id}`}
-                            checked={style.noPadding === true}
-                            onCheckedChange={(checked) => {
-                              const updatedStyles = styles.map((s) => {
-                                if (s.id === style.id) {
-                                  const isChecking = checked as boolean
-                                  let newDescription = s.description
-                                  
-                                  if (isChecking) {
-                                    if (!newDescription.startsWith("No padding - ")) {
-                                      newDescription = `No padding - ${newDescription}`
+                        {/* Button Border Controls & No Padding */}
+                        <div className="grid grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                            <Input
+                              className="mt-1.5 text-xs bg-white w-full"
+                              type="number"
+                              value={getDisplayValue(style.buttonBorderWidth, "", "0")}
+                              onChange={(e) => updateStyle(style.id, "buttonBorderWidth", e.target.value)}
+                              placeholder="0"
+                              min="0"
+                            />
+                          </div>
+
+                          <div>
+                            <Label className="text-xs text-slate-600">Button border colour</Label>
+                            <Select
+                              value={style.buttonBorderColor || "#000000"}
+                              onValueChange={(value) => {
+                                updateStyle(style.id, "buttonBorderColor", value)
+                              }}
+                            >
+                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                                <div className="flex items-center gap-2 max-w-[200px]">
+                                  <div
+                                    className="w-4 h-4 rounded border shrink-0"
+                                    style={{ backgroundColor: style.buttonBorderColor || "#000000" }}
+                                  />
+                                  <span className="truncate text-xs">
+                                    {colors.find((c) => c.hex === style.buttonBorderColor)?.name || colors.find((c) => c.name === style.buttonBorderColor)?.name || "Black"}
+                                  </span>
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                  <SelectItem key={color.id} value={color.name}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
+                                      {color.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-5">
+                            <Checkbox
+                              id={`noPadding-${style.id}`}
+                              checked={style.noPadding === true}
+                              onCheckedChange={(checked) => {
+                                const updatedStyles = styles.map((s) => {
+                                  if (s.id === style.id) {
+                                    const isChecking = checked as boolean
+                                    let newDescription = s.description
+                                    
+                                    if (isChecking) {
+                                      if (!newDescription.startsWith("No padding - ")) {
+                                        newDescription = `No padding - ${newDescription}`
+                                      }
+                                    } else {
+                                      if (newDescription.startsWith("No padding - ")) {
+                                        newDescription = newDescription.replace("No padding - ", "")
+                                      }
                                     }
-                                  } else {
-                                    if (newDescription.startsWith("No padding - ")) {
-                                      newDescription = newDescription.replace("No padding - ", "")
-                                    }
+                                    
+                                    return { ...s, noPadding: isChecking, description: newDescription }
                                   }
-                                  
-                                  return { ...s, noPadding: isChecking, description: newDescription }
-                                }
-                                return s
-                              })
-                              setStyles(updatedStyles)
-                            }}
-                            className="h-4 w-4 border border-slate-400 cursor-pointer"
-                          />
-                          <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                            No padding
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="h-3 w-3 text-slate-400" />
-                              </TooltipTrigger>
-                              <TooltipContent side="right" className="max-w-xs text-xs">
-                                Removes padding from all sides for this style
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                                  return s
+                                })
+                                setStyles(updatedStyles)
+                              }}
+                              className="h-4 w-4 border border-slate-400 cursor-pointer"
+                            />
+                            <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                              No padding
+                            </Label>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <HelpCircle className="h-3 w-3 text-slate-400" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs text-xs">
+                                  Removes padding from all sides for this style
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                         </div>
                       </div>
 
@@ -4032,7 +4095,7 @@ ${iconTemplates}</div>`
                               fontWeight: style.buttonWeight || buttonWeight || '600',
                               borderRadius: style.buttonBorderRadius || buttonBorderRadius || '4px',
                               padding: `${style.buttonPaddingTop || buttonPaddingTop || "10"}px ${style.buttonPaddingRight || buttonPaddingRight || "20"}px ${style.buttonPaddingBottom || buttonPaddingBottom || "10"}px ${style.buttonPaddingLeft || buttonPaddingLeft || "20"}px`,
-                              border: 'none',
+                              border: `${style.buttonBorderWidth || "0"}px solid ${getColorHexValue(style.buttonBorderColor || style.buttonBg) || buttonBg}`,
                               cursor: 'pointer',
                             }}
                             onMouseEnter={(e) => {
@@ -4044,10 +4107,15 @@ ${iconTemplates}</div>`
                                 const hoverText = getColorHexValue(style.buttonTextHover)
                                 if (hoverText) e.currentTarget.style.color = hoverText
                               }
+                              if (style.buttonBorderColorHover) {
+                                const hoverBorderColor = getColorHexValue(style.buttonBorderColorHover)
+                                if (hoverBorderColor) e.currentTarget.style.borderColor = hoverBorderColor
+                              }
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.backgroundColor = buttonBg
                               e.currentTarget.style.color = buttonText
+                              e.currentTarget.style.borderColor = getColorHexValue(style.buttonBorderColor || style.buttonBg) || buttonBg
                             }}
                           >
                             Sample Button

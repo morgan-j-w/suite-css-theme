@@ -217,6 +217,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     const btnSize = style.buttonSize || buttonSize || "15px"
     const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
     const btnWeight = style.buttonWeight || buttonWeight || "400"
+    const btnBorderWidth = style.buttonBorderWidth || "0"
+    const btnBorderColor = getColorHex(style.buttonBorderColor || style.buttonBg, colors)
+    const btnBorderColorHover = getColorHex(style.buttonBorderColorHover || style.buttonBgHover, colors)
     const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
     const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
     const h3FontVal = formatFontForCSS(style.h3Font || h3Font || "Arial, sans-serif")
@@ -243,8 +246,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
     css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`
     css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;}\n`
-    css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight};}\n`
-    css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBg} !important; text-decoration:none;color:${btnText} !important;}\n`
+    css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; border: ${btnBorderWidth}px solid ${btnBorderColor};}\n`
+    css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBg} !important; text-decoration:none;color:${btnText} !important; border-color: ${btnBorderColorHover} !important;}\n`
     
     // Add no padding CSS if noPadding is enabled
     if (style.noPadding) {
