@@ -515,7 +515,7 @@ export default function ThemeGenerator() {
         noPadding: false,
         iconColor: "#000000",
         buttonBorderWidth: "0",
-        buttonBorderColor: blackColor?.name || "Black",
+        buttonBorderColor: "none",
         buttonBorderColorHover: blackColor?.name || "Black",
       },
     ])
@@ -1059,7 +1059,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
       const btnWeight = style.buttonWeight || buttonWeight || "400"
       const btnBorderWidth = style.buttonBorderWidth || "0"
-      const btnBorderColor = getColorHexValue(style.buttonBorderColor || style.buttonBg)
+      const btnBorderColor = getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg)
       const btnBorderColorHover = getColorHexValue(style.buttonBorderColorHover || style.buttonBgHover)
       const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
       const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
@@ -3883,23 +3883,32 @@ ${iconTemplates}</div>`
                           <div>
                             <Label className="text-xs text-slate-600">Button border colour</Label>
                             <Select
-                              value={style.buttonBorderColor || "#000000"}
+                              value={style.buttonBorderColor || "none"}
                               onValueChange={(value) => {
                                 updateStyle(style.id, "buttonBorderColor", value)
                               }}
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <div className="flex items-center gap-2 max-w-[200px]">
-                                  <div
-                                    className="w-4 h-4 rounded border shrink-0"
-                                    style={{ backgroundColor: style.buttonBorderColor || "#000000" }}
-                                  />
-                                  <span className="truncate text-xs">
-                                    {colors.find((c) => c.hex === style.buttonBorderColor)?.name || colors.find((c) => c.name === style.buttonBorderColor)?.name || "Black"}
-                                  </span>
+                                  {style.buttonBorderColor && style.buttonBorderColor !== "none" ? (
+                                    <>
+                                      <div
+                                        className="w-4 h-4 rounded border shrink-0"
+                                        style={{ backgroundColor: colors.find((c) => c.name === style.buttonBorderColor)?.hex || "#000000" }}
+                                      />
+                                      <span className="truncate text-xs">
+                                        {colors.find((c) => c.name === style.buttonBorderColor)?.name || style.buttonBorderColor}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="truncate text-xs text-slate-400">None</span>
+                                  )}
                                 </div>
                               </SelectTrigger>
                               <SelectContent>
+                                <SelectItem value="none">
+                                  <span className="text-slate-400">None</span>
+                                </SelectItem>
                                 {colors.filter((color) => color.name.trim() !== "").map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
@@ -4098,7 +4107,7 @@ ${iconTemplates}</div>`
                               fontWeight: style.buttonWeight || buttonWeight || '600',
                               borderRadius: style.buttonBorderRadius || buttonBorderRadius || '4px',
                               padding: `${style.buttonPaddingTop || buttonPaddingTop || "10"}px ${style.buttonPaddingRight || buttonPaddingRight || "20"}px ${style.buttonPaddingBottom || buttonPaddingBottom || "10"}px ${style.buttonPaddingLeft || buttonPaddingLeft || "20"}px`,
-                              border: `${style.buttonBorderWidth || "0"}px solid ${getColorHexValue(style.buttonBorderColor || style.buttonBg) || buttonBg}`,
+                              border: `${style.buttonBorderWidth || "0"}px solid ${getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg) || buttonBg}`,
                               cursor: 'pointer',
                             }}
                             onMouseEnter={(e) => {
@@ -4118,7 +4127,7 @@ ${iconTemplates}</div>`
                             onMouseLeave={(e) => {
                               e.currentTarget.style.backgroundColor = buttonBg
                               e.currentTarget.style.color = buttonText
-                              e.currentTarget.style.borderColor = getColorHexValue(style.buttonBorderColor || style.buttonBg) || buttonBg
+                              e.currentTarget.style.borderColor = getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg) || buttonBg
                             }}
                           >
                             Sample Button
