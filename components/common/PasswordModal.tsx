@@ -32,7 +32,7 @@ export const PasswordModal = ({
                 className="h-10 w-auto"
               />
             </div>
-            <CardTitle className="text-2xl">Theme Generator</CardTitle>
+            <CardTitle className="text-2xl">Brand Builder</CardTitle>
             <CardDescription>Enter password to access</CardDescription>
           </CardHeader>
           <CardContent>

@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 interface ThemeContextPanelProps {
   themeName?: string
   onThemeNameChange?: (name: string) => void
-  usedInDocuments?: number
   isDirty?: boolean
   savedTimeAgo?: string
 }
@@ -15,7 +14,6 @@ interface ThemeContextPanelProps {
 export const ThemeContextPanel = ({
   themeName = "Untitled Theme",
   onThemeNameChange,
-  usedInDocuments = 8,
   isDirty = false,
   savedTimeAgo = "Saved 2 mins ago",
 }: ThemeContextPanelProps) => {
@@ -71,11 +69,6 @@ export const ThemeContextPanel = ({
 
         {/* Metadata Row - Right Aligned */}
         <div className="flex items-center gap-3 w-full lg:w-auto lg:justify-end">
-          {/* Usage Pill */}
-          <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded-full">
-            Theme used in <span className="ml-1 mr-1 font-semibold text-slate-900">{usedInDocuments}</span>document{usedInDocuments !== 1 ? "s" : ""}
-          </span>
-
           {/* Status Pill */}
           {isDirty ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
