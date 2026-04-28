@@ -149,6 +149,8 @@ export default function ThemeGenerator() {
     setButtonLineHeight,
     buttonWeight,
     setButtonWeight,
+    linkWeight,
+    setLinkWeight,
     buttonPaddingTop,
     setButtonPaddingTop,
     buttonPaddingRight,
@@ -670,6 +672,15 @@ export default function ThemeGenerator() {
     )
   }
 
+  const updateAllStylesLinkWeight = (value: string) => {
+    setStyles(
+      styles.map((s) => ({
+        ...s,
+        linkWeight: value,
+      })),
+    )
+  }
+
   const updateAllStylesBodySize = (value: string) => {
     setStyles(
       styles.map((s) => ({
@@ -1058,6 +1069,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const btnSize = style.buttonSize || buttonSize || "15px"
       const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
       const btnWeight = style.buttonWeight || buttonWeight || "400"
+      const linkWeightVal = style.linkWeight || linkWeight || "400"
       const btnBorderWidth = style.buttonBorderWidth || "0"
       const btnBorderColor = getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg)
       const btnBorderColorHover = getColorHexValue(style.buttonBorderColorHover || style.buttonBgHover)
@@ -1083,10 +1095,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .header2{font-family: ${h2FontVal};font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}\n`
       css += `${className} .header3{font-family: ${h3FontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}\n`
       css += `${className} .header4{font-family: ${h4FontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}\n`
-      css += `${className} .figcaption a, ${className} a{color:${linkColor};text-decoration:underline;}\n`
+      css += `${className} .figcaption a, ${className} a{color:${linkColor};text-decoration:underline;font-weight: ${linkWeightVal};}\n`
       css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
-      css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};}\n`
-      css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;}\n`
+      css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor}; font-weight: ${linkWeightVal};}\n`
+      css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important; font-weight: ${linkWeightVal};}\n`
       css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; border: ${btnBorderWidth}px solid ${btnBorderColor};}\n`
       css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important; border-color: ${btnBorderColorHover} !important;}\n`
       
@@ -3126,6 +3138,33 @@ ${iconTemplates}</div>`
               </CardContent>
             </Card>
 
+            {/* Links typography */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Links typography</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Weight</Label>
+                  <Select value={linkWeight || "400"} onValueChange={(value) => {
+                    setLinkWeight(value)
+                    updateAllStylesLinkWeight(value)
+                  }}>
+                    <SelectTrigger className="mt-1.5 h-9 w-full">
+                      <SelectValue placeholder="Select weight" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fontWeightOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
                     {/* Webfont imports */}
                     <Card className="shadow-sm">
                       <CardHeader className="pb-2">
@@ -3234,6 +3273,21 @@ ${iconTemplates}</div>`
                   >
                     Body copy sample text
                   </div>
+                </div>
+                <div>
+                  <a 
+                    href="#" 
+                    onClick={(e) => e.preventDefault()}
+                    style={{
+                      fontFamily: cleanFontValue(bodyFont) || "Arial, sans-serif",
+                      fontSize: `${bodySize || '15px'}`,
+                      fontWeight: linkWeight || '400',
+                      color: '#0066cc',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Sample link
+                  </a>
                 </div>
                 <button
                   className="w-full bg-slate-900 text-white transition-colors hover:bg-slate-800"

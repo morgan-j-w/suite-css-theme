@@ -40,6 +40,7 @@ export interface StyleDefinition {
   buttonSize: string
   buttonLineHeight: string
   buttonWeight: string
+  linkWeight?: string
   noPadding?: boolean
   iconStyle?: string
   iconColor?: string
