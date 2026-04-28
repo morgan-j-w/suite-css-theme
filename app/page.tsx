@@ -4451,7 +4451,7 @@ ${iconTemplates}</div>`
                             </div>
                           </div>
 
-                          {/* Body Typography Column */}
+                          {/* Body + Links Typography Column */}
                           <div className="space-y-6">
                             {/* Body */}
                             <div>
@@ -4505,12 +4505,9 @@ ${iconTemplates}</div>`
                                 </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Links Typography Column */}
-                          <div className="space-y-6">
                             {/* Links */}
-                            <div>
+                            <div className="border-t pt-4">
                               <Label className="text-xs text-slate-600">Links</Label>
                               <div className="mt-3">
                                 <Label className="text-xs text-slate-600">Weight</Label>
@@ -4677,6 +4674,7 @@ ${iconTemplates}</div>`
                                     bodySize: undefined,
                                     bodyLineHeight: undefined,
                                     bodyWeight: undefined,
+                                    linkWeight: undefined,
                                     buttonSize: undefined,
                                     buttonLineHeight: undefined,
                                     buttonWeight: undefined,
