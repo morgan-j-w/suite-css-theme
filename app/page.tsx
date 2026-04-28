@@ -4507,6 +4507,33 @@ ${iconTemplates}</div>`
                             </div>
                           </div>
 
+                          {/* Links Typography Column */}
+                          <div className="space-y-6">
+                            {/* Links */}
+                            <div>
+                              <Label className="text-xs text-slate-600">Links</Label>
+                              <div className="mt-3">
+                                <Label className="text-xs text-slate-600">Weight</Label>
+                                <Select
+                                  value={style.linkWeight || linkWeight || "400"}
+                                  onValueChange={(value) => updateStyle(style.id, "linkWeight", value)}
+                                >
+                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectValue placeholder={getWeightLabel(style.linkWeight || linkWeight || "400")} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="300">Light</SelectItem>
+                                    <SelectItem value="400">Regular</SelectItem>
+                                    <SelectItem value="500">Medium</SelectItem>
+                                    <SelectItem value="600">Semibold</SelectItem>
+                                    <SelectItem value="700">Bold</SelectItem>
+                                    <SelectItem value="800">Extrabold</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Button Typography Column */}
                           <div className="space-y-6">
                             {/* Button */}
