@@ -37,6 +37,7 @@ export const useThemeState = () => {
   const [buttonSize, setButtonSize] = useState("15px")
   const [buttonLineHeight, setButtonLineHeight] = useState("22px")
   const [buttonWeight, setButtonWeight] = useState("400")
+  const [linkWeight, setLinkWeight] = useState("400")
   const [buttonPaddingTop, setButtonPaddingTop] = useState("10")
   const [buttonPaddingRight, setButtonPaddingRight] = useState("20")
   const [buttonPaddingBottom, setButtonPaddingBottom] = useState("10")
@@ -90,6 +91,7 @@ export const useThemeState = () => {
     setButtonSize(loadFromLocalStorage("buttonSize", "15px") as string)
     setButtonLineHeight(loadFromLocalStorage("buttonLineHeight", "22px") as string)
     setButtonWeight(loadFromLocalStorage("buttonWeight", "400") as string)
+    setLinkWeight(loadFromLocalStorage("linkWeight", "400") as string)
     setButtonPaddingTop(loadFromLocalStorage("buttonPaddingTop", "10") as string)
     setButtonPaddingRight(loadFromLocalStorage("buttonPaddingRight", "20") as string)
     setButtonPaddingBottom(loadFromLocalStorage("buttonPaddingBottom", "10") as string)
@@ -159,6 +161,8 @@ export const useThemeState = () => {
     setButtonLineHeight,
     buttonWeight,
     setButtonWeight,
+    linkWeight,
+    setLinkWeight,
     buttonPaddingTop,
     setButtonPaddingTop,
     buttonPaddingRight,
