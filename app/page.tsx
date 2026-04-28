@@ -4145,7 +4145,7 @@ ${iconTemplates}</div>`
                               }}
                             >
                               {style.description}{" "}
-                              <a href="#" style={{ color: linkColor, textDecoration: "underline" }}>
+                              <a href="#" style={{ color: linkColor, textDecoration: "underline", fontWeight: style.linkWeight || linkWeight || '400' }}>
                                 body text with link
                               </a>
                             </p>
