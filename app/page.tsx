@@ -3671,7 +3671,7 @@ ${iconTemplates}</div>`
                         </div>
 
                         {/* Color Selectors - 4 Column Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           {/* Row 1 */}
                           <div>
                             <Label className="text-xs text-slate-600">Background</Label>
