@@ -27,7 +27,6 @@ import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
 import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
-import { AppFooter } from "@/components/common/AppFooter"
 import { DevInformationModal } from "@/components/common/DevInformationModal"
 import { ThemeContextPanel } from "@/components/common/ThemeContextPanel"
 
@@ -55,6 +54,7 @@ export default function ThemeGenerator() {
   const [copiedImport, setCopiedImport] = useState(false)
   const [resetStyles, setResetStyles] = useState<Set<string>>(new Set())
   const [themeName, setThemeName] = useState("Untitled Theme")
+  const [themeType, setThemeType] = useState("composer")
   const [savedTimeAgo, setSavedTimeAgo] = useState("")
   const { toast } = useToast()
 
@@ -232,6 +232,7 @@ export default function ThemeGenerator() {
   // localStorage sync effects
   useEffect(() => { saveToLocalStorage("themeColors", colors) }, [colors])
   useEffect(() => { localStorage.setItem("themeName", themeName) }, [themeName])
+  useEffect(() => { localStorage.setItem("themeType", themeType) }, [themeType])
   useEffect(() => { saveToLocalStorage("h1Font", h1Font) }, [h1Font])
   useEffect(() => { saveToLocalStorage("h2Font", h2Font) }, [h2Font])
   useEffect(() => { saveToLocalStorage("h3Font", h3Font) }, [h3Font])
@@ -280,6 +281,11 @@ export default function ThemeGenerator() {
       setThemeName(savedThemeName)
     }
     
+    const savedThemeType = localStorage.getItem("themeType")
+    if (savedThemeType) {
+      setThemeType(savedThemeType)
+    }
+    
     const lastSaved = localStorage.getItem("lastSavedTime")
     if (lastSaved) {
       const lastSavedDate = new Date(lastSaved)
@@ -292,7 +298,12 @@ export default function ThemeGenerator() {
         setSavedTimeAgo(`Saved ${diffMins} min${diffMins !== 1 ? 's' : ''} ago`)
       } else {
         const diffHours = Math.floor(diffMins / 60)
-        setSavedTimeAgo(`Saved ${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`)
+        if (diffHours < 24) {
+          setSavedTimeAgo(`Saved ${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`)
+        } else {
+          const diffDays = Math.floor(diffHours / 24)
+          setSavedTimeAgo(`Saved ${diffDays} day${diffDays !== 1 ? 's' : ''} ago`)
+        }
       }
     }
     
@@ -461,10 +472,12 @@ export default function ThemeGenerator() {
     const buttonName = blackColor?.name || "Black"
     const description = `${bgName} background with ${headingName.toLowerCase()} headings and ${buttonName.toLowerCase()} buttons`
     
+    const newStyleId = Date.now().toString()
+    
     setStyles([
       ...styles,
       {
-        id: Date.now().toString(),
+        id: newStyleId,
         name: `Style ${styleNumber}`,
         description: description,
         background: whiteColor?.name || "White",
@@ -503,6 +516,14 @@ export default function ThemeGenerator() {
         iconColor: "#000000",
       },
     ])
+    
+    // Smooth scroll to the newly added style
+    setTimeout(() => {
+      const element = document.getElementById(`style-${newStyleId}`)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 0)
   }
 
   const removeStyle = (id: string) => {
@@ -545,6 +566,14 @@ export default function ThemeGenerator() {
     newStyles.splice(currentIndex + 1, 0, clonedStyle)
     
     setStyles(newStyles)
+    
+    // Smooth scroll to the newly duplicated style
+    setTimeout(() => {
+      const element = document.getElementById(`style-${clonedStyle.id}`)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 0)
   }
 
   const updateStyle = (id: string, field: keyof StyleDefinition, value: string | boolean) => {
@@ -1665,7 +1694,8 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   }
 
   const copyMediaToClipboard = async () => {
-    const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
+    const breakpoint = themeType === 'events' ? '1023px' : '650px'
+    const mediaQuery = getMediaQuery(breakpoint)
     await navigator.clipboard.writeText(mediaQuery)
     setCopiedMedia(true)
     setTimeout(() => setCopiedMedia(false), 2000)
@@ -1677,56 +1707,269 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     setTimeout(() => setCopiedCss(false), 2000)
   }
 
-  const copyExportHtml = async () => {
-    const iconStyleMap: Record<string, string> = {
-      'material-rounded': 'material-rounded',
-      'material-outlined': 'material-outlined',
-      'material-sharp': 'material-sharp',
+  const getMediaQuery = (breakpoint: string = '650px') => {
+    const breakpointValue = breakpoint.replace('px', '')
+    return `@media screen and (max-width:${breakpointValue}px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
+  }
+
+  const getGridTemplates = () => {
+    if (themeType === 'events') {
+      // Events Desk / Landing Page Theme - Simplified grid templates
+      return `<div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
+            <table align="center" border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td>
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="contenttable mso-full-width" style="width: 100%;" align="left" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 1-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="template grid grid-2 allow-top allow-bottom allow-move allow-delete">
+            <table align="center" border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td align="left" valign="top">
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="guttertable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td><!-- Gutter --></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="template grid grid-3 allow-top allow-bottom allow-move allow-delete">
+            <table align="center" border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td align="left" valign="top">
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="guttertable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td><!-- Gutter --></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="guttertable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td><!-- Gutter --></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="template grid grid-4 allow-top allow-bottom allow-move allow-delete">
+            <table align="center" border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td align="left" valign="top">
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="guttertable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td><!-- Gutter --></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="guttertable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td><!-- Gutter --></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="guttertable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td><!-- Gutter --></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="mso-full-width contenttable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td class="block" draggable="false" data-sd-content="none" valign="top">
+                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="margintable" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Margin -->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>`
+    } else {
+      // Composer Theme - Keep current structure (this will be called from copyExportHtml)
+      return null
     }
-    const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
-    const iconSize = globalIconSize || "18"
+  }
 
-    const shareIcons = [
-      { name: 'Facebook', id: 'facebook', variable: 'FACEBOOK_SHARE_DOC' },
-      { name: 'X', id: 'twitterx--v1', variable: 'TWITTER_SHARE_DOC' },
-      { name: 'LinkedIn', id: 'linkedin', variable: 'LINKEDIN_SHARE_DOC' },
-      { name: 'Print', id: 'print', variable: 'PRINT_SHARE_DOC' },
-      { name: 'Email', id: 'new-post', variable: 'EMAIL_SHARE_DOC' },
-    ]
-
-    // Generate icon templates for each style
-    let iconTemplates = ''
-    styles.forEach((style, index) => {
-      const iconColor = (style.iconColor || "#000000").replace('#', '')
-      iconTemplates += `    <div class="text-style-${index + 1}"><br>\n`
-      shareIcons.forEach(icon => {
-        const classId = icon.id === 'twitterx--v1' ? 'twitter' : icon.id === 'new-post' ? 'forward' : icon.id
-        iconTemplates += `        <a title="${icon.name}" class="sd-${classId}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
-        iconTemplates += `            <img alt="${icon.name}" src="https://img.icons8.com/${mappedStyle}/96/${iconColor}/${icon.id}.png" width="${iconSize}">\n`
-        iconTemplates += `        </a>\n`
-      })
-      iconTemplates += `    </div>\n`
-    })
-
-    const htmlContent = `<div class="read-more-button">
-    <div><!--[if mso]>
-        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
-                    stroke="#f" fillcolor="#64ccc9">
-            <w:anchorlock></w:anchorlock>
-            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
-                Read more
-            </center>
-        </v:roundrect>
-        <![endif]-->
-        <a class="btn-cm" href="http://">
-            Read more
-        </a>
-    </div>
-</div>
-
-<div class="grid-templates">
-    <div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
+  const getComposerGridTemplates = () => {
+    return `<div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
         <table cellspacing="0" cellpadding="0" border="0" align="center">
             <tbody>
             <tr>
@@ -1996,8 +2239,64 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
             </tr>
             </tbody>
         </table>
+    </div>`
+  }
+
+  const copyExportHtml = async () => {
+    const iconStyleMap: Record<string, string> = {
+      'material-rounded': 'material-rounded',
+      'material-outlined': 'material-outlined',
+      'material-sharp': 'material-sharp',
+    }
+    const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+    const iconSize = globalIconSize || "18"
+
+    const shareIcons = [
+      { name: 'Facebook', id: 'facebook', variable: 'FACEBOOK_SHARE_DOC' },
+      { name: 'X', id: 'twitterx--v1', variable: 'TWITTER_SHARE_DOC' },
+      { name: 'LinkedIn', id: 'linkedin', variable: 'LINKEDIN_SHARE_DOC' },
+      { name: 'Print', id: 'print', variable: 'PRINT_SHARE_DOC' },
+      { name: 'Email', id: 'new-post', variable: 'EMAIL_SHARE_DOC' },
+    ]
+
+    // Generate icon templates for each style
+    let iconTemplates = ''
+    styles.forEach((style, index) => {
+      const iconColor = (style.iconColor || "#000000").replace('#', '')
+      iconTemplates += `    <div class="text-style-${index + 1}"><br>\n`
+      shareIcons.forEach(icon => {
+        const classId = icon.id === 'twitterx--v1' ? 'twitter' : icon.id === 'new-post' ? 'forward' : icon.id
+        iconTemplates += `        <a title="${icon.name}" class="sd-${classId}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
+        iconTemplates += `            <img alt="${icon.name}" src="https://img.icons8.com/${mappedStyle}/96/${iconColor}/${icon.id}.png" width="${iconSize}">\n`
+        iconTemplates += `        </a>\n`
+      })
+      iconTemplates += `    </div>\n`
+    })
+
+    // Determine which grid templates to use based on theme type
+    const gridTemplatesContent = themeType === 'events' ? getGridTemplates() : getComposerGridTemplates()
+
+    const htmlContent = `<div class="read-more-button">
+    <div><!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
+                    stroke="#f" fillcolor="#64ccc9">
+            <w:anchorlock></w:anchorlock>
+            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
+                Read more
+            </center>
+        </v:roundrect>
+        <![endif]-->
+        <a class="btn-cm" href="http://">
+            Read more
+        </a>
     </div>
 </div>
+
+<div class="grid-templates">
+${gridTemplatesContent}
+</div>
+
 
 <div class="icon-templates">
 ${iconTemplates}</div>`
@@ -2007,7 +2306,8 @@ ${iconTemplates}</div>`
   }
 
   const copyExportMediaQuery = async () => {
-    const mediaQuery = `@media screen and (max-width:650px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
+    const breakpoint = themeType === 'events' ? '1023px' : '650px'
+    const mediaQuery = getMediaQuery(breakpoint)
     await navigator.clipboard.writeText(mediaQuery)
     setCopiedMedia(true)
     setTimeout(() => setCopiedMedia(false), 2000)
@@ -2087,14 +2387,6 @@ ${iconTemplates}</div>`
       })
     } finally {
       setIsSaving(false)
-    }
-  }
-
-  const handleExitFromHeader = () => {
-    if (hasUnsavedChanges) {
-      setShowExitWarning(true)
-    } else {
-      window.location.href = "/"
     }
   }
 
@@ -2182,7 +2474,6 @@ ${iconTemplates}</div>`
       {/* Header Bar - Full Width */}
       <AppHeader 
         onSaveTheme={handleSaveThemeFromHeader} 
-        onExit={handleExitFromHeader}
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
         onDevInfo={() => setShowDevInfo(true)}
@@ -2198,7 +2489,6 @@ ${iconTemplates}</div>`
                 themeName={themeName}
                 onThemeNameChange={setThemeName}
                 savedTimeAgo={savedTimeAgo}
-                usedInDocuments={8}
                 isDirty={hasUnsavedChanges}
               />
             </div>
@@ -2954,7 +3244,23 @@ ${iconTemplates}</div>`
             {currentStep === 2 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Configure your theme</h2>
-                <p className="text-slate-600 mb-4">Set up article padding, icon settings and button styling for your theme.</p>
+                <p className="text-slate-600 mb-6">Set up article padding, icon settings and button styling for your theme.</p>
+
+                {/* Theme Type Selector */}
+                <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-150">
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+                    <label className="text-sm font-semibold text-slate-800 whitespace-nowrap flex-shrink-0">Theme type:</label>
+                    <Select value={themeType} onValueChange={setThemeType}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a theme type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="composer">Composer Theme</SelectItem>
+                        <SelectItem value="events">Events Desk / Landing Page Theme</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Theme padding */}
@@ -3296,7 +3602,7 @@ ${iconTemplates}</div>`
                 const buttonText = getColorHexValue(style.buttonText)
 
                 return (
-                  <div key={style.id} className="p-4 border rounded-lg bg-slate-50">
+                  <div key={style.id} id={`style-${style.id}`} className="p-4 border rounded-lg bg-slate-50">
                     <div className="grid lg:grid-cols-5 gap-4">
                       {/* Left Column: Tools */}
                       <div className="space-y-3 lg:col-span-3">
@@ -4014,7 +4320,7 @@ ${iconTemplates}</div>`
                           {/* Body Typography Column */}
                           <div className="space-y-6">
                             {/* Body */}
-                            <div className="pt-2 border-t">
+                            <div>
                               <Label className="text-xs text-slate-600">Body font</Label>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
@@ -4070,7 +4376,7 @@ ${iconTemplates}</div>`
                           {/* Button Typography Column */}
                           <div className="space-y-6">
                             {/* Button */}
-                            <div className="pt-6 border-t">
+                            <div>
                               <Label className="text-xs text-slate-600">Button font</Label>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
@@ -4519,7 +4825,6 @@ ${iconTemplates}</div>`
         </datalist>
             </div>
             </div>
-          <AppFooter />
       <DevInformationModal
         isOpen={showDevInfo}
         onClose={() => setShowDevInfo(false)}
