@@ -591,8 +591,8 @@ export default function ThemeGenerator() {
         if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
           updated.buttonTextHover = value as string
         }
-        // Mirror button border color hover when button background hover changes
-        if (field === "buttonBgHover" && s.buttonBorderColorHover === s.buttonBgHover) {
+        // Always sync button border color hover when button background hover changes
+        if (field === "buttonBgHover") {
           updated.buttonBorderColorHover = value as string
         }
         
@@ -623,8 +623,8 @@ export default function ThemeGenerator() {
           if (field === "buttonText" && s.buttonTextHover === s.buttonText) {
             updated.buttonTextHover = value
           }
-          // Mirror button border color hover when button background hover changes
-          if (field === "buttonBgHover" && s.buttonBorderColorHover === s.buttonBgHover) {
+          // Always sync button border color hover when button background hover changes
+          if (field === "buttonBgHover") {
             updated.buttonBorderColorHover = value
           }
           return updated
