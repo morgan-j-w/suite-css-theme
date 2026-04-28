@@ -13,6 +13,8 @@ export interface StyleDefinition {
   headingColor: string
   buttonBg: string
   buttonText: string
+  buttonBgHover?: string
+  buttonTextHover?: string
   linkColor: string
   h1Font: string
   h2Font: string
@@ -42,6 +44,14 @@ export interface StyleDefinition {
   iconStyle?: string
   iconColor?: string
   iconSize?: string
+  buttonBorderWidth?: string
+  buttonBorderColor?: string
+  buttonBorderColorHover?: string
+  buttonPaddingTop?: string
+  buttonPaddingRight?: string
+  buttonPaddingBottom?: string
+  buttonPaddingLeft?: string
+  buttonBorderRadius?: string
 }
 
 export interface GoogleFont {
