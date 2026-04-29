@@ -1083,7 +1083,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const descriptionPrefix = style.noPadding ? 'No padding - ' : ''
       const capitalizeFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
       css += `/* Style ${styleNum} */\n`
-      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons ';}\n`
+      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${style.description || `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`}';}\n`
       css += `#layout ${className} .header{padding-bottom:${titlePaddingBottom || "14"}px;}\n`
       css += `${className} {background-color:${bgColor};color:${textColor};font-family: ${bodyFontVal}; font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-weight: ${bodyWeightVal};}\n`
       css += `${className} .main{color:${textColor};font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-family: ${bodyFontVal}; }\n`
