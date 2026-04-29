@@ -79,7 +79,7 @@ export const ThemeContextPanel = ({
               ) : (
                 <Monitor className="h-3.5 w-3.5" />
               )}
-              {themeType === "composer" ? "Email composer" : "Events Desk"}
+              {themeType === "composer" ? "Email Composer theme" : "Events Desk / Landing Pages theme"}
             </span>
           )}
           {/* Status Pill */}
