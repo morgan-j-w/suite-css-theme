@@ -3327,11 +3327,11 @@ ${iconTemplates}</div>`
                     <RadioGroup value={themeType} onValueChange={setThemeType}>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5" />
+                          <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-700" />
                           <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="events" id="events-theme" className="w-5 h-5" />
+                          <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-700" />
                           <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
                         </div>
                       </div>
