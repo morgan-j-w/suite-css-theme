@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Pencil } from "lucide-react"
+import { Check, Pencil, Mail, Monitor } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 interface ThemeContextPanelProps {
@@ -9,6 +9,7 @@ interface ThemeContextPanelProps {
   onThemeNameChange?: (name: string) => void
   isDirty?: boolean
   savedTimeAgo?: string
+  themeType?: string
 }
 
 export const ThemeContextPanel = ({
@@ -16,6 +17,7 @@ export const ThemeContextPanel = ({
   onThemeNameChange,
   isDirty = false,
   savedTimeAgo = "Saved 2 mins ago",
+  themeType = "composer",
 }: ThemeContextPanelProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(themeName)
@@ -72,7 +74,11 @@ export const ThemeContextPanel = ({
           {/* Status Pill */}
           {isDirty ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
+              {themeType === "composer" ? (
+                <Mail className="h-3.5 w-3.5" />
+              ) : (
+                <Monitor className="h-3.5 w-3.5" />
+              )}
               Unsaved changes
             </span>
           ) : savedTimeAgo ? (
