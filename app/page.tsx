@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
@@ -3321,17 +3322,18 @@ ${iconTemplates}</div>`
 
                 {/* Theme Type Selector */}
                 <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-150">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-                    <label className="text-sm font-semibold text-slate-800 whitespace-nowrap flex-shrink-0">Theme type:</label>
-                    <Select value={themeType} onValueChange={setThemeType}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a theme type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="composer">Email Composer theme</SelectItem>
-                        <SelectItem value="events">Events Desk / Landing Pages theme</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="flex flex-col gap-3">
+                    <label className="text-sm font-semibold text-slate-800">Theme type:</label>
+                    <RadioGroup value={themeType} onValueChange={setThemeType}>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="composer" id="composer-theme" />
+                        <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="events" id="events-theme" />
+                        <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
+                      </div>
+                    </RadioGroup>
                   </div>
                 </div>
 
