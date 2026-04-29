@@ -3321,17 +3321,19 @@ ${iconTemplates}</div>`
                 <p className="text-slate-600 mb-6">Set up article padding, icon settings and button styling for your theme.</p>
 
                 {/* Theme Type Selector */}
-                <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-150">
+                <div className="bg-white rounded-lg p-4 mb-6 border border-slate-150">
                   <div className="flex flex-col gap-3">
                     <label className="text-sm font-semibold text-slate-800">Theme type:</label>
                     <RadioGroup value={themeType} onValueChange={setThemeType}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="composer" id="composer-theme" />
-                        <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="events" id="events-theme" />
-                        <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5" />
+                          <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="events" id="events-theme" className="w-5 h-5" />
+                          <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
+                        </div>
                       </div>
                     </RadioGroup>
                   </div>
