@@ -874,6 +874,7 @@ export default function ThemeGenerator() {
     
     // Get first style's button background color for default button styling
     const firstStyleButtonBg = styles.length > 0 ? getColorHexValue(styles[0].buttonBg || buttonBg) : "#00677f"
+    const firstStyleButtonText = styles.length > 0 ? getColorHexValue(styles[0].buttonText || buttonText) : "#ffffff"
     const baseCss = `.wrapper [class*="text-style-"] {padding: 5px !Important;}
 .style-selector .info, .style-selector .header1 {font-size:14px !Important;line-height:24px !Important;}
 
@@ -999,7 +1000,7 @@ padding: ${paddingValue}px}
 
 .btn-cm{/* All buttons styles */
 background-color:${firstStyleButtonBg}; border: 0px;
-color:#ffffff;display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
+color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};
 
 
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
