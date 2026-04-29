@@ -3321,9 +3321,9 @@ ${iconTemplates}</div>`
                 <p className="text-slate-600 mb-6">Set up article padding, icon settings and button styling for your theme.</p>
 
                 {/* Theme Type Selector */}
+                <div className="font-semibold text-lg mb-3">Theme type</div>
                 <div className="bg-white rounded-lg p-4 mb-6 border border-slate-150">
-                  <div className="flex flex-col gap-3">
-                    <label className="text-sm font-semibold text-slate-800">Theme type:</label>
+                  <div className="flex flex-row gap-3">
                     <RadioGroup value={themeType} onValueChange={setThemeType}>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-3">
