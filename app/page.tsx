@@ -2519,6 +2519,7 @@ ${iconTemplates}</div>`
                 onThemeNameChange={setThemeName}
                 savedTimeAgo={savedTimeAgo}
                 isDirty={hasUnsavedChanges}
+                themeType={themeType}
               />
             </div>
             
@@ -3326,8 +3327,8 @@ ${iconTemplates}</div>`
                         <SelectValue placeholder="Select a theme type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="composer">Composer Theme</SelectItem>
-                        <SelectItem value="events">Events Desk / Landing Page Theme</SelectItem>
+                        <SelectItem value="composer">Email Composer theme</SelectItem>
+                        <SelectItem value="events">Events Desk / Landing Pages theme</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
