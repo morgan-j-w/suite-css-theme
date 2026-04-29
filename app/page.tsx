@@ -3321,23 +3321,27 @@ ${iconTemplates}</div>`
                 <p className="text-slate-600 mb-6">Set up article padding, icon settings and button styling for your theme.</p>
 
                 {/* Theme Type Selector */}
-                <div className="font-semibold text-lg mb-3">Theme type</div>
-                <div className="bg-white rounded-lg p-4 mb-6 border border-slate-150">
-                  <div className="flex flex-row gap-3">
-                    <RadioGroup value={themeType} onValueChange={setThemeType}>
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-700" />
-                          <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
+                <Card className="shadow-sm mb-6">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Theme type</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex flex-row gap-3">
+                      <RadioGroup value={themeType} onValueChange={setThemeType}>
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-700" />
+                            <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-700" />
+                            <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-700" />
-                          <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
-                        </div>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                </div>
+                      </RadioGroup>
+                    </div>
+                  </CardContent>
+                </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Theme padding */}
