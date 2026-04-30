@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
@@ -22,6 +23,7 @@ import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { downloadIconsZip } from "@/lib/icons"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
+import { checkAllContrasts, getComplianceLevel, type ContrastResults } from "@/lib/wcag"
 
 // Import components
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
@@ -874,6 +876,7 @@ export default function ThemeGenerator() {
     
     // Get first style's button background color for default button styling
     const firstStyleButtonBg = styles.length > 0 ? getColorHexValue(styles[0].buttonBg || buttonBg) : "#00677f"
+    const firstStyleButtonText = styles.length > 0 ? getColorHexValue(styles[0].buttonText || buttonText) : "#ffffff"
     const baseCss = `.wrapper [class*="text-style-"] {padding: 5px !Important;}
 .style-selector .info, .style-selector .header1 {font-size:14px !Important;line-height:24px !Important;}
 
@@ -999,7 +1002,7 @@ padding: ${paddingValue}px}
 
 .btn-cm{/* All buttons styles */
 background-color:${firstStyleButtonBg}; border: 0px;
-color:#ffffff;display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
+color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};
 
 
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
@@ -3319,20 +3322,39 @@ ${iconTemplates}</div>`
                 <p className="text-slate-600 mb-6">Set up article padding, icon settings and button styling for your theme.</p>
 
                 {/* Theme Type Selector */}
-                <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-150">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-                    <label className="text-sm font-semibold text-slate-800 whitespace-nowrap flex-shrink-0">Theme type:</label>
-                    <Select value={themeType} onValueChange={setThemeType}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a theme type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="composer">Email Composer theme</SelectItem>
-                        <SelectItem value="events">Events Desk / Landing Pages theme</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                <Card className="shadow-sm mb-6">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-base">Theme type</CardTitle>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-slate-400 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-sm text-xs">
+                            Choose the platform your CSS targets. Email Composer themes optimize for email clients with limited CSS support. Events/Landing Pages themes are web-optimized with broader CSS features enabled.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex flex-row gap-3">
+                      <RadioGroup value={themeType} onValueChange={setThemeType}>
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-700" />
+                            <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-700" />
+                            <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
+                          </div>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </CardContent>
+                </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Theme padding */}
@@ -3559,6 +3581,16 @@ ${iconTemplates}</div>`
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5" style={{ color: "#ec2176" }} />
                 <span className="font-semibold text-slate-900">Generate colour combinations</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-slate-400 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm text-xs">
+                      Automatically creates 5 color combination suggestions based on color theory. Click the + icon to add any combination as a new style to your theme. Great for quick prototyping.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               {showCombinationGenerator ? (
                 <ChevronUp className="h-5 w-5 text-slate-600" />
@@ -3716,7 +3748,19 @@ ${iconTemplates}</div>`
 
                         {/* Description */}
                         <div>
-                          <Label className="text-xs text-slate-600">Description</Label>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-slate-600">Description</Label>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-sm text-xs">
+                                  Add notes about this style (e.g., 'Primary CTA', 'Alert box'). This text appears in the generated CSS comments, making handoff to developers clearer and helping with version control.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                           <Textarea
                             value={style.description}
                             onChange={(e) => updateStyle(style.id, "description", e.target.value)}
@@ -3761,7 +3805,19 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Heading colour</Label>
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs text-slate-600">Heading colour</Label>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="max-w-sm text-xs">
+                                    Color applied to all headings (H1-H4). Choose a color that contrasts well with your background for readability. This creates visual hierarchy in your email.
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                             <Select
                               value={style.headingColor}
                               onValueChange={(value) =>
@@ -4121,7 +4177,50 @@ ${iconTemplates}</div>`
 
                       {/* Right Column: Preview */}
                       <div className="min-w-0 lg:col-span-2">
-                        <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 block">Preview</Label>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold block">Preview</Label>
+                          {(() => {
+                            const contrastResults = checkAllContrasts(bgColor, headingColor, textColor, linkColor, buttonBg, buttonText)
+                            const level = getComplianceLevel(contrastResults)
+                            const badgeColor = level === 'AAA' ? 'bg-green-100 text-green-800' : level === 'AA' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                            const borderColor = level === 'AAA' ? 'border-green-300' : level === 'AA' ? 'border-yellow-300' : 'border-red-300'
+                            return (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help bg-white`}>
+                                      WCAG {level}
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="left" className="max-w-md">
+                                    <div className="space-y-2 text-xs">
+                                      <p className="font-semibold">Contrast Ratios:</p>
+                                      <div className="space-y-1">
+                                        <div className="flex justify-between gap-4">
+                                          <span>Heading on bg:</span>
+                                          <span className="font-mono">{contrastResults.headingOnBg.ratio}:1 {contrastResults.headingOnBg.aaa ? '✓AAA' : contrastResults.headingOnBg.aa ? '✓AA' : '✗'}</span>
+                                        </div>
+                                        <div className="flex justify-between gap-4">
+                                          <span>Body text on bg:</span>
+                                          <span className="font-mono">{contrastResults.bodyTextOnBg.ratio}:1 {contrastResults.bodyTextOnBg.aaa ? '✓AAA' : contrastResults.bodyTextOnBg.aa ? '✓AA' : '✗'}</span>
+                                        </div>
+                                        <div className="flex justify-between gap-4">
+                                          <span>Link on bg:</span>
+                                          <span className="font-mono">{contrastResults.linkOnBg.ratio}:1 {contrastResults.linkOnBg.aaa ? '✓AAA' : contrastResults.linkOnBg.aa ? '✓AA' : '✗'}</span>
+                                        </div>
+                                        <div className="flex justify-between gap-4">
+                                          <span>Button text:</span>
+                                          <span className="font-mono">{contrastResults.buttonTextOnButtonBg.ratio}:1 {contrastResults.buttonTextOnButtonBg.aaa ? '✓AAA' : contrastResults.buttonTextOnButtonBg.aa ? '✓AA' : '✗'}</span>
+                                        </div>
+                                      </div>
+                                      <p className="text-xs text-slate-400 pt-2 border-t">AA: 4.5:1 | AAA: 7:1</p>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )
+                          })()}
+                        </div>
                         <div className={`rounded-lg border ${style.noPadding ? '' : 'p-4'}`} style={{ backgroundColor: bgColor, color: textColor }}>
                           <div
                             style={{
@@ -4226,7 +4325,19 @@ ${iconTemplates}</div>`
                         onClick={() => toggleTypographyExpanded(style.id)}
                         className="w-full flex items-center justify-between hover:bg-slate-100 transition-colors p-2 rounded"
                       >
-                        <span className="font-semibold text-sm">Typography overrides</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">Typography overrides</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-sm text-xs">
+                                Override global typography for just this style. Leave fields blank to use global settings. Useful when one style needs different heading sizes or fonts than others.
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                         {expandedTypography.has(style.id) ? (
                           <ChevronUp className="h-4 w-4 text-slate-600" />
                         ) : (
@@ -4241,7 +4352,19 @@ ${iconTemplates}</div>`
                             <div className="space-y-6">
                             {/* Heading 1 */}
                             <div>
-                              <Label className="text-xs text-slate-600">Heading 1 font</Label>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-slate-600">Heading 1 font</Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm text-xs">
+                                      Use web-safe fonts (Arial, Helvetica, Georgia, Courier). Most email clients support these. Custom fonts may not display — specify a backup font in case the primary fails (e.g., "Arial, sans-serif").
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h1Font, h1Font, "Arial, sans-serif")}
@@ -4456,7 +4579,19 @@ ${iconTemplates}</div>`
                           <div className="space-y-6">
                             {/* Body */}
                             <div>
-                              <Label className="text-xs text-slate-600">Body font</Label>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-slate-600">Body font</Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm text-xs">
+                                      Use web-safe fonts (Arial, Helvetica, Georgia, Courier). Most email clients support these. Custom fonts may not display — specify a backup font in case the primary fails (e.g., "Arial, sans-serif").
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
@@ -4536,7 +4671,19 @@ ${iconTemplates}</div>`
                           <div className="space-y-6">
                             {/* Button */}
                             <div>
-                              <Label className="text-xs text-slate-600">Button font</Label>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs text-slate-600">Button font</Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm text-xs">
+                                      Use web-safe fonts (Arial, Helvetica, Georgia, Courier). Most email clients support these. Custom fonts may not display — specify a backup font in case the primary fails (e.g., "Arial, sans-serif").
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
@@ -4707,6 +4854,7 @@ ${iconTemplates}</div>`
                             variant="outline"
                             size="sm"
                             className="w-full mt-4"
+                            title="Removes all typography overrides for this style, reverting to global defaults"
                           >
                             {resetStyles.has(style.id) ? (
                               <>
