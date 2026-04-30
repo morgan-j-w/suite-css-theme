@@ -26,6 +26,9 @@ export const generateCSS = (
     h4Size = "16px",
     h4LineHeight = "24px",
     h4Weight = "400",
+    buttonSize = "15px",
+    buttonLineHeight = "22px",
+    buttonWeight = "400",
     themePadding = "25px",
     buttonPaddingTop = "10",
     buttonPaddingRight = "20",
@@ -160,7 +163,7 @@ color:#ffffff;display:inline-block;font-family: ${buttonFontFormatted}; font-wei
 
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
 
-a.btn-cm.btn-poll {width: 100% !important; padding: 10px 0px 10px 0px !Important;}
+a.btn-cm.btn-poll {width: 100% !important; padding: ${buttonPaddingTop}px 0px ${buttonPaddingBottom}px 0px !Important;}
 
 .read-more, .link-button {padding-top: 0px;}
 
@@ -219,7 +222,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     const btnWeight = style.buttonWeight || buttonWeight || "400"
     const btnBorderWidth = style.buttonBorderWidth || "0"
     const btnBorderColor = getColorHex(style.buttonBorderColor || style.buttonBg, colors)
-    const btnBorderColorHover = getColorHex(style.buttonBorderColorHover || style.buttonBgHover, colors)
+    const btnBorderColorHover = getColorHex(style.buttonBorderColorHover || style.buttonBgHover || style.buttonBg, colors)
     const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
     const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
     const h3FontVal = formatFontForCSS(style.h3Font || h3Font || "Arial, sans-serif")
