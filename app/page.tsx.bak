@@ -22,6 +22,7 @@ import { ColorDefinition, StyleDefinition } from "@/lib/types"
 // Import utilities
 import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
+import { downloadIconsZip } from "@/lib/icons"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
 import { checkAllContrasts, getComplianceLevel, type ContrastResults } from "@/lib/wcag"
 
@@ -58,7 +59,7 @@ export default function ThemeGenerator() {
   const [themeName, setThemeName] = useState("Untitled Theme")
   const [themeType, setThemeType] = useState("composer")
   const [savedTimeAgo, setSavedTimeAgo] = useState("")
-  const [wcagFilter, setWcagFilter] = useState<'all' | 'AA' | 'AAA'>('all')
+  const [wcagPopoverOpen, setWcagPopoverOpen] = useState(false)
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -433,17 +434,15 @@ export default function ThemeGenerator() {
       const match = match1 || match2
       
       if (match) {
-        let hex: string = ""
-        let name: string = ""
+        let hex: string
+        let name: string
         
         if (match1) {
           [, hex, name] = match1
-        } else if (match2) {
+        } else {
           const [, nameVal, hexVal] = match2
           hex = hexVal
           name = nameVal
-        } else {
-          return
         }
         
         if (hex && name && name.trim()) {
@@ -843,27 +842,8 @@ export default function ThemeGenerator() {
 
 
   // Wrapper for getColorHex that uses component colors
-  const getColorHexValue = (colorName: string | undefined): string => {
-    if (!colorName) return "#000000"
+  const getColorHexValue = (colorName: string): string => {
     return getColorHex(colorName, colors)
-  }
-
-  const calculateWCAGLevel = (combo: StyleDefinition): string => {
-    try {
-      const bgHex = getColorHexValue(combo.background)
-      const headingHex = getColorHexValue(combo.headingColor)
-      const textHex = getColorHexValue(combo.textColor)
-      const linkHex = getColorHexValue(combo.linkColor)
-      const buttonBgHex = getColorHexValue(combo.buttonBg)
-      const buttonTextHex = getColorHexValue(combo.buttonText)
-      const iconHex = combo.iconColor || "#000000"
-      
-      const contrastResults = checkAllContrasts(bgHex, headingHex, textHex, linkHex, buttonBgHex, buttonTextHex, iconHex)
-      const level = getComplianceLevel(contrastResults)
-      return level
-    } catch (error) {
-      return 'NONE'
-    }
   }
 
   const generateCSS = () => {
@@ -897,8 +877,8 @@ export default function ThemeGenerator() {
     const buttonBorderRadiusValue = `${buttonBorderRadius || "4px"}`
     
     // Get first style's button background color for default button styling
-    const firstStyleButtonBg = styles.length > 0 ? getColorHexValue(styles[0].buttonBg) : "#00677f"
-    const firstStyleButtonText = styles.length > 0 ? getColorHexValue(styles[0].buttonText) : "#ffffff"
+    const firstStyleButtonBg = styles.length > 0 ? getColorHexValue(styles[0].buttonBg || buttonBg) : "#00677f"
+    const firstStyleButtonText = styles.length > 0 ? getColorHexValue(styles[0].buttonText || buttonText) : "#ffffff"
     const baseCss = `.wrapper [class*="text-style-"] {padding: 5px !Important;}
 .style-selector .info, .style-selector .header1 {font-size:14px !Important;line-height:24px !Important;}
 
@@ -1030,7 +1010,7 @@ color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
 
 
-a.btn-cm.btn-poll {width: 100% !important; padding: ${buttonPaddingTop}px 0px ${buttonPaddingBottom}px 0px !Important;}
+a.btn-cm.btn-poll {width: 100% !important; padding: 10px 0px 10px 0px !Important;}
 
 .read-more, .link-button {padding-top: 0px;}
 
@@ -1299,10 +1279,6 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
           iconStyle: "ios-outline",
           iconColor: "#000000",
         }
-        
-        // Calculate WCAG level for this combination
-        combo.wcagLevel = calculateWCAGLevel(combo)
-        
         combinations.push(combo)
       }
     })
@@ -1393,106 +1369,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         noPadding: false,
         iconColor: "#000000",
       }
-      
-      // Calculate WCAG level for this combination
-      combo.wcagLevel = calculateWCAGLevel(combo)
-      
       newCombinations.push(combo)
-    }
-
-    setGeneratedCombinations(newCombinations)
-  }
-
-  const generateCombinationsForWCAG = (targetLevel: 'AA' | 'AAA') => {
-    if (colors.length < 2) {
-      alert("Please add at least 2 colours to generate combinations")
-      return
-    }
-
-    const newCombinations: StyleDefinition[] = []
-    const minTextContrast = targetLevel === 'AAA' ? 7 : 4.5
-    const minButtonContrast = targetLevel === 'AAA' ? 4.5 : 3
-
-    // Pre-calculate valid colors for target level
-    const validColorCache: Record<string, Record<string, ColorDefinition[]>> = {}
-    
-    colors.forEach(bgColor => {
-      validColorCache[bgColor.id] = {
-        text: colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast),
-        button: colors.filter(c => c.id !== bgColor.id),
-      }
-    })
-
-    // Generate combinations targeting specific WCAG level
-    let attempts = 0
-    const maxAttempts = 200
-
-    while (newCombinations.length < 15 && attempts < maxAttempts) {
-      attempts++
-
-      const bgColor = colors[Math.floor(Math.random() * colors.length)]
-      const validText = validColorCache[bgColor.id].text
-      const validBtn = validColorCache[bgColor.id].button
-
-      if (validText.length === 0 || validBtn.length === 0) continue
-
-      const textColor = validText[Math.floor(Math.random() * validText.length)]
-      const headingColor = validText[Math.floor(Math.random() * validText.length)]
-      const linkColor = validText[Math.floor(Math.random() * validText.length)]
-      
-      const btnBg = validBtn[Math.floor(Math.random() * validBtn.length)]
-      const btnTextOptions = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
-      
-      if (btnTextOptions.length === 0) continue
-      const btnText = btnTextOptions[Math.floor(Math.random() * btnTextOptions.length)]
-
-      const combo: StyleDefinition = {
-        id: `combo-${Date.now()}-${Math.random()}`,
-        name: `Combination ${newCombinations.length + 1}`,
-        description: `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`.replace(/^./, ch => ch.toUpperCase()),
-        background: bgColor.name,
-        textColor: textColor.name,
-        headingColor: headingColor.name,
-        buttonBg: btnBg.name,
-        buttonText: btnText.name,
-        buttonBgHover: btnBg.name,
-        buttonTextHover: btnText.name,
-        linkColor: linkColor.name,
-        h1Font: h1Font,
-        h2Font: h2Font,
-        h3Font: h3Font,
-        h4Font: h4Font,
-        bodyFont: bodyFont,
-        buttonFont: buttonFont,
-        h1Size: h1Size,
-        h1LineHeight: h1LineHeight,
-        h1Weight: h1Weight,
-        h2Size: h2Size,
-        h2LineHeight: h2LineHeight,
-        h2Weight: h2Weight,
-        h3Size: h3Size,
-        h3LineHeight: h3LineHeight,
-        h3Weight: h3Weight,
-        h4Size: h4Size,
-        h4LineHeight: h4LineHeight,
-        h4Weight: h4Weight,
-        bodySize: bodySize,
-        bodyLineHeight: bodyLineHeight,
-        bodyWeight: bodyWeight,
-        buttonSize: buttonSize,
-        buttonLineHeight: buttonLineHeight,
-        buttonWeight: buttonWeight,
-        noPadding: false,
-        iconColor: "#000000",
-      }
-      
-      // Calculate WCAG level for this combination
-      combo.wcagLevel = calculateWCAGLevel(combo)
-      
-      // Only add if it matches the target level
-      if (combo.wcagLevel === targetLevel) {
-        newCombinations.push(combo)
-      }
     }
 
     setGeneratedCombinations(newCombinations)
@@ -2670,13 +2547,13 @@ ${iconTemplates}</div>`
                     }
                     setCurrentStep(step)
                   }}
-                  disabled={currentStep === 1 && !!colorNameError && step > currentStep}
+                  disabled={currentStep === 1 && colorNameError && step > currentStep}
                   className={`w-10 h-10 rounded-full font-semibold flex items-center justify-center transition-all ${
                     step === currentStep
                       ? "text-white shadow-lg"
                       : step < currentStep
                       ? "text-white cursor-pointer"
-                      : currentStep === 1 && !!colorNameError && step > currentStep
+                      : currentStep === 1 && colorNameError && step > currentStep
                       ? "bg-slate-200 text-slate-600 cursor-not-allowed opacity-50"
                       : "bg-slate-200 text-slate-600 cursor-pointer hover:bg-slate-300"
                   }`}
@@ -3457,7 +3334,7 @@ ${iconTemplates}</div>`
                             <HelpCircle className="h-4 w-4 text-slate-400 cursor-help" />
                           </TooltipTrigger>
                           <TooltipContent side="right" className="max-w-sm text-xs">
-                            Choose where your theme will be used - Email Composer or Events Desk and Landing Pages. It will automatically adapt for email or web.
+                            Choose the platform your CSS targets. Email Composer themes optimize for email clients with limited CSS support. Events/Landing Pages themes are web-optimized with broader CSS features enabled.
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -3468,11 +3345,11 @@ ${iconTemplates}</div>`
                       <RadioGroup value={themeType} onValueChange={setThemeType}>
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center space-x-3">
-                            <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-300" />
+                            <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-700" />
                             <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
                           </div>
                           <div className="flex items-center space-x-3">
-                            <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-300" />
+                            <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-700" />
                             <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
                           </div>
                         </div>
@@ -3712,7 +3589,7 @@ ${iconTemplates}</div>`
                       <HelpCircle className="h-4 w-4 text-slate-400 cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent side="right" className="max-w-sm text-xs">
-                      Automatically creates colour combination suggestions. Click the + icon to add any combination as a new style to your theme.
+                      Automatically creates 5 color combination suggestions based on color theory. Click the + icon to add any combination as a new style to your theme. Great for quick prototyping.
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -3727,47 +3604,9 @@ ${iconTemplates}</div>`
 
           {showCombinationGenerator && (
             <CardContent className="pt-4 pb-4">
-              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
-                <div className="flex items-center gap-3">
-                  <p className="text-sm text-slate-600">Filter by WCAG:</p>
-                  <div className="flex gap-2">
-                    {(['all', 'AA', 'AAA'] as const).map((level) => (
-                      <button
-                        key={level}
-                        onClick={() => {
-                          setWcagFilter(level)
-                          if (level === 'AA') {
-                            generateCombinationsForWCAG('AA')
-                          } else if (level === 'AAA') {
-                            generateCombinationsForWCAG('AAA')
-                          } else if (level === 'all' && generatedCombinations.length === 0) {
-                            generateMoreCombinations()
-                          }
-                        }}
-                        className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                          wcagFilter === level
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        {level === 'all' ? 'All' : `WCAG ${level}`}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <Button 
-                  onClick={() => {
-                    if (wcagFilter === 'AA') {
-                      generateCombinationsForWCAG('AA')
-                    } else if (wcagFilter === 'AAA') {
-                      generateCombinationsForWCAG('AAA')
-                    } else {
-                      generateMoreCombinations()
-                    }
-                  }} 
-                  size="sm" 
-                  variant="outline"
-                >
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-slate-600">Click + to add a combination to your theme</p>
+                <Button onClick={generateMoreCombinations} size="sm" variant="outline">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Generate More
                 </Button>
@@ -3784,13 +3623,7 @@ ${iconTemplates}</div>`
                     <div>
                       <h4 className="text-sm font-semibold mb-3 text-slate-700">Generated Combinations</h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                        {generatedCombinations
-                          .filter((combo) => {
-                            if (wcagFilter === 'all') return true
-                            return combo.wcagLevel === wcagFilter
-                          })
-                          .slice(0, 15)
-                          .map((combo, index) => (
+                        {generatedCombinations.map((combo, index) => (
                           <div
                             key={combo.id}
                             className="relative text-left p-3 border rounded-lg group cursor-pointer transition-all"
@@ -3840,7 +3673,7 @@ ${iconTemplates}</div>`
                                 <Plus className="h-4 w-4 text-slate-900" />
                               </button>
                               <button
-                                onClick={() => setGeneratedCombinations(generatedCombinations.filter((c) => c.id !== combo.id))}
+                                onClick={() => setGeneratedCombinations(generatedCombinations.filter((_, i) => i !== index))}
                                 className="flex items-center justify-center w-8 h-8 bg-white rounded-full hover:bg-slate-100 transition-colors"
                                 title="Delete from generated"
                               >
@@ -3925,7 +3758,7 @@ ${iconTemplates}</div>`
                                   <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent side="right" className="max-w-sm text-xs">
-                                  Automatically updates based on your colour selections. You can edit this text if needed.
+                                  Add notes about this style (e.g., 'Primary CTA', 'Alert box'). This text appears in the generated CSS comments, making handoff to developers clearer and helping with version control.
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -3982,7 +3815,7 @@ ${iconTemplates}</div>`
                                     <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
                                   </TooltipTrigger>
                                   <TooltipContent side="right" className="max-w-sm text-xs">
-                                    Colour applied to all headings (H1-H4).
+                                    Color applied to all headings (H1-H4). Choose a color that contrasts well with your background for readability. This creates visual hierarchy in your email.
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
@@ -4346,7 +4179,7 @@ ${iconTemplates}</div>`
 
                       {/* Right Column: Preview */}
                       <div className="min-w-0 lg:col-span-2">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-2">
                           <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold block">Preview</Label>
                           {(() => {
                             const contrastResults = checkAllContrasts(bgColor, headingColor, textColor, linkColor, buttonBg, buttonText, style.iconColor || "#000000")
@@ -4354,76 +4187,80 @@ ${iconTemplates}</div>`
                             const badgeColor = level === 'AAA' ? 'bg-green-100 text-green-800' : level === 'AA' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
                             const borderColor = level === 'AAA' ? 'border-green-300' : level === 'AA' ? 'border-yellow-300' : 'border-red-300'
                             return (
-                              <TooltipProvider>
-                                <Tooltip delayDuration={0}>
-                                  <TooltipTrigger asChild>
-                                    <button 
-                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help bg-white flex items-center gap-1.5`}
-                                    >
-                                      WCAG {level}
-                                      {level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top" showArrow={false} className="bg-white text-slate-900 border border-slate-200 shadow-lg p-3 max-w-md">
-                                    <div className="space-y-2 text-xs">
-                                      <p className="font-semibold">Contrast Ratios:</p>
-                                      <div className="space-y-1">
-                                        <div className="flex justify-between gap-4 items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: headingColor }}></div>
-                                            <span>Heading</span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-mono">{contrastResults.headingOnBg.ratio}:1</span>
-                                            {contrastResults.headingOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.headingOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
-                                          </div>
+                              <Popover open={wcagPopoverOpen} onOpenChange={setWcagPopoverOpen>>
+                                <PopoverTrigger asChild>
+                                  <div 
+                                    className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help bg-white flex items-center gap-1.5`}
+                                    onMouseEnter={() => setWcagPopoverOpen(true)}
+                                    onMouseLeave={() => setWcagPopoverOpen(false)}
+                                  >
+                                    WCAG {level}
+                                    {level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
+                                  </div>
+                                </PopoverTrigger>
+                                <PopoverContent 
+                                  className="max-w-md bg-slate-50 text-slate-900 border-slate-200"
+                                  onMouseEnter={() => setWcagPopoverOpen(true)}
+                                  onMouseLeave={() => setWcagPopoverOpen(false)}
+                                >
+                                  <div className="space-y-2 text-xs">
+                                    <p className="font-semibold">Contrast Ratios:</p>
+                                    <div className="space-y-1">
+                                      <div className="flex justify-between gap-4 items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-3 h-3 border border-slate-300" style={{ backgroundColor: headingColor }}></div>
+                                          <span>Heading</span>
                                         </div>
-                                        <div className="flex justify-between gap-4 items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: textColor }}></div>
-                                            <span>Body text</span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-mono">{contrastResults.bodyTextOnBg.ratio}:1</span>
-                                            {contrastResults.bodyTextOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.bodyTextOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
-                                          </div>
-                                        </div>
-                                        <div className="flex justify-between gap-4 items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: linkColor }}></div>
-                                            <span>Link</span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-mono">{contrastResults.linkOnBg.ratio}:1</span>
-                                            {contrastResults.linkOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.linkOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
-                                          </div>
-                                        </div>
-                                        <div className="flex justify-between gap-4 items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: buttonText }}></div>
-                                            <span>Button text</span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-mono">{contrastResults.buttonTextOnButtonBg.ratio}:1</span>
-                                            {contrastResults.buttonTextOnButtonBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.buttonTextOnButtonBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
-                                          </div>
-                                        </div>
-                                        <div className="flex justify-between gap-4 items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: style.iconColor || "#000000" }}></div>
-                                            <span>Icon</span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-mono">{contrastResults.iconOnBg.ratio}:1</span>
-                                            {contrastResults.iconOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.iconOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
-                                          </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono">{contrastResults.headingOnBg.ratio}:1</span>
+                                          {contrastResults.headingOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.headingOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
                                         </div>
                                       </div>
-                                      <p className="text-xs text-slate-600 pt-2 border-t">AA: 4.5:1 | AAA: 7:1</p>
+                                      <div className="flex justify-between gap-4 items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-3 h-3 border border-slate-300" style={{ backgroundColor: textColor }}></div>
+                                          <span>Body text</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono">{contrastResults.bodyTextOnBg.ratio}:1</span>
+                                          {contrastResults.bodyTextOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.bodyTextOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-between gap-4 items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-3 h-3 border border-slate-300" style={{ backgroundColor: linkColor }}></div>
+                                          <span>Link</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono">{contrastResults.linkOnBg.ratio}:1</span>
+                                          {contrastResults.linkOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.linkOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-between gap-4 items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-3 h-3 border border-slate-300" style={{ backgroundColor: buttonText }}></div>
+                                          <span>Button text</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono">{contrastResults.buttonTextOnButtonBg.ratio}:1</span>
+                                          {contrastResults.buttonTextOnButtonBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.buttonTextOnButtonBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-between gap-4 items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-3 h-3 border border-slate-300" style={{ backgroundColor: style.iconColor || "#000000" }}></div>
+                                          <span>Icon</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono">{contrastResults.iconOnBg.ratio}:1</span>
+                                          {contrastResults.iconOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.iconOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                        </div>
+                                      </div>
                                     </div>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
+                                    <p className="text-xs text-slate-400 pt-2 border-t">AA: 4.5:1 | AAA: 7:1</p>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
                             )
                           })()}
                         </div>
@@ -4560,6 +4397,16 @@ ${iconTemplates}</div>`
                             <div>
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-slate-600">Heading 1 font</Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm text-xs">
+                                      Use web-safe fonts (Arial, Helvetica, Georgia, Courier). Most email clients support these. Custom fonts may not display — specify a backup font in case the primary fails (e.g., "Arial, sans-serif").
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               </div>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
@@ -4777,6 +4624,16 @@ ${iconTemplates}</div>`
                             <div>
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-slate-600">Body font</Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm text-xs">
+                                      Use web-safe fonts (Arial, Helvetica, Georgia, Courier). Most email clients support these. Custom fonts may not display — specify a backup font in case the primary fails (e.g., "Arial, sans-serif").
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               </div>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
@@ -4859,6 +4716,16 @@ ${iconTemplates}</div>`
                             <div>
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-slate-600">Button font</Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-sm text-xs">
+                                      Use web-safe fonts (Arial, Helvetica, Georgia, Courier). Most email clients support these. Custom fonts may not display — specify a backup font in case the primary fails (e.g., "Arial, sans-serif").
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               </div>
                               <Input
                                 className="mt-1 mb-3 text-xs bg-white w-full"
@@ -5083,7 +4950,7 @@ ${iconTemplates}</div>`
                 }
                 setCurrentStep(Math.min(4, currentStep + 1))
               }}
-              disabled={currentStep === 1 && !!colorNameError}
+              disabled={currentStep === 1 && colorNameError}
               className="flex-1 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next →

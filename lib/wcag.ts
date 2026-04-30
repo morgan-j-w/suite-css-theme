@@ -82,6 +82,11 @@ export interface ContrastResults {
     aa: boolean
     aaa: boolean
   }
+  iconOnBg: {
+    ratio: number
+    aa: boolean
+    aaa: boolean
+  }
 }
 
 export function checkAllContrasts(
@@ -90,12 +95,14 @@ export function checkAllContrasts(
   bodyTextColor: string,
   linkColor: string,
   buttonBg: string,
-  buttonText: string
+  buttonText: string,
+  iconColor: string = "#000000"
 ): ContrastResults {
   const headingRatio = getContrastRatio(bgColor, headingColor)
   const bodyRatio = getContrastRatio(bgColor, bodyTextColor)
   const linkRatio = getContrastRatio(bgColor, linkColor)
   const buttonRatio = getContrastRatio(buttonBg, buttonText)
+  const iconRatio = getContrastRatio(bgColor, iconColor)
 
   return {
     headingOnBg: {
@@ -118,6 +125,11 @@ export function checkAllContrasts(
       aa: meetsWCAG_AA(buttonRatio, true), // buttons are considered large
       aaa: meetsWCAG_AAA(buttonRatio, true),
     },
+    iconOnBg: {
+      ratio: parseFloat(iconRatio.toFixed(2)),
+      aa: meetsWCAG_AA(iconRatio, false),
+      aaa: meetsWCAG_AAA(iconRatio, false),
+    },
   }
 }
 
@@ -130,6 +142,7 @@ export function getComplianceLevel(results: ContrastResults): "AAA" | "AA" | "FA
     results.bodyTextOnBg,
     results.linkOnBg,
     results.buttonTextOnButtonBg,
+    results.iconOnBg,
   ]
 
   const allAAA = allCombinations.every((c) => c.aaa)

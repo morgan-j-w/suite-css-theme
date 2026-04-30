@@ -9,12 +9,12 @@ export const shuffleArray = <T,>(array: T[]): T[] => {
   return shuffled
 }
 
-export const cleanFontValue = (fontValue: string): string => {
+export const cleanFontValue = (fontValue: string | undefined): string => {
   if (!fontValue) return ""
   return fontValue.trim().replace(/;$/, "")
 }
 
-export const formatFontForCSS = (fontValue: string): string => {
+export const formatFontForCSS = (fontValue: string | undefined): string => {
   if (!fontValue) return "'Arial', sans-serif"
   const cleaned = cleanFontValue(fontValue)
   // Split by comma to handle fallback fonts

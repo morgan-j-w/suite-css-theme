@@ -122,3 +122,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide Radix Tooltip arrow */
+[data-radix-tooltip-arrow] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+[data-radix-tooltip-arrow] svg {
+  display: none !important;
+}
+
+/* Radio button styling */
+[role="radio"] {
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
+}
+
+[role="radio"][data-state="checked"] {
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
+}
+
+[role="radio"][data-state="checked"]::after {
+  background-color: #110e1f;
+}
