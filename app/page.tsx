@@ -3729,29 +3729,41 @@ ${iconTemplates}</div>`
             <CardContent className="pt-4 pb-4">
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
                 <div className="flex items-center gap-3">
-                  <p className="text-sm text-slate-600">Filter by WCAG:</p>
+                  <p className="text-sm text-slate-600">Filter by:</p>
                   <div className="flex gap-2">
                     {(['all', 'AA', 'AAA'] as const).map((level) => (
-                      <button
-                        key={level}
-                        onClick={() => {
-                          setWcagFilter(level)
-                          if (level === 'AA') {
-                            generateCombinationsForWCAG('AA')
-                          } else if (level === 'AAA') {
-                            generateCombinationsForWCAG('AAA')
-                          } else if (level === 'all' && generatedCombinations.length === 0) {
-                            generateMoreCombinations()
-                          }
-                        }}
-                        className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                          wcagFilter === level
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        {level === 'all' ? 'All' : `WCAG ${level}`}
-                      </button>
+                      <div key={level}>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => {
+                                  setWcagFilter(level)
+                                  if (level === 'AA') {
+                                    generateCombinationsForWCAG('AA')
+                                  } else if (level === 'AAA') {
+                                    generateCombinationsForWCAG('AAA')
+                                  } else if (level === 'all' && generatedCombinations.length === 0) {
+                                    generateMoreCombinations()
+                                  }
+                                }}
+                                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                                  wcagFilter === level
+                                    ? 'bg-slate-900 text-white'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                }`}
+                              >
+                                {level === 'all' ? 'All' : `WCAG ${level}`}
+                              </button>
+                            </TooltipTrigger>
+                            {level === 'all' && (
+                              <TooltipContent side="top" className="text-xs">
+                                All combinations (including non-WCAG compliant)
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     ))}
                   </div>
                 </div>
