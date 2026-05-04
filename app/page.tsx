@@ -2422,11 +2422,16 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
   const copyExportHtml = async () => {
     const iconStyleMap: Record<string, string> = {
+      'material-rounded': 'material-rounded',
+      'material-outlined': 'material-outlined',
+      'material-sharp': 'material-sharp',
+    }
+    // For X icon only, swap the rounded/sharp styles due to icons8 naming
+    const xIconStyleMap: Record<string, string> = {
       'material-rounded': 'material-sharp',
       'material-outlined': 'material-outlined',
       'material-sharp': 'material-rounded',
     }
-    const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
     const iconSize = globalIconSize || "18"
 
     const shareIcons = [
@@ -2444,6 +2449,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       iconTemplates += `    <div class="text-style-${index + 1}"><br>\n`
       shareIcons.forEach(icon => {
         const classId = icon.id === 'twitterx--v1' ? 'twitter' : icon.id === 'new-post' ? 'forward' : icon.id
+        const mappedStyle = (icon.id === 'twitterx--v1' ? xIconStyleMap : iconStyleMap)[globalIconStyle || 'material-sharp']
         iconTemplates += `        <a title="${icon.name}" class="sd-${classId}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
         iconTemplates += `            <img alt="${icon.name}" src="https://img.icons8.com/${mappedStyle}/96/${iconColor}/${icon.id}.png" width="${iconSize}">\n`
         iconTemplates += `        </a>\n`
@@ -3586,11 +3592,17 @@ ${iconTemplates}</div>`
                       { id: 'new-post', name: 'Email' },
                     ].map((icon) => {
                       const iconStyleMap: Record<string, string> = {
+                        'material-rounded': 'material-rounded',
+                        'material-outlined': 'material-outlined',
+                        'material-sharp': 'material-sharp',
+                      }
+                      // For X icon only, swap the rounded/sharp styles due to icons8 naming
+                      const xIconStyleMap: Record<string, string> = {
                         'material-rounded': 'material-sharp',
                         'material-outlined': 'material-outlined',
                         'material-sharp': 'material-rounded',
                       }
-                      const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                      const mappedStyle = (icon.id === 'x' ? xIconStyleMap : iconStyleMap)[globalIconStyle || 'material-sharp']
                       const iconSize = globalIconSize || "18"
                       
                       return (
@@ -4534,11 +4546,17 @@ ${iconTemplates}</div>`
                               { id: 'new-post', name: 'Email' },
                             ].map((icon) => {
                               const iconStyleMap: Record<string, string> = {
+                                'material-rounded': 'material-rounded',
+                                'material-outlined': 'material-outlined',
+                                'material-sharp': 'material-sharp',
+                              }
+                              // For X icon only, swap the rounded/sharp styles due to icons8 naming
+                              const xIconStyleMap: Record<string, string> = {
                                 'material-rounded': 'material-sharp',
                                 'material-outlined': 'material-outlined',
                                 'material-sharp': 'material-rounded',
                               }
-                              const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
+                              const mappedStyle = (icon.id === 'x' ? xIconStyleMap : iconStyleMap)[globalIconStyle || 'material-sharp']
                               const iconColor = style.iconColor || '#000000'
                               const iconSize = globalIconSize || "18"
                               
