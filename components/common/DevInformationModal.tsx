@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Check, Copy, AlertCircle, AlertTriangle } from "lucide-react"
+import { Check, Copy, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface CSSValidationResult {
@@ -63,21 +63,7 @@ export const DevInformationModal = ({
               </Alert>
             )}
             
-            {cssValidationResult.warnings && cssValidationResult.warnings.length > 0 && (
-              <Alert>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>CSS Warnings ({cssValidationResult.warnings.length})</AlertTitle>
-                <AlertDescription>
-                  <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                    {cssValidationResult.warnings.map((warning, idx) => (
-                      <li key={idx}>{warning}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            {cssValidationResult.isValid && cssValidationResult.warnings.length === 0 && (
+            {cssValidationResult.isValid && cssValidationResult.errors.length === 0 && (
               <Alert>
                 <Check className="h-4 w-4 text-green-600" />
                 <AlertTitle className="text-green-800">CSS Valid</AlertTitle>

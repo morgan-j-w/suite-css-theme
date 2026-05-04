@@ -1875,11 +1875,6 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         description: `${validation.errors.length} error(s) found. Review in Dev Info modal.`,
         variant: "destructive",
       })
-    } else if (validation.warnings.length > 0) {
-      toast({
-        title: "CSS Copied (with warnings)",
-        description: `${validation.warnings.length} warning(s) found. Review in Dev Info modal.`,
-      })
     } else {
       toast({
         title: "CSS Copied",
