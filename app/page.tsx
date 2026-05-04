@@ -24,6 +24,7 @@ import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
 import { checkAllContrasts, getComplianceLevel, type ContrastResults } from "@/lib/wcag"
+import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
 
 // Import components
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
@@ -59,6 +60,7 @@ export default function ThemeGenerator() {
   const [themeType, setThemeType] = useState("composer")
   const [savedTimeAgo, setSavedTimeAgo] = useState("")
   const [wcagFilter, setWcagFilter] = useState<'all' | 'AA' | 'AAA'>('all')
+  const [cssValidationResult, setCssValidationResult] = useState<any>(null)
   const { toast } = useToast()
 
   const toggleTypographyExpanded = (styleId: string) => {
@@ -1024,7 +1026,7 @@ padding: ${paddingValue}px}
 
 .btn-cm{/* All buttons styles */
 background-color:${firstStyleButtonBg}; border: 0px;
-color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};
+color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
 
 
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
@@ -1859,8 +1861,34 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   }
 
   const copyExportCss = async () => {
-    await navigator.clipboard.writeText(generateCSS())
+    const css = generateCSS()
+    const validation = validateCSS(css)
+    setCssValidationResult(validation)
+
+    if (!validation.isValid) {
+      toast({
+        title: "CSS Validation Failed",
+        description: `Found ${validation.errors.length} error(s). Check the Dev Info modal for details.`,
+        variant: "destructive",
+      })
+      return
+    }
+
+    await navigator.clipboard.writeText(css)
     setCopiedCss(true)
+
+    if (validation.warnings.length > 0) {
+      toast({
+        title: "CSS Copied with Warnings",
+        description: `${validation.warnings.length} warning(s) found. Review in Dev Info modal.`,
+      })
+    } else {
+      toast({
+        title: "CSS Valid",
+        description: "CSS copied to clipboard with no issues!",
+      })
+    }
+
     setTimeout(() => setCopiedCss(false), 2000)
   }
 
@@ -5332,6 +5360,7 @@ ${iconTemplates}</div>`
         copiedHtml={copiedHtml}
         copiedMediaQuery={copiedMedia}
         copiedImport={copiedImport}
+        cssValidationResult={cssValidationResult}
       />
       <Toaster />
     </>
