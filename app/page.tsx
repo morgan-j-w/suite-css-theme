@@ -2422,9 +2422,9 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
   const copyExportHtml = async () => {
     const iconStyleMap: Record<string, string> = {
-      'material-rounded': 'material-rounded',
+      'material-rounded': 'material-sharp',
       'material-outlined': 'material-outlined',
-      'material-sharp': 'material-sharp',
+      'material-sharp': 'material-rounded',
     }
     const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
     const iconSize = globalIconSize || "18"
@@ -3586,9 +3586,9 @@ ${iconTemplates}</div>`
                       { id: 'new-post', name: 'Email' },
                     ].map((icon) => {
                       const iconStyleMap: Record<string, string> = {
-                        'material-rounded': 'material-rounded',
+                        'material-rounded': 'material-sharp',
                         'material-outlined': 'material-outlined',
-                        'material-sharp': 'material-sharp',
+                        'material-sharp': 'material-rounded',
                       }
                       const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
                       const iconSize = globalIconSize || "18"
@@ -4534,9 +4534,9 @@ ${iconTemplates}</div>`
                               { id: 'new-post', name: 'Email' },
                             ].map((icon) => {
                               const iconStyleMap: Record<string, string> = {
-                                'material-rounded': 'material-rounded',
+                                'material-rounded': 'material-sharp',
                                 'material-outlined': 'material-outlined',
-                                'material-sharp': 'material-sharp',
+                                'material-sharp': 'material-rounded',
                               }
                               const mappedStyle = iconStyleMap[globalIconStyle || 'material-sharp']
                               const iconColor = style.iconColor || '#000000'
