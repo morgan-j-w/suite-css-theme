@@ -127,10 +127,7 @@ export const DevInformationModal = ({
           <Button
             onClick={onCopyCss}
             variant="outline"
-            className={`w-full flex items-center justify-center gap-2 h-12 ${
-              cssValidationResult?.errors?.length ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={cssValidationResult?.errors?.length ? true : false}
+            className="w-full flex items-center justify-center gap-2 h-12"
           >
             {copiedCss ? (
               <>

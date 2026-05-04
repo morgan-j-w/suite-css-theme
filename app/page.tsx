@@ -1865,27 +1865,25 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
     const validation = validateCSS(css)
     setCssValidationResult(validation)
 
-    if (!validation.isValid) {
-      toast({
-        title: "CSS Validation Failed",
-        description: `Found ${validation.errors.length} error(s). Check the Dev Info modal for details.`,
-        variant: "destructive",
-      })
-      return
-    }
-
+    // Always copy, regardless of validation status
     await navigator.clipboard.writeText(css)
     setCopiedCss(true)
 
-    if (validation.warnings.length > 0) {
+    if (!validation.isValid) {
       toast({
-        title: "CSS Copied with Warnings",
+        title: "CSS Copied (with errors)",
+        description: `${validation.errors.length} error(s) found. Review in Dev Info modal.`,
+        variant: "destructive",
+      })
+    } else if (validation.warnings.length > 0) {
+      toast({
+        title: "CSS Copied (with warnings)",
         description: `${validation.warnings.length} warning(s) found. Review in Dev Info modal.`,
       })
     } else {
       toast({
-        title: "CSS Valid",
-        description: "CSS copied to clipboard with no issues!",
+        title: "CSS Copied",
+        description: "Valid CSS copied to clipboard!",
       })
     }
 

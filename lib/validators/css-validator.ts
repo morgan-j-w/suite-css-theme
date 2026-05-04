@@ -111,7 +111,7 @@ function validateRules(css: string): {
   while ((match = rulePattern.exec(css)) !== null) {
     ruleCount++
     const selector = match[1].trim()
-    const content = match[2].trim()
+    let content = match[2].trim()
 
     // Warn about empty selectors
     if (!selector || selector.length === 0) {
@@ -123,15 +123,20 @@ function validateRules(css: string): {
       warnings.push(`Rule ${ruleCount}: Empty rule content for selector "${selector}"`)
     }
 
-    // Check for property:value syntax
-    const properties = content.split(";").filter(p => p.trim().length > 0)
-    properties.forEach((prop, index) => {
-      if (!prop.includes(":")) {
-        errors.push(
-          `Rule ${ruleCount}: Property #${index + 1} is missing colon: "${prop.trim()}"`
-        )
-      }
-    })
+    // Remove CSS comments from content before checking properties
+    content = content.replace(/\/\*[\s\S]*?\*\//g, "").trim()
+
+    // Check for property:value syntax (skip if content is now empty after removing comments)
+    if (content.length > 0) {
+      const properties = content.split(";").filter(p => p.trim().length > 0)
+      properties.forEach((prop, index) => {
+        if (!prop.includes(":")) {
+          errors.push(
+            `Rule ${ruleCount}: Property #${index + 1} is missing colon: "${prop.trim()}"`
+          )
+        }
+      })
+    }
   }
 
   // Check if there are any rules at all
