@@ -479,7 +479,9 @@ export default function ThemeGenerator() {
     const bgName = whiteColor?.name || "White"
     const headingName = blackColor?.name || "Black"
     const buttonName = blackColor?.name || "Black"
-    const description = `${bgName} background with ${headingName.toLowerCase()} headings and ${buttonName.toLowerCase()} buttons`
+    const description = headingName === buttonName 
+      ? `${bgName} background with ${headingName.toLowerCase()} headings and buttons`
+      : `${bgName} background with ${headingName.toLowerCase()} headings and ${buttonName.toLowerCase()} buttons`
     
     const newStyleId = Date.now().toString()
     
@@ -612,7 +614,12 @@ export default function ThemeGenerator() {
   }
 
   const generateDescription = (style: StyleDefinition): string => {
-    const text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
+    let text: string
+    if (style.headingColor === style.buttonBg) {
+      text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and buttons`
+    } else {
+      text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
+    }
     return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
@@ -1109,8 +1116,11 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
       const descriptionPrefix = style.noPadding ? 'No padding - ' : ''
       const capitalizeFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+      const defaultDescription = style.headingColor === style.buttonBg
+        ? `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and buttons`
+        : `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
       css += `/* Style ${styleNum} */\n`
-      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${style.description || `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`}';}\n`
+      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${style.description || defaultDescription}';}\n`
       css += `#layout ${className} .header{padding-bottom:${titlePaddingBottom || "14"}px;}\n`
       css += `${className} {background-color:${bgColor};color:${textColor};font-family: ${bodyFontVal}; font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-weight: ${bodyWeightVal};}\n`
       css += `${className} .main{color:${textColor};font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-family: ${bodyFontVal}; }\n`
@@ -1162,19 +1172,6 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     const feedbackPadding = titlePaddingBottom || "15"
     css += `.feedback-td-1 {padding-top: ${feedbackPadding}px;}\n`
 
-    // Add media queries for "show padding on mobile" for styles with noPadding enabled
-    const mobileSelectors: string[] = []
-    styles.forEach((style, index) => {
-      if (style.noPadding && style.showPaddingOnMobile) {
-        mobileSelectors.push(`#layout td.block.text-style-${index + 1}`)
-      }
-    })
-    
-    if (mobileSelectors.length > 0) {
-      const themePaddingVal = themePadding || "25px"
-      css += `@media (max-width: 650px) {${mobileSelectors.join(',')} {padding-left: ${themePaddingVal} !important; padding-right: ${themePaddingVal} !important;}}\n`
-    }
-
     return css
   }
 
@@ -1218,7 +1215,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
                 const combo: StyleDefinition = {
                   id: `combo-${Date.now()}-${Math.random()}`,
                   name: `Combination ${combinations.length + 1}`,
-                  description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
+                  description: headingColor.name === btnBg.name 
+                    ? `${bgColor.name} background with ${headingColor.name} headings and buttons`
+                    : `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
                   background: bgColor.name,
                   textColor: textColor.name,
                   headingColor: headingColor.name,
@@ -1300,7 +1299,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         const combo: StyleDefinition = {
           id: `combo-${Date.now()}-${Math.random()}`,
           name: `Combination ${combinations.length + 1}`,
-          description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
+          description: headingColor.name === btnBg.name 
+            ? `${bgColor.name} background with ${headingColor.name} headings and buttons`
+            : `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
           background: bgColor.name,
           textColor: textColor.name,
           headingColor: headingColor.name,
@@ -1393,7 +1394,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const combo: StyleDefinition = {
         id: `combo-${Date.now()}-${Math.random()}`,
         name: `Combination ${generatedCombinations.length + newCombinations.length + 1}`,
-        description: `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`.replace(/^./, ch => ch.toUpperCase()),
+        description: (headingColor.name === btnBg.name
+          ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
+          : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
+        ).replace(/^./, ch => ch.toUpperCase()),
         background: bgColor.name,
         textColor: textColor.name,
         headingColor: headingColor.name,
@@ -1485,7 +1489,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const combo: StyleDefinition = {
         id: `combo-${Date.now()}-${Math.random()}`,
         name: `Combination ${newCombinations.length + 1}`,
-        description: `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`.replace(/^./, ch => ch.toUpperCase()),
+        description: (headingColor.name === btnBg.name
+          ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
+          : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
+        ).replace(/^./, ch => ch.toUpperCase()),
         background: bgColor.name,
         textColor: textColor.name,
         headingColor: headingColor.name,
@@ -1922,7 +1929,21 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   const getMediaQuery = (breakpoint: string = '650px') => {
     const breakpointValue = breakpoint.replace('px', '')
     const gutterSize = themePadding || '10px'
-    return `@media screen and (max-width:${breakpointValue}px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:${gutterSize}!important;width:${gutterSize}!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
+    
+    // Build mobile padding selectors for styles with noPadding && showPaddingOnMobile
+    let mobilePaddingRules = ''
+    const mobileSelectors: string[] = []
+    styles.forEach((style, index) => {
+      if (style.noPadding && style.showPaddingOnMobile) {
+        mobileSelectors.push(`#layout td.block.text-style-${index + 1}`)
+      }
+    })
+    if (mobileSelectors.length > 0) {
+      const themePaddingVal = themePadding || '25px'
+      mobilePaddingRules = `${mobileSelectors.join(',')} {padding-left: ${themePaddingVal} !important; padding-right: ${themePaddingVal} !important;}`
+    }
+    
+    return `@media screen and (max-width:${breakpointValue}px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:${gutterSize}!important;width:${gutterSize}!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}${mobilePaddingRules}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
   }
 
   const getGridTemplates = () => {
