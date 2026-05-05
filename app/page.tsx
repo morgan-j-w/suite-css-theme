@@ -1162,6 +1162,19 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     const feedbackPadding = titlePaddingBottom || "15"
     css += `.feedback-td-1 {padding-top: ${feedbackPadding}px;}\n`
 
+    // Add media queries for "show padding on mobile" for styles with noPadding enabled
+    const mobileSelectors: string[] = []
+    styles.forEach((style, index) => {
+      if (style.noPadding && style.showPaddingOnMobile) {
+        mobileSelectors.push(`#layout td.block.text-style-${index + 1}`)
+      }
+    })
+    
+    if (mobileSelectors.length > 0) {
+      const themePaddingVal = themePadding || "25px"
+      css += `@media (max-width: 650px) {${mobileSelectors.join(',')} {padding-left: ${themePaddingVal} !important; padding-right: ${themePaddingVal} !important;}}\n`
+    }
+
     return css
   }
 
@@ -4407,6 +4420,38 @@ ${iconTemplates}</div>`
                                 </Tooltip>
                               </TooltipProvider>
                             </div>
+                            {/* Show padding on mobile - nested checkbox */}
+                            {style.noPadding && (
+                              <div className="flex items-center gap-2 mt-2 ml-6 pl-3 border-l-2 border-slate-300">
+                                <Checkbox
+                                  id={`showPaddingOnMobile-${style.id}`}
+                                  checked={style.showPaddingOnMobile === true}
+                                  onCheckedChange={(checked) => {
+                                    const updatedStyles = styles.map((s) => {
+                                      if (s.id === style.id) {
+                                        return { ...s, showPaddingOnMobile: checked as boolean }
+                                      }
+                                      return s
+                                    })
+                                    setStyles(updatedStyles)
+                                  }}
+                                  className="h-4 w-4 border border-slate-400 cursor-pointer"
+                                />
+                                <Label htmlFor={`showPaddingOnMobile-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                                  Show padding on mobile
+                                </Label>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <HelpCircle className="h-3 w-3 text-slate-400" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-xs text-xs">
+                                      On mobile devices (≤650px), restore padding for better spacing
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
