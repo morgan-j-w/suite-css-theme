@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle, AlertCircle } from "lucide-react"
+import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle, AlertCircle, PaintBucket, Type, Link, Square, Smile, Maximize2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Toaster } from "@/components/ui/sonner"
 import { useToast } from "@/hooks/use-toast"
@@ -20,7 +21,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ColorDefinition, StyleDefinition } from "@/lib/types"
 
 // Import utilities
-import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
+import { generateCSS, getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
 import { checkAllContrasts, getComplianceLevel, type ContrastResults } from "@/lib/wcag"
@@ -49,6 +50,7 @@ export default function ThemeGenerator() {
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const isInitializedRef = useRef(false)
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
@@ -190,6 +192,8 @@ export default function ThemeGenerator() {
     setCurrentStep,
   } = themeState
 
+  const namedColors = useMemo(() => colors.filter((c) => c.name.trim() !== ""), [colors])
+
   // Authentication handlers
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -277,6 +281,7 @@ export default function ThemeGenerator() {
   useEffect(() => { saveToLocalStorage("globalIconStyle", globalIconStyle) }, [globalIconStyle])
   useEffect(() => { saveToLocalStorage("globalIconSize", globalIconSize) }, [globalIconSize])
   useEffect(() => { saveToLocalStorage("themeStyles", styles) }, [styles])
+  useEffect(() => () => { if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current) }, [])
 
   // Initialize client and fonts list
   useEffect(() => {
@@ -472,7 +477,6 @@ export default function ThemeGenerator() {
   }
 
   const addStyle = () => {
-    const styleNumber = styles.length + 1
     const whiteColor = colors.find(c => c.hex === "#ffffff") || colors[0]
     const blackColor = colors.find(c => c.hex === "#000000") || colors[1]
     
@@ -485,11 +489,11 @@ export default function ThemeGenerator() {
     
     const newStyleId = Date.now().toString()
     
-    setStyles([
-      ...styles,
+    setStyles((prev) => [
+      ...prev,
       {
         id: newStyleId,
-        name: `Style ${styleNumber}`,
+        name: `Style ${prev.length + 1}`,
         description: description,
         background: whiteColor?.name || "White",
         textColor: blackColor?.name || "Black",
@@ -541,49 +545,72 @@ export default function ThemeGenerator() {
   }
 
   const removeStyle = (id: string) => {
-    const remainingStyles = styles.filter((s) => s.id !== id)
-    const renumberedStyles = remainingStyles.map((s, index) => ({
-      ...s,
-      name: `Style ${index + 1}`,
-    }))
-    setStyles(renumberedStyles)
+    setStyles((prev) => {
+      const remainingStyles = prev.filter((s) => s.id !== id)
+      return remainingStyles.map((s, index) => ({
+        ...s,
+        name: `Style ${index + 1}`,
+      }))
+    })
   }
 
   const moveStyle = (styleId: string, direction: "up" | "down") => {
-    const currentIndex = styles.findIndex((s) => s.id === styleId)
-    if (currentIndex === -1) return
+    setStyles((prev) => {
+      const currentIndex = prev.findIndex((s) => s.id === styleId)
+      if (currentIndex === -1) return prev
 
-    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
+      const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
 
-    // Check bounds
-    if (newIndex < 0 || newIndex >= styles.length) return
+      // Check bounds
+      if (newIndex < 0 || newIndex >= prev.length) return prev
 
-    const newStyles = [...styles]
-    const [movedStyle] = newStyles.splice(currentIndex, 1)
-    newStyles.splice(newIndex, 0, movedStyle)
+      const newStyles = [...prev]
+      const [movedStyle] = newStyles.splice(currentIndex, 1)
+      newStyles.splice(newIndex, 0, movedStyle)
 
-    setStyles(newStyles)
+      return newStyles
+    })
+    
+    // Scroll to the moved style after a brief delay to allow DOM to update
+    setTimeout(() => {
+      const element = document.getElementById(`style-${styleId}`)
+      if (element) {
+        // Get the header height to account for sticky positioning
+        const header = document.querySelector('header')
+        const headerHeight = header?.offsetHeight || 0
+        const elementTop = element.getBoundingClientRect().top + window.scrollY
+        const offsetTop = elementTop - headerHeight - 20 // 20px padding below header
+        
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        })
+      }
+    }, 0)
   }
 
   const duplicateStyle = (styleId: string) => {
-    const styleToClone = styles.find((s) => s.id === styleId)
-    if (!styleToClone) return
+    const clonedId = Date.now().toString()
+    setStyles((prev) => {
+      const styleToClone = prev.find((s) => s.id === styleId)
+      if (!styleToClone) return prev
 
-    const clonedStyle = {
-      ...styleToClone,
-      id: Date.now().toString(),
-      name: `${styleToClone.name} (Copy)`,
-    }
+      const clonedStyle = {
+        ...styleToClone,
+        id: clonedId,
+        name: `${styleToClone.name} (Copy)`,
+      }
 
-    const currentIndex = styles.findIndex((s) => s.id === styleId)
-    const newStyles = [...styles]
-    newStyles.splice(currentIndex + 1, 0, clonedStyle)
-    
-    setStyles(newStyles)
-    
+      const currentIndex = prev.findIndex((s) => s.id === styleId)
+      const newStyles = [...prev]
+      newStyles.splice(currentIndex + 1, 0, clonedStyle)
+
+      return newStyles
+    })
+
     // Smooth scroll to the newly duplicated style
     setTimeout(() => {
-      const element = document.getElementById(`style-${clonedStyle.id}`)
+      const element = document.getElementById(`style-${clonedId}`)
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
@@ -591,7 +618,7 @@ export default function ThemeGenerator() {
   }
 
   const updateStyle = (id: string, field: keyof StyleDefinition, value: string | boolean) => {
-    setStyles(styles.map((s) => {
+    setStyles((prev) => prev.map((s) => {
       if (s.id === id) {
         const updated = { ...s, [field]: value }
         
@@ -624,8 +651,8 @@ export default function ThemeGenerator() {
   }
 
   const updateStyleWithSmartDescription = (id: string, field: keyof StyleDefinition, value: string) => {
-    setStyles(
-      styles.map((s) => {
+    setStyles((prev) =>
+      prev.map((s) => {
         if (s.id === id) {
           const updated = { ...s, [field]: value }
           // Auto-update description when any colour field changes
@@ -651,182 +678,182 @@ export default function ThemeGenerator() {
   }
 
   const updateAllStylesFonts = (fontType: "h1" | "h2" | "h3" | "h4" | "body" | "button", value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         [`${fontType}Font`]: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesButtonSize = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         buttonSize: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesButtonLineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         buttonLineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesButtonWeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         buttonWeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesLinkWeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         linkWeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesBodySize = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         bodySize: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesBodyLineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         bodyLineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesBodyWeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         bodyWeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH1Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h1Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH1LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h1LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH1Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h1Weight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH2Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h2Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH2LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h2LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH2Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h2Weight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH3Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h3Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH3LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h3LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH3Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h3Weight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH4Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h4Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH4LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h4LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH4Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h4Weight: value,
-      })),
+      }))
     )
   }
 
@@ -4043,7 +4070,10 @@ ${iconTemplates}</div>`
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           {/* Row 1 */}
                           <div>
-                            <Label className="text-xs text-slate-600">Background</Label>
+                            <div className="flex items-center gap-1">
+                              <PaintBucket className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Background</Label>
+                            </div>
                             <Select
                               value={style.background}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
@@ -4062,7 +4092,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4075,7 +4105,8 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
                               <Label className="text-xs text-slate-600">Heading colour</Label>
                               <TooltipProvider>
                                 <Tooltip>
@@ -4108,7 +4139,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4121,7 +4152,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Text colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Text colour</Label>
+                            </div>
                             <Select
                               value={style.textColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
@@ -4140,7 +4174,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4153,7 +4187,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Link colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Link className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Link colour</Label>
+                            </div>
                             <Select
                               value={style.linkColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
@@ -4172,7 +4209,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4186,7 +4223,10 @@ ${iconTemplates}</div>`
 
                           {/* Row 2 */}
                           <div>
-                            <Label className="text-xs text-slate-600">Button background</Label>
+                            <div className="flex items-center gap-1">
+                              <PaintBucket className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button background</Label>
+                            </div>
                             <Select
                               value={style.buttonBg}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
@@ -4205,7 +4245,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4218,7 +4258,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button text</Label>
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button text</Label>
+                            </div>
                             <Select
                               value={style.buttonText}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
@@ -4237,7 +4280,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4250,7 +4293,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                            <div className="flex items-center gap-1">
+                              <Square className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                            </div>
                             <Input
                               className="mt-1.5 text-xs bg-white w-full"
                               type="number"
@@ -4262,7 +4308,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button border colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Square className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button border colour</Label>
+                            </div>
                             <Select
                               value={style.buttonBorderColor || "none"}
                               onValueChange={(value) => {
@@ -4290,7 +4339,7 @@ ${iconTemplates}</div>`
                                 <SelectItem value="none">
                                   <span className="text-slate-400">None</span>
                                 </SelectItem>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4304,7 +4353,10 @@ ${iconTemplates}</div>`
 
                           {/* Row 3 */}
                           <div>
-                            <Label className="text-xs text-slate-600">Button background hover</Label>
+                            <div className="flex items-center gap-1">
+                              <PaintBucket className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button background hover</Label>
+                            </div>
                             <Select
                               value={style.buttonBgHover}
                               onValueChange={(value) => updateStyle(style.id, "buttonBgHover", value)}
@@ -4323,7 +4375,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4336,7 +4388,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button text hover</Label>
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button text hover</Label>
+                            </div>
                             <Select
                               value={style.buttonTextHover}
                               onValueChange={(value) => updateStyle(style.id, "buttonTextHover", value)}
@@ -4355,7 +4410,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4368,7 +4423,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Icon colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Smile className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Icon colour</Label>
+                            </div>
                             <Select
                               value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
@@ -4387,7 +4445,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.hex}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4397,84 +4455,6 @@ ${iconTemplates}</div>`
                                 ))}
                               </SelectContent>
                             </Select>
-                          </div>
-
-                          <div className="md:col-span-4 lg:col-span-1">
-                            <Label className="text-xs text-slate-600">Style padding</Label>
-                            <div className="flex items-center gap-2 mt-3">
-                              <Checkbox
-                                id={`noPadding-${style.id}`}
-                                checked={style.noPadding === true}
-                                onCheckedChange={(checked) => {
-                                  const updatedStyles = styles.map((s) => {
-                                    if (s.id === style.id) {
-                                      const isChecking = checked as boolean
-                                      let newDescription = s.description
-                                      
-                                      if (isChecking) {
-                                        if (!newDescription.startsWith("No padding - ")) {
-                                          newDescription = `No padding - ${newDescription}`
-                                        }
-                                      } else {
-                                        if (newDescription.startsWith("No padding - ")) {
-                                          newDescription = newDescription.replace("No padding - ", "")
-                                        }
-                                      }
-                                      
-                                      return { ...s, noPadding: isChecking, description: newDescription }
-                                    }
-                                    return s
-                                  })
-                                  setStyles(updatedStyles)
-                                }}
-                                className="h-4 w-4 border border-slate-400 cursor-pointer"
-                              />
-                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                                No padding
-                              </Label>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <HelpCircle className="h-3 w-3 text-slate-400" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right" className="max-w-xs text-xs">
-                                    Removes padding from all sides for this style
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
-                            {/* Show padding on mobile - nested checkbox */}
-                            {style.noPadding && (
-                              <div className="flex items-center gap-1.5 mt-2 ml-4 pl-2 border-l-2 border-slate-300 whitespace-nowrap">
-                                <Checkbox
-                                  id={`showPaddingOnMobile-${style.id}`}
-                                  checked={style.showPaddingOnMobile === true}
-                                  onCheckedChange={(checked) => {
-                                    const updatedStyles = styles.map((s) => {
-                                      if (s.id === style.id) {
-                                        return { ...s, showPaddingOnMobile: checked as boolean }
-                                      }
-                                      return s
-                                    })
-                                    setStyles(updatedStyles)
-                                  }}
-                                  className="h-4 w-4 border border-slate-400 cursor-pointer"
-                                />
-                                <Label htmlFor={`showPaddingOnMobile-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                                  Show padding on mobile
-                                </Label>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <HelpCircle className="h-4 w-4 text-slate-500 cursor-help" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right" className="max-w-xs text-xs">
-                                      On mobile devices (≤650px), restore padding for better spacing
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -4489,6 +4469,7 @@ ${iconTemplates}</div>`
                             const badgeColor = level === 'AAA' ? 'bg-green-50 text-green-700' : level === 'AA' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
                             const borderColor = level === 'AAA' ? 'border-green-200' : level === 'AA' ? 'border-yellow-200' : 'border-red-200'
                             return (
+                              <div className="flex items-center gap-1.5">
                               <TooltipProvider>
                                 <Tooltip delayDuration={0}>
                                   <TooltipTrigger asChild>
@@ -4559,6 +4540,106 @@ ${iconTemplates}</div>`
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
+                              {level === 'FAIL' && (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button title="Suggest accessible colours" className="text-slate-400 hover:text-slate-600 flex items-center">
+                                      <Sparkles className="h-3.5 w-3.5" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent side="top" align="end" className="w-72 p-3">
+                                    <p className="font-semibold text-xs text-slate-700 mb-2">Contrast suggestions</p>
+                                    <div className="space-y-3 text-xs">
+                                      {!contrastResults.headingOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(headingColor, bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Heading colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "headingColor", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.bodyTextOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(textColor, bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Body text colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "textColor", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.linkOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(linkColor, bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Link colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "linkColor", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.buttonTextOnButtonBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(buttonText, buttonBg, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Button text colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "buttonText", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.iconOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(style.iconColor || "#000000", bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Icon colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyle(style.id, "iconColor", alt.hex)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
+                              </div>
                             )
                           })()}
                         </div>
@@ -4663,6 +4744,90 @@ ${iconTemplates}</div>`
                             })}
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Style Padding Section */}
+                    <div className="mt-4 pt-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1">
+                          <Maximize2 className="h-3 w-3 text-slate-400" />
+                          <Label className="text-xs text-slate-600 font-semibold">Style padding</Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id={`noPadding-${style.id}`}
+                            checked={style.noPadding === true}
+                            className="data-[state=unchecked]:bg-slate-300"
+                            onCheckedChange={(checked) => {
+                              const isChecking = checked as boolean
+                              setStyles((prev) => prev.map((s) => {
+                                if (s.id === style.id) {
+                                  let newDescription = s.description
+                                  
+                                  if (isChecking) {
+                                    if (!newDescription.startsWith("No padding - ")) {
+                                      newDescription = `No padding - ${newDescription}`
+                                    }
+                                  } else {
+                                    if (newDescription.startsWith("No padding - ")) {
+                                      newDescription = newDescription.replace("No padding - ", "")
+                                    }
+                                  }
+                                  
+                                  return { ...s, noPadding: isChecking, description: newDescription }
+                                }
+                                return s
+                              }))
+                            }}
+                          />
+                          <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                            No padding
+                          </Label>
+                        </div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-3 w-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs text-xs">
+                              Removes padding from all sides for this style
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        {/* Show padding on mobile - nested toggle */}
+                        {style.noPadding && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                id={`showPaddingOnMobile-${style.id}`}
+                                checked={style.showPaddingOnMobile === true}
+                                className="data-[state=unchecked]:bg-slate-300"
+                                onCheckedChange={(checked) => {
+                                  setStyles((prev) => prev.map((s) => {
+                                    if (s.id === style.id) {
+                                      return { ...s, showPaddingOnMobile: checked as boolean }
+                                    }
+                                    return s
+                                  }))
+                                }}
+                              />
+                              <Label htmlFor={`showPaddingOnMobile-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                                Show padding on mobile
+                              </Label>
+                            </div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs text-xs">
+                                  Restores left and right padding to the style on mobile devices
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -5114,7 +5279,7 @@ ${iconTemplates}</div>`
 
                         <Button
                             onClick={() => {
-                              const updatedStyles = styles.map((s) => {
+                              setStyles((prev) => prev.map((s) => {
                                 if (s.id === style.id) {
                                   return {
                                     ...s,
@@ -5151,16 +5316,18 @@ ${iconTemplates}</div>`
                                   }
                                 }
                                 return s
-                              })
-                              setStyles(updatedStyles)
+                              }))
                               
                               // Show check icon feedback
-                              const newSet = new Set(resetStyles)
-                              newSet.add(style.id)
-                              setResetStyles(newSet)
+                              setResetStyles((prev) => {
+                                const newSet = new Set(prev)
+                                newSet.add(style.id)
+                                return newSet
+                              })
                               
                               // Auto-clear after 2 seconds
-                              setTimeout(() => {
+                              if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current)
+                              resetTimeoutRef.current = setTimeout(() => {
                                 setResetStyles((prev) => {
                                   const updated = new Set(prev)
                                   updated.delete(style.id)
