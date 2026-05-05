@@ -4399,7 +4399,7 @@ ${iconTemplates}</div>`
                             </Select>
                           </div>
 
-                          <div>
+                          <div className="md:col-span-4">
                             <Label className="text-xs text-slate-600">Style padding</Label>
                             <div className="flex items-center gap-2 mt-3">
                               <Checkbox
