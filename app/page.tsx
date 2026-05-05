@@ -4466,7 +4466,7 @@ ${iconTemplates}</div>`
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <HelpCircle className="h-3 w-3 text-slate-400" />
+                                      <HelpCircle className="h-4 w-4 text-slate-500 cursor-help" />
                                     </TooltipTrigger>
                                     <TooltipContent side="right" className="max-w-xs text-xs">
                                       On mobile devices (≤650px), restore padding for better spacing
