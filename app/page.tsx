@@ -4374,15 +4374,17 @@ ${iconTemplates}</div>`
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
-                                <div className="flex items-center gap-2 max-w-[200px]">
-                                  <div
-                                    className="w-4 h-4 rounded border shrink-0"
-                                    style={{ backgroundColor: style.iconColor || "#000000" }}
-                                  />
-                                  <span className="truncate text-xs">
-                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
-                                  </span>
-                                </div>
+                                <SelectValue>
+                                  <div className="flex items-center gap-2 max-w-[200px]">
+                                    <div
+                                      className="w-4 h-4 rounded border shrink-0"
+                                      style={{ backgroundColor: style.iconColor || "#000000" }}
+                                    />
+                                    <span className="truncate text-xs">
+                                      {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                    </span>
+                                  </div>
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
                                 {colors.filter((color) => color.name.trim() !== "").map((color) => (
