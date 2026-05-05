@@ -54,6 +54,7 @@ export interface StyleDefinition {
   buttonPaddingLeft?: string
   buttonBorderRadius?: string
   wcagLevel?: string
+  showPaddingOnMobile?: boolean
 }
 
 export interface GoogleFont {

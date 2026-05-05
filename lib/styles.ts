@@ -304,3 +304,37 @@ export const getContrastRatio = (hex1: string, hex2: string): number => {
 
   return (lighter + 0.05) / (darker + 0.05)
 }
+
+export const findAccessibleAlternatives = (
+  failingColorHex: string,
+  bgColorHex: string,
+  palette: ColorDefinition[],
+  minRatio = 4.5
+): Array<ColorDefinition & { ratio: number }> => {
+  const passing = palette
+    .filter((c) => c.name.trim() !== "")
+    .map((c) => ({ ...c, ratio: Math.round(getContrastRatio(c.hex, bgColorHex) * 100) / 100 }))
+    .filter((c) => c.ratio >= minRatio)
+
+  const failRgb = hexToRgb(failingColorHex)
+  if (!failRgb) return passing.slice(0, 3)
+
+  return passing
+    .sort((a, b) => {
+      const rgbA = hexToRgb(a.hex)
+      const rgbB = hexToRgb(b.hex)
+      if (!rgbA || !rgbB) return 0
+      const distA = Math.sqrt(
+        Math.pow(rgbA.r - failRgb.r, 2) +
+        Math.pow(rgbA.g - failRgb.g, 2) +
+        Math.pow(rgbA.b - failRgb.b, 2)
+      )
+      const distB = Math.sqrt(
+        Math.pow(rgbB.r - failRgb.r, 2) +
+        Math.pow(rgbB.g - failRgb.g, 2) +
+        Math.pow(rgbB.b - failRgb.b, 2)
+      )
+      return distA - distB
+    })
+    .slice(0, 3)
+}

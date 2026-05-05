@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle, AlertCircle } from "lucide-react"
+import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle, AlertCircle, PaintBucket, Type, Link, Square, Smile, Maximize2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Toaster } from "@/components/ui/sonner"
 import { useToast } from "@/hooks/use-toast"
@@ -20,7 +21,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ColorDefinition, StyleDefinition } from "@/lib/types"
 
 // Import utilities
-import { generateCSS, getColorHex, getContrastRatio } from "@/lib/styles"
+import { generateCSS, getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
 import { checkAllContrasts, getComplianceLevel, type ContrastResults } from "@/lib/wcag"
@@ -49,6 +50,7 @@ export default function ThemeGenerator() {
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const isInitializedRef = useRef(false)
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
@@ -190,6 +192,8 @@ export default function ThemeGenerator() {
     setCurrentStep,
   } = themeState
 
+  const namedColors = useMemo(() => colors.filter((c) => c.name.trim() !== ""), [colors])
+
   // Authentication handlers
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -277,6 +281,7 @@ export default function ThemeGenerator() {
   useEffect(() => { saveToLocalStorage("globalIconStyle", globalIconStyle) }, [globalIconStyle])
   useEffect(() => { saveToLocalStorage("globalIconSize", globalIconSize) }, [globalIconSize])
   useEffect(() => { saveToLocalStorage("themeStyles", styles) }, [styles])
+  useEffect(() => () => { if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current) }, [])
 
   // Initialize client and fonts list
   useEffect(() => {
@@ -472,22 +477,23 @@ export default function ThemeGenerator() {
   }
 
   const addStyle = () => {
-    const styleNumber = styles.length + 1
     const whiteColor = colors.find(c => c.hex === "#ffffff") || colors[0]
     const blackColor = colors.find(c => c.hex === "#000000") || colors[1]
     
     const bgName = whiteColor?.name || "White"
     const headingName = blackColor?.name || "Black"
     const buttonName = blackColor?.name || "Black"
-    const description = `${bgName} background with ${headingName.toLowerCase()} headings and ${buttonName.toLowerCase()} buttons`
+    const description = headingName === buttonName 
+      ? `${bgName} background with ${headingName.toLowerCase()} headings and buttons`
+      : `${bgName} background with ${headingName.toLowerCase()} headings and ${buttonName.toLowerCase()} buttons`
     
     const newStyleId = Date.now().toString()
     
-    setStyles([
-      ...styles,
+    setStyles((prev) => [
+      ...prev,
       {
         id: newStyleId,
-        name: `Style ${styleNumber}`,
+        name: `Style ${prev.length + 1}`,
         description: description,
         background: whiteColor?.name || "White",
         textColor: blackColor?.name || "Black",
@@ -539,49 +545,72 @@ export default function ThemeGenerator() {
   }
 
   const removeStyle = (id: string) => {
-    const remainingStyles = styles.filter((s) => s.id !== id)
-    const renumberedStyles = remainingStyles.map((s, index) => ({
-      ...s,
-      name: `Style ${index + 1}`,
-    }))
-    setStyles(renumberedStyles)
+    setStyles((prev) => {
+      const remainingStyles = prev.filter((s) => s.id !== id)
+      return remainingStyles.map((s, index) => ({
+        ...s,
+        name: `Style ${index + 1}`,
+      }))
+    })
   }
 
   const moveStyle = (styleId: string, direction: "up" | "down") => {
-    const currentIndex = styles.findIndex((s) => s.id === styleId)
-    if (currentIndex === -1) return
+    setStyles((prev) => {
+      const currentIndex = prev.findIndex((s) => s.id === styleId)
+      if (currentIndex === -1) return prev
 
-    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
+      const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
 
-    // Check bounds
-    if (newIndex < 0 || newIndex >= styles.length) return
+      // Check bounds
+      if (newIndex < 0 || newIndex >= prev.length) return prev
 
-    const newStyles = [...styles]
-    const [movedStyle] = newStyles.splice(currentIndex, 1)
-    newStyles.splice(newIndex, 0, movedStyle)
+      const newStyles = [...prev]
+      const [movedStyle] = newStyles.splice(currentIndex, 1)
+      newStyles.splice(newIndex, 0, movedStyle)
 
-    setStyles(newStyles)
+      return newStyles
+    })
+    
+    // Scroll to the moved style after a brief delay to allow DOM to update
+    setTimeout(() => {
+      const element = document.getElementById(`style-${styleId}`)
+      if (element) {
+        // Get the header height to account for sticky positioning
+        const header = document.querySelector('header')
+        const headerHeight = header?.offsetHeight || 0
+        const elementTop = element.getBoundingClientRect().top + window.scrollY
+        const offsetTop = elementTop - headerHeight - 20 // 20px padding below header
+        
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        })
+      }
+    }, 0)
   }
 
   const duplicateStyle = (styleId: string) => {
-    const styleToClone = styles.find((s) => s.id === styleId)
-    if (!styleToClone) return
+    const clonedId = Date.now().toString()
+    setStyles((prev) => {
+      const styleToClone = prev.find((s) => s.id === styleId)
+      if (!styleToClone) return prev
 
-    const clonedStyle = {
-      ...styleToClone,
-      id: Date.now().toString(),
-      name: `${styleToClone.name} (Copy)`,
-    }
+      const clonedStyle = {
+        ...styleToClone,
+        id: clonedId,
+        name: `${styleToClone.name} (Copy)`,
+      }
 
-    const currentIndex = styles.findIndex((s) => s.id === styleId)
-    const newStyles = [...styles]
-    newStyles.splice(currentIndex + 1, 0, clonedStyle)
-    
-    setStyles(newStyles)
-    
+      const currentIndex = prev.findIndex((s) => s.id === styleId)
+      const newStyles = [...prev]
+      newStyles.splice(currentIndex + 1, 0, clonedStyle)
+
+      return newStyles
+    })
+
     // Smooth scroll to the newly duplicated style
     setTimeout(() => {
-      const element = document.getElementById(`style-${clonedStyle.id}`)
+      const element = document.getElementById(`style-${clonedId}`)
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
@@ -589,7 +618,7 @@ export default function ThemeGenerator() {
   }
 
   const updateStyle = (id: string, field: keyof StyleDefinition, value: string | boolean) => {
-    setStyles(styles.map((s) => {
+    setStyles((prev) => prev.map((s) => {
       if (s.id === id) {
         const updated = { ...s, [field]: value }
         
@@ -612,13 +641,18 @@ export default function ThemeGenerator() {
   }
 
   const generateDescription = (style: StyleDefinition): string => {
-    const text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
+    let text: string
+    if (style.headingColor === style.buttonBg) {
+      text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and buttons`
+    } else {
+      text = `${style.background.toLowerCase()} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
+    }
     return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
   const updateStyleWithSmartDescription = (id: string, field: keyof StyleDefinition, value: string) => {
-    setStyles(
-      styles.map((s) => {
+    setStyles((prev) =>
+      prev.map((s) => {
         if (s.id === id) {
           const updated = { ...s, [field]: value }
           // Auto-update description when any colour field changes
@@ -644,182 +678,182 @@ export default function ThemeGenerator() {
   }
 
   const updateAllStylesFonts = (fontType: "h1" | "h2" | "h3" | "h4" | "body" | "button", value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         [`${fontType}Font`]: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesButtonSize = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         buttonSize: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesButtonLineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         buttonLineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesButtonWeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         buttonWeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesLinkWeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         linkWeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesBodySize = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         bodySize: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesBodyLineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         bodyLineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesBodyWeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         bodyWeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH1Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h1Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH1LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h1LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH1Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h1Weight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH2Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h2Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH2LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h2LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH2Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h2Weight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH3Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h3Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH3LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h3LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH3Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h3Weight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH4Size = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h4Size: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH4LineHeight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h4LineHeight: value,
-      })),
+      }))
     )
   }
 
   const updateAllStylesH4Weight = (value: string) => {
-    setStyles(
-      styles.map((s) => ({
+    setStyles((prev) =>
+      prev.map((s) => ({
         ...s,
         h4Weight: value,
-      })),
+      }))
     )
   }
 
@@ -1109,8 +1143,11 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
       const descriptionPrefix = style.noPadding ? 'No padding - ' : ''
       const capitalizeFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+      const defaultDescription = style.headingColor === style.buttonBg
+        ? `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and buttons`
+        : `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
       css += `/* Style ${styleNum} */\n`
-      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${style.description || `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`}';}\n`
+      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${style.description || defaultDescription}';}\n`
       css += `#layout ${className} .header{padding-bottom:${titlePaddingBottom || "14"}px;}\n`
       css += `${className} {background-color:${bgColor};color:${textColor};font-family: ${bodyFontVal}; font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-weight: ${bodyWeightVal};}\n`
       css += `${className} .main{color:${textColor};font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-family: ${bodyFontVal}; }\n`
@@ -1140,6 +1177,27 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       
       css += `\n`
     })
+
+    // Add strong tag rule if any font weight is 300 or lower
+    const getWeightValue = (weight: any) => {
+      const val = weight || "400"
+      return parseInt(val.toString().replace(/\D/g, '') || "400")
+    }
+    
+    const h1WeightNum = getWeightValue(h1Weight)
+    const h2WeightNum = getWeightValue(h2Weight)
+    const h3WeightNum = getWeightValue(h3Weight)
+    const h4WeightNum = getWeightValue(h4Weight)
+    const linkWeightNum = getWeightValue(linkWeight)
+    const bodyWeightNum = getWeightValue(bodyWeight)
+    
+    if (h1WeightNum <= 300 || h2WeightNum <= 300 || h3WeightNum <= 300 || h4WeightNum <= 300 || linkWeightNum <= 300 || bodyWeightNum <= 300) {
+      css += `strong {font-weight: bold !important;}\n`
+    }
+
+    // Add feedback-td-1 rule with title padding
+    const feedbackPadding = titlePaddingBottom || "15"
+    css += `.feedback-td-1 {padding-top: ${feedbackPadding}px;}\n`
 
     return css
   }
@@ -1184,7 +1242,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
                 const combo: StyleDefinition = {
                   id: `combo-${Date.now()}-${Math.random()}`,
                   name: `Combination ${combinations.length + 1}`,
-                  description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
+                  description: headingColor.name === btnBg.name 
+                    ? `${bgColor.name} background with ${headingColor.name} headings and buttons`
+                    : `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
                   background: bgColor.name,
                   textColor: textColor.name,
                   headingColor: headingColor.name,
@@ -1266,7 +1326,9 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         const combo: StyleDefinition = {
           id: `combo-${Date.now()}-${Math.random()}`,
           name: `Combination ${combinations.length + 1}`,
-          description: `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
+          description: headingColor.name === btnBg.name 
+            ? `${bgColor.name} background with ${headingColor.name} headings and buttons`
+            : `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
           background: bgColor.name,
           textColor: textColor.name,
           headingColor: headingColor.name,
@@ -1359,7 +1421,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const combo: StyleDefinition = {
         id: `combo-${Date.now()}-${Math.random()}`,
         name: `Combination ${generatedCombinations.length + newCombinations.length + 1}`,
-        description: `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`.replace(/^./, ch => ch.toUpperCase()),
+        description: (headingColor.name === btnBg.name
+          ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
+          : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
+        ).replace(/^./, ch => ch.toUpperCase()),
         background: bgColor.name,
         textColor: textColor.name,
         headingColor: headingColor.name,
@@ -1451,7 +1516,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const combo: StyleDefinition = {
         id: `combo-${Date.now()}-${Math.random()}`,
         name: `Combination ${newCombinations.length + 1}`,
-        description: `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`.replace(/^./, ch => ch.toUpperCase()),
+        description: (headingColor.name === btnBg.name
+          ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
+          : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
+        ).replace(/^./, ch => ch.toUpperCase()),
         background: bgColor.name,
         textColor: textColor.name,
         headingColor: headingColor.name,
@@ -1887,7 +1955,22 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
 
   const getMediaQuery = (breakpoint: string = '650px') => {
     const breakpointValue = breakpoint.replace('px', '')
-    return `@media screen and (max-width:${breakpointValue}px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:10px!important;width:10px!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
+    const gutterSize = themePadding || '10px'
+    
+    // Build mobile padding selectors for styles with noPadding && showPaddingOnMobile
+    let mobilePaddingRules = ''
+    const mobileSelectors: string[] = []
+    styles.forEach((style, index) => {
+      if (style.noPadding && style.showPaddingOnMobile) {
+        mobileSelectors.push(`#layout td.block.text-style-${index + 1}`)
+      }
+    })
+    if (mobileSelectors.length > 0) {
+      const themePaddingVal = themePadding || '25px'
+      mobilePaddingRules = `${mobileSelectors.join(',')} {padding-left: ${themePaddingVal} !important; padding-right: ${themePaddingVal} !important;}`
+    }
+    
+    return `@media screen and (max-width:${breakpointValue}px){.mobileBlock{display:block!important}.sd-mobile-hidden{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout .block[data-sd-content=image] img{width:100%!important;max-width:100%!important;min-width:100%!important}.figure img,.sd-mobile-img-figure img{width:100%!important;height:auto!important;max-width:100%!important}.sd-img-responsive{width:100%!important;height:auto!important}.mobile-break{word-break:break-all!important}#layout .btn-poll,#layout .grid>table,#layout .section,.sd-mobile-full-width,.section>tbody>tr>td>.grid>table,table.guttertable,table.margintable,table.mso-full-width.contenttable{width:100%!important}#layout .block[data-sd-content=article] .figure img:not([data-full-width=false]),#layout .block[data-sd-content=image] img:not([data-full-width=false]),#layout .block[data-sd-content=map] img,#layout .block[data-sd-content=video-email] img:not([data-full-width=false]):not(.btn-play){width:100%!important;height:auto!important;max-width:100%!important}#layout .btn-cm,#layout .btn-poll{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;width:100%!important;}#layout .btn-width-auto{width:auto!important}.sd-mobile-quicklinks,.sd-mobile-quicklinks *{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}#layout,#layout .block>table,#layout .grid,#layout .grid>table>tbody>tr>td>table.contenttable,#layout .section>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table,#layout .section>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>table{height:auto!important;width:100%!important}.clearHeight,.grid>table>tbody>tr>td>table.contenttable>tbody>tr>td{height:auto!important}.guttertable{height:${gutterSize}!important;width:${gutterSize}!important}.sd-mobile-quicklinks .guttertable,.sd-mobile-quicklinks .margintable{height:0!important}.margintable{display:none!important;mso-hide:all!important;width:0!important;min-width:0!important;max-width:0!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important;font-size:0!important;line-height:0!important;visibility:hidden!important}.block[data-sd-content=links]{display:block!important;}.intro-article{padding-left:30px!important;padding-right:30px!important;box-sizing:border-box!important}.sd-padding-0{padding:0!important}.sd-padding-top-0{padding-top:0!important}.sd-padding-right-0{padding-right:0!important}.sd-padding-bottom-0{padding-bottom:0!important}.sd-padding-left-0{padding-left:0!important}.sd-padding-top-15{padding-top:15px!important}.sd-padding-right-15{padding-right:15px!important}.sd-padding-bottom-15{padding-bottom:15px!important}.sd-padding-top-10{padding-top:10px!important}.sd-padding-bottom-10{padding-bottom:10px!important}.sd-padding-left-15{padding-left:15px!important}.sd-padding-right-10{padding-right:10px!important}.sd-padding-left-10{padding-left:10px!important}.sd-padding-15{padding:15px!important}.sd-padding-top-20{padding-top:20px!important}.sd-padding-right-20{padding-right:20px!important}.sd-padding-bottom-20{padding-bottom:20px!important}.sd-padding-left-20{padding-left:20px!important}.sd-padding-top-25{padding-top:25px!important}.sd-padding-20{padding:20px!important}.sd-padding-left-40{padding-left:40px!important}.sd-padding-right-40{padding-right:40px!important}#header_wide,#middle_0_wide{width:100%!important;margin:0 auto!important}#footer_wide{width:100%;margin:0 auto!important}.text-left,.textLeft{text-align:left!important}.block[data-sd-content=article][data-image-position=left] .figcaption{border-right:0!important}.block[data-sd-content=article][data-image-position=right] .figcaption{border-left:0!important}.textCenter{text-align:center!important}.figure iframe{width:100%}#layout .block[data-sd-content=video-email] .figure img{height:50px!important;width:auto!important}td.figure.sd-mobile-img-figure.sd-image-figure-right{padding-left:0 !important;}td.figure.sd-mobile-img-figure.sd-image-figure-left{padding-right:0 !important;}.stack{display:block!important;width:100%!important;text-align:center!important;}.textCenter .link-button-wrapper div{text-align:center!important;}.footerLinks a{display:block!important;margin-bottom:0.5rem;}.footerLinks a:last-child{margin-bottom:0!important;}.br-0{border-radius:0px!important;}.sd-padding-bottom-30{padding-bottom:30px!important}${mobilePaddingRules}}*[x-apple-data-detectors],.x-gmail-data-detectors,.x-gmail-data-detectors *,.aBn{border-bottom:0!important;cursor:default!important;color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}`
   }
 
   const getGridTemplates = () => {
@@ -3987,7 +4070,10 @@ ${iconTemplates}</div>`
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           {/* Row 1 */}
                           <div>
-                            <Label className="text-xs text-slate-600">Background</Label>
+                            <div className="flex items-center gap-1">
+                              <PaintBucket className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Background</Label>
+                            </div>
                             <Select
                               value={style.background}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
@@ -4006,7 +4092,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4019,7 +4105,8 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
                               <Label className="text-xs text-slate-600">Heading colour</Label>
                               <TooltipProvider>
                                 <Tooltip>
@@ -4052,7 +4139,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4065,7 +4152,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Text colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Text colour</Label>
+                            </div>
                             <Select
                               value={style.textColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
@@ -4084,7 +4174,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4097,7 +4187,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Link colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Link className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Link colour</Label>
+                            </div>
                             <Select
                               value={style.linkColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
@@ -4116,7 +4209,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4130,7 +4223,10 @@ ${iconTemplates}</div>`
 
                           {/* Row 2 */}
                           <div>
-                            <Label className="text-xs text-slate-600">Button background</Label>
+                            <div className="flex items-center gap-1">
+                              <PaintBucket className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button background</Label>
+                            </div>
                             <Select
                               value={style.buttonBg}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
@@ -4149,7 +4245,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4162,7 +4258,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button text</Label>
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button text</Label>
+                            </div>
                             <Select
                               value={style.buttonText}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
@@ -4181,7 +4280,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4194,7 +4293,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                            <div className="flex items-center gap-1">
+                              <Square className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                            </div>
                             <Input
                               className="mt-1.5 text-xs bg-white w-full"
                               type="number"
@@ -4206,7 +4308,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button border colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Square className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button border colour</Label>
+                            </div>
                             <Select
                               value={style.buttonBorderColor || "none"}
                               onValueChange={(value) => {
@@ -4234,7 +4339,7 @@ ${iconTemplates}</div>`
                                 <SelectItem value="none">
                                   <span className="text-slate-400">None</span>
                                 </SelectItem>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4248,7 +4353,10 @@ ${iconTemplates}</div>`
 
                           {/* Row 3 */}
                           <div>
-                            <Label className="text-xs text-slate-600">Button background hover</Label>
+                            <div className="flex items-center gap-1">
+                              <PaintBucket className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button background hover</Label>
+                            </div>
                             <Select
                               value={style.buttonBgHover}
                               onValueChange={(value) => updateStyle(style.id, "buttonBgHover", value)}
@@ -4267,7 +4375,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4280,7 +4388,10 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Button text hover</Label>
+                            <div className="flex items-center gap-1">
+                              <Type className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Button text hover</Label>
+                            </div>
                             <Select
                               value={style.buttonTextHover}
                               onValueChange={(value) => updateStyle(style.id, "buttonTextHover", value)}
@@ -4299,7 +4410,7 @@ ${iconTemplates}</div>`
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.name}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4312,24 +4423,29 @@ ${iconTemplates}</div>`
                           </div>
 
                           <div>
-                            <Label className="text-xs text-slate-600">Icon colour</Label>
+                            <div className="flex items-center gap-1">
+                              <Smile className="h-3 w-3 text-slate-400" />
+                              <Label className="text-xs text-slate-600">Icon colour</Label>
+                            </div>
                             <Select
                               value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
                               <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
-                                <div className="flex items-center gap-2 max-w-[200px]">
-                                  <div
-                                    className="w-4 h-4 rounded border shrink-0"
-                                    style={{ backgroundColor: style.iconColor || "#000000" }}
-                                  />
-                                  <span className="truncate text-xs">
-                                    {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
-                                  </span>
-                                </div>
+                                <SelectValue>
+                                  <div className="flex items-center gap-2 max-w-[200px]">
+                                    <div
+                                      className="w-4 h-4 rounded border shrink-0"
+                                      style={{ backgroundColor: style.iconColor || "#000000" }}
+                                    />
+                                    <span className="truncate text-xs">
+                                      {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                    </span>
+                                  </div>
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {colors.filter((color) => color.name.trim() !== "").map((color) => (
+                                {namedColors.map((color) => (
                                   <SelectItem key={color.id} value={color.hex}>
                                     <div className="flex items-center gap-2">
                                       <div className="w-4 h-4 rounded border" style={{ backgroundColor: color.hex }} />
@@ -4339,52 +4455,6 @@ ${iconTemplates}</div>`
                                 ))}
                               </SelectContent>
                             </Select>
-                          </div>
-
-                          <div>
-                            <Label className="text-xs text-slate-600">Style padding</Label>
-                            <div className="flex items-center gap-2 mt-3">
-                              <Checkbox
-                                id={`noPadding-${style.id}`}
-                                checked={style.noPadding === true}
-                                onCheckedChange={(checked) => {
-                                  const updatedStyles = styles.map((s) => {
-                                    if (s.id === style.id) {
-                                      const isChecking = checked as boolean
-                                      let newDescription = s.description
-                                      
-                                      if (isChecking) {
-                                        if (!newDescription.startsWith("No padding - ")) {
-                                          newDescription = `No padding - ${newDescription}`
-                                        }
-                                      } else {
-                                        if (newDescription.startsWith("No padding - ")) {
-                                          newDescription = newDescription.replace("No padding - ", "")
-                                        }
-                                      }
-                                      
-                                      return { ...s, noPadding: isChecking, description: newDescription }
-                                    }
-                                    return s
-                                  })
-                                  setStyles(updatedStyles)
-                                }}
-                                className="h-4 w-4 border border-slate-400 cursor-pointer"
-                              />
-                              <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
-                                No padding
-                              </Label>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <HelpCircle className="h-3 w-3 text-slate-400" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right" className="max-w-xs text-xs">
-                                    Removes padding from all sides for this style
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -4396,14 +4466,15 @@ ${iconTemplates}</div>`
                           {(() => {
                             const contrastResults = checkAllContrasts(bgColor, headingColor, textColor, linkColor, buttonBg, buttonText, style.iconColor || "#000000")
                             const level = getComplianceLevel(contrastResults)
-                            const badgeColor = level === 'AAA' ? 'bg-green-100 text-green-800' : level === 'AA' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                            const borderColor = level === 'AAA' ? 'border-green-300' : level === 'AA' ? 'border-yellow-300' : 'border-red-300'
+                            const badgeColor = level === 'AAA' ? 'bg-green-50 text-green-700' : level === 'AA' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
+                            const borderColor = level === 'AAA' ? 'border-green-200' : level === 'AA' ? 'border-yellow-200' : 'border-red-200'
                             return (
+                              <div className="flex items-center gap-1.5">
                               <TooltipProvider>
                                 <Tooltip delayDuration={0}>
                                   <TooltipTrigger asChild>
                                     <button 
-                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help bg-white flex items-center gap-1.5`}
+                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help flex items-center gap-1.5`}
                                     >
                                       WCAG {level}
                                       {level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
@@ -4469,6 +4540,106 @@ ${iconTemplates}</div>`
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
+                              {level === 'FAIL' && (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button title="Suggest accessible colours" className="text-slate-400 hover:text-slate-600 flex items-center">
+                                      <Sparkles className="h-3.5 w-3.5" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent side="top" align="end" className="w-72 p-3">
+                                    <p className="font-semibold text-xs text-slate-700 mb-2">Contrast suggestions</p>
+                                    <div className="space-y-3 text-xs">
+                                      {!contrastResults.headingOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(headingColor, bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Heading colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "headingColor", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.bodyTextOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(textColor, bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Body text colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "textColor", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.linkOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(linkColor, bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Link colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "linkColor", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.buttonTextOnButtonBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(buttonText, buttonBg, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Button text colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "buttonText", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                      {!contrastResults.iconOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(style.iconColor || "#000000", bgColor, colors)
+                                        return alts.length > 0 ? (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Icon colour</p>
+                                            <div className="space-y-0.5">
+                                              {alts.map((alt) => (
+                                                <button key={alt.id} onClick={() => updateStyle(style.id, "iconColor", alt.hex)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                  <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                  <span className="truncate">{alt.name}</span>
+                                                  <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ) : null
+                                      })()}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
+                              </div>
                             )
                           })()}
                         </div>
@@ -4573,6 +4744,90 @@ ${iconTemplates}</div>`
                             })}
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Style Padding Section */}
+                    <div className="mt-4 pt-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1">
+                          <Maximize2 className="h-3 w-3 text-slate-400" />
+                          <Label className="text-xs text-slate-600 font-semibold">Style padding</Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            id={`noPadding-${style.id}`}
+                            checked={style.noPadding === true}
+                            className="data-[state=unchecked]:bg-slate-300"
+                            onCheckedChange={(checked) => {
+                              const isChecking = checked as boolean
+                              setStyles((prev) => prev.map((s) => {
+                                if (s.id === style.id) {
+                                  let newDescription = s.description
+                                  
+                                  if (isChecking) {
+                                    if (!newDescription.startsWith("No padding - ")) {
+                                      newDescription = `No padding - ${newDescription}`
+                                    }
+                                  } else {
+                                    if (newDescription.startsWith("No padding - ")) {
+                                      newDescription = newDescription.replace("No padding - ", "")
+                                    }
+                                  }
+                                  
+                                  return { ...s, noPadding: isChecking, description: newDescription }
+                                }
+                                return s
+                              }))
+                            }}
+                          />
+                          <Label htmlFor={`noPadding-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                            No padding
+                          </Label>
+                        </div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-3 w-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs text-xs">
+                              Removes padding from all sides for this style
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        {/* Show padding on mobile - nested toggle */}
+                        {style.noPadding && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                id={`showPaddingOnMobile-${style.id}`}
+                                checked={style.showPaddingOnMobile === true}
+                                className="data-[state=unchecked]:bg-slate-300"
+                                onCheckedChange={(checked) => {
+                                  setStyles((prev) => prev.map((s) => {
+                                    if (s.id === style.id) {
+                                      return { ...s, showPaddingOnMobile: checked as boolean }
+                                    }
+                                    return s
+                                  }))
+                                }}
+                              />
+                              <Label htmlFor={`showPaddingOnMobile-${style.id}`} className="text-xs font-semibold text-slate-700 cursor-pointer">
+                                Show padding on mobile
+                              </Label>
+                            </div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="max-w-xs text-xs">
+                                  Restores left and right padding to the style on mobile devices
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -5024,7 +5279,7 @@ ${iconTemplates}</div>`
 
                         <Button
                             onClick={() => {
-                              const updatedStyles = styles.map((s) => {
+                              setStyles((prev) => prev.map((s) => {
                                 if (s.id === style.id) {
                                   return {
                                     ...s,
@@ -5061,16 +5316,18 @@ ${iconTemplates}</div>`
                                   }
                                 }
                                 return s
-                              })
-                              setStyles(updatedStyles)
+                              }))
                               
                               // Show check icon feedback
-                              const newSet = new Set(resetStyles)
-                              newSet.add(style.id)
-                              setResetStyles(newSet)
+                              setResetStyles((prev) => {
+                                const newSet = new Set(prev)
+                                newSet.add(style.id)
+                                return newSet
+                              })
                               
                               // Auto-clear after 2 seconds
-                              setTimeout(() => {
+                              if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current)
+                              resetTimeoutRef.current = setTimeout(() => {
                                 setResetStyles((prev) => {
                                   const updated = new Set(prev)
                                   updated.delete(style.id)

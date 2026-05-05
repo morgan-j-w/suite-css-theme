@@ -135,7 +135,7 @@ export const DevInformationModal = ({
             {copiedMediaQuery ? (
               <>
                 <Check className="h-4 w-4 text-green-600" />
-                <span>Copied Media Query!</span>
+                <span>Copied media query!</span>
               </>
             ) : (
               <>
