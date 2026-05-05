@@ -1142,17 +1142,17 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     })
 
     // Add strong tag rule if any font weight is 300 or lower
-    const getWeightValue = (styleVal: any, globalVal: any) => {
-      const val = styleVal || globalVal || "400"
+    const getWeightValue = (weight: any) => {
+      const val = weight || "400"
       return parseInt(val.toString().replace(/\D/g, '') || "400")
     }
     
-    const h1WeightNum = getWeightValue(h1WeightVal, h1Weight)
-    const h2WeightNum = getWeightValue(h2WeightVal, h2Weight)
-    const h3WeightNum = getWeightValue(h3WeightVal, h3Weight)
-    const h4WeightNum = getWeightValue(h4WeightVal, h4Weight)
-    const linkWeightNum = getWeightValue(linkWeightVal, linkWeight)
-    const bodyWeightNum = getWeightValue(bodyWeightVal, bodyWeight)
+    const h1WeightNum = getWeightValue(h1Weight)
+    const h2WeightNum = getWeightValue(h2Weight)
+    const h3WeightNum = getWeightValue(h3Weight)
+    const h4WeightNum = getWeightValue(h4Weight)
+    const linkWeightNum = getWeightValue(linkWeight)
+    const bodyWeightNum = getWeightValue(bodyWeight)
     
     if (h1WeightNum <= 300 || h2WeightNum <= 300 || h3WeightNum <= 300 || h4WeightNum <= 300 || linkWeightNum <= 300 || bodyWeightNum <= 300) {
       css += `strong {font-weight: bold !important;}\n`
