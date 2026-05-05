@@ -1158,6 +1158,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `strong {font-weight: bold !important;}\n`
     }
 
+    // Add feedback-td-1 rule with title padding
+    const feedbackPadding = titlePaddingBottom || "15"
+    css += `.feedback-td-1 {padding-top: ${feedbackPadding}px;}\n`
+
     return css
   }
 
