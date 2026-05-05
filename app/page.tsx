@@ -4425,7 +4425,7 @@ ${iconTemplates}</div>`
                                 <Tooltip delayDuration={0}>
                                   <TooltipTrigger asChild>
                                     <button 
-                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help bg-white flex items-center gap-1.5`}
+                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help flex items-center gap-1.5`}
                                     >
                                       WCAG {level}
                                       {level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
