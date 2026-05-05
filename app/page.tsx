@@ -4418,8 +4418,8 @@ ${iconTemplates}</div>`
                           {(() => {
                             const contrastResults = checkAllContrasts(bgColor, headingColor, textColor, linkColor, buttonBg, buttonText, style.iconColor || "#000000")
                             const level = getComplianceLevel(contrastResults)
-                            const badgeColor = level === 'AAA' ? 'bg-green-100 text-green-800' : level === 'AA' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                            const borderColor = level === 'AAA' ? 'border-green-300' : level === 'AA' ? 'border-yellow-300' : 'border-red-300'
+                            const badgeColor = level === 'AAA' ? 'bg-green-50 text-green-700' : level === 'AA' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
+                            const borderColor = level === 'AAA' ? 'border-green-200' : level === 'AA' ? 'border-yellow-200' : 'border-red-200'
                             return (
                               <TooltipProvider>
                                 <Tooltip delayDuration={0}>
