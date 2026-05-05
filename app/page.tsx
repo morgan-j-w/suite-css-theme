@@ -4422,7 +4422,7 @@ ${iconTemplates}</div>`
                             </div>
                             {/* Show padding on mobile - nested checkbox */}
                             {style.noPadding && (
-                              <div className="flex items-center gap-2 mt-2 ml-6 pl-3 border-l-2 border-slate-300">
+                              <div className="flex items-center gap-1.5 mt-2 ml-4 pl-2 border-l-2 border-slate-300 whitespace-nowrap">
                                 <Checkbox
                                   id={`showPaddingOnMobile-${style.id}`}
                                   checked={style.showPaddingOnMobile === true}
