@@ -1173,6 +1173,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         css += `#layout ${className}.block[data-sd-content=map] td.gm-text-wrapper, #layout ${className}.block[data-sd-content=poll], #layout ${className}.block[data-sd-content=links], #layout ${className}.block[data-sd-content=rsvp], #layout ${className}.block[data-sd-content=calendar], #layout ${className}.block[data-sd-content=share], #layout ${className}.block[data-sd-content=list], #layout ${className}.block[data-sd-content=subscription] {padding: 0px;}\n`
         css += `#layout ${className}.block[data-sd-content="links"] .block-body .header-container .header {padding: 0px; padding-bottom: 0px;}\n`
         css += `#layout ${className}.block .read-more {padding-top: 15px !Important;}\n`
+        css += `${className} td.share-article {padding-top: ${paddingValue}px !Important;}\n`
       }
       
       css += `\n`
