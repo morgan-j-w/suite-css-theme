@@ -24,7 +24,7 @@ import { ColorDefinition, StyleDefinition } from "@/lib/types"
 import { generateCSS, getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
-import { checkAllContrasts, getComplianceLevel, type ContrastResults } from "@/lib/wcag"
+import { checkAllContrasts, getComplianceLevel, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
 
 // Import components
@@ -62,6 +62,7 @@ export default function ThemeGenerator() {
   const [themeType, setThemeType] = useState("composer")
   const [savedTimeAgo, setSavedTimeAgo] = useState("")
   const [wcagFilter, setWcagFilter] = useState<'all' | 'AA' | 'AAA'>('all')
+  const [activeContrastSuggestionStyleId, setActiveContrastSuggestionStyleId] = useState<string | null>(null)
   const [cssValidationResult, setCssValidationResult] = useState<any>(null)
   const { toast } = useToast()
 
@@ -884,6 +885,59 @@ export default function ThemeGenerator() {
     return getColorHex(colorName, colors)
   }
 
+  const parsePixelSize = (value: string | undefined, fallback: number): number => {
+    if (!value) return fallback
+    const parsed = parseFloat(value.toString().replace(/[^\d.]/g, ""))
+    return Number.isFinite(parsed) ? parsed : fallback
+  }
+
+  const parseFontWeightValue = (value: string | undefined, fallback: number): number => {
+    if (!value) return fallback
+    const parsed = parseInt(value.toString().replace(/\D/g, ""), 10)
+    return Number.isFinite(parsed) ? parsed : fallback
+  }
+
+  const isLargeTextForWCAG = (sizePx: number, fontWeight: number): boolean => {
+    // WCAG large text threshold: 24px regular OR 18.66px bold (700+).
+    return fontWeight >= 700 ? sizePx >= 18.66 : sizePx >= 24
+  }
+
+  const getContrastHint = (result: ContrastResults["headingOnBg"]): string | null => {
+    if (result.aa) return null
+
+    if (!result.largeText && result.ratio >= 3) {
+      return "Passes as large text only. Use 24px regular or 18.66px bold, or increase contrast."
+    }
+
+    if (!result.largeText) {
+      return "Fails as normal text. Increase contrast or size/weight."
+    }
+
+    return "Fails even as large text. Increase color contrast."
+  }
+
+  const isTypographyDependentFail = (results: ContrastResults): boolean => {
+    const textChecks = [
+      results.headingOnBg,
+      results.bodyTextOnBg,
+      results.linkOnBg,
+      results.buttonTextOnButtonBg,
+    ]
+
+    const hasRecoverableTypographyFail = textChecks.some(
+      (check) => !check.aa && !check.largeText && check.ratio >= 3
+    )
+
+    const allTextAtLeastLargeAa = textChecks.every((check) => check.ratio >= 3)
+
+    return (
+      hasRecoverableTypographyFail &&
+      allTextAtLeastLargeAa &&
+      results.buttonBgOnBg.aa &&
+      results.iconOnBg.aa
+    )
+  }
+
   const calculateWCAGLevel = (combo: StyleDefinition): string => {
     try {
       const bgHex = getColorHexValue(combo.background)
@@ -1376,99 +1430,152 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     setShowCombinationGenerator(true)
   }
 
+  const interleaveByBackground = (combinations: StyleDefinition[]) => {
+    const grouped: Record<string, StyleDefinition[]> = {}
+
+    combinations.forEach((combo) => {
+      if (!grouped[combo.background]) {
+        grouped[combo.background] = []
+      }
+      grouped[combo.background].push(combo)
+    })
+
+    Object.values(grouped).forEach((group) => {
+      group.sort(() => Math.random() - 0.5)
+    })
+
+    const ordered: StyleDefinition[] = []
+    let hasRemaining = true
+
+    while (hasRemaining) {
+      hasRemaining = false
+      const keys = Object.keys(grouped).sort(() => Math.random() - 0.5)
+
+      keys.forEach((key) => {
+        const next = grouped[key].pop()
+        if (next) {
+          ordered.push(next)
+          hasRemaining = true
+        }
+      })
+    }
+
+    return ordered
+  }
+
   const generateMoreCombinations = () => {
+    const allCombos = (window as any).allWCAGCombinations || []
+    if (allCombos.length === 0) {
+      if (wcagFilter === 'AA') {
+        generateCombinationsForWCAG('AA')
+      } else if (wcagFilter === 'AAA') {
+        generateCombinationsForWCAG('AAA')
+      } else {
+        generateCombinationsForAll()
+      }
+      return
+    }
+
+    let offset = (window as any).wcagCombinationOffset || 0
+    const nextBatch = allCombos.slice(offset, offset + 15)
+    
+    // If we've reached the end, reshuffle and start over
+    if (nextBatch.length === 0) {
+      const reshuffled = interleaveByBackground([...allCombos])
+      ;(window as any).allWCAGCombinations = reshuffled
+      ;(window as any).wcagCombinationOffset = 15
+      setGeneratedCombinations(reshuffled.slice(0, 15))
+    } else {
+      // Keep paging fixed-size: show one batch (15) at a time.
+      setGeneratedCombinations(nextBatch)
+      ;(window as any).wcagCombinationOffset = offset + 15
+    }
+  }
+
+  const generateCombinationsForAll = () => {
     if (colors.length < 2) {
       alert("Please add at least 2 colours to generate combinations")
       return
     }
 
-    const newCombinations: StyleDefinition[] = []
-    const minTextContrast = 4.5
-    const minButtonContrast = 3
+    const allCombinations: StyleDefinition[] = []
+    const minTextContrast = 3
+    const minButtonContrast = 2
 
-    // Pre-calculate valid colors once
-    const validColorCache: Record<string, Record<string, ColorDefinition[]>> = {}
-    
-    colors.forEach(bgColor => {
-      validColorCache[bgColor.id] = {
-        text: colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast),
-        button: colors.filter(c => c.id !== bgColor.id),
-      }
+    colors.forEach((bgColor) => {
+      const validTextColors = colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast)
+      if (validTextColors.length === 0) return
+
+      validTextColors.forEach((textColor) => {
+        const validHeadingColors = colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast)
+        const validLinkColors = colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast)
+
+        colors.forEach((btnBg) => {
+          if (btnBg.id === bgColor.id) return
+          const validBtnTexts = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
+          if (validBtnTexts.length === 0) return
+
+          validBtnTexts.forEach((btnText) => {
+            const headingColor = validHeadingColors[0]
+            const linkColor = validLinkColors[0]
+
+            if (!headingColor || !linkColor) return
+
+            const combo: StyleDefinition = {
+              id: `combo-${Date.now()}-${Math.random()}`,
+              name: `Combination`,
+              description: (headingColor.name === btnBg.name
+                ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
+                : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
+              ).replace(/^./, ch => ch.toUpperCase()),
+              background: bgColor.name,
+              textColor: textColor.name,
+              headingColor: headingColor.name,
+              buttonBg: btnBg.name,
+              buttonText: btnText.name,
+              buttonBgHover: btnBg.name,
+              buttonTextHover: btnText.name,
+              linkColor: linkColor.name,
+              h1Font: h1Font,
+              h2Font: h2Font,
+              h3Font: h3Font,
+              h4Font: h4Font,
+              bodyFont: bodyFont,
+              buttonFont: buttonFont,
+              h1Size: h1Size,
+              h1LineHeight: h1LineHeight,
+              h1Weight: h1Weight,
+              h2Size: h2Size,
+              h2LineHeight: h2LineHeight,
+              h2Weight: h2Weight,
+              h3Size: h3Size,
+              h3LineHeight: h3LineHeight,
+              h3Weight: h3Weight,
+              h4Size: h4Size,
+              h4LineHeight: h4LineHeight,
+              h4Weight: h4Weight,
+              bodySize: bodySize,
+              bodyLineHeight: bodyLineHeight,
+              bodyWeight: bodyWeight,
+              buttonSize: buttonSize,
+              buttonLineHeight: buttonLineHeight,
+              buttonWeight: buttonWeight,
+              noPadding: false,
+              iconColor: textColor.hex,
+            }
+
+            combo.wcagLevel = calculateWCAGLevel(combo)
+            allCombinations.push(combo)
+          })
+        })
+      })
     })
 
-    // Generate random combinations
-    let attempts = 0
-    const maxAttempts = 100
-
-    while (newCombinations.length < 15 && attempts < maxAttempts) {
-      attempts++
-
-      const bgColor = colors[Math.floor(Math.random() * colors.length)]
-      const validText = validColorCache[bgColor.id].text
-      const validBtn = validColorCache[bgColor.id].button
-
-      if (validText.length === 0 || validBtn.length === 0) continue
-
-      const textColor = validText[Math.floor(Math.random() * validText.length)]
-      const headingColor = validText[Math.floor(Math.random() * validText.length)]
-      const linkColor = validText[Math.floor(Math.random() * validText.length)]
-      
-      const btnBg = validBtn[Math.floor(Math.random() * validBtn.length)]
-      const btnTextOptions = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
-      
-      if (btnTextOptions.length === 0) continue
-      const btnText = btnTextOptions[Math.floor(Math.random() * btnTextOptions.length)]
-
-      const combo: StyleDefinition = {
-        id: `combo-${Date.now()}-${Math.random()}`,
-        name: `Combination ${generatedCombinations.length + newCombinations.length + 1}`,
-        description: (headingColor.name === btnBg.name
-          ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
-          : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
-        ).replace(/^./, ch => ch.toUpperCase()),
-        background: bgColor.name,
-        textColor: textColor.name,
-        headingColor: headingColor.name,
-        buttonBg: btnBg.name,
-        buttonText: btnText.name,
-        buttonBgHover: btnBg.name,
-        buttonTextHover: btnText.name,
-        linkColor: linkColor.name,
-        h1Font: h1Font,
-        h2Font: h2Font,
-        h3Font: h3Font,
-        h4Font: h4Font,
-        bodyFont: bodyFont,
-        buttonFont: buttonFont,
-        h1Size: h1Size,
-        h1LineHeight: h1LineHeight,
-        h1Weight: h1Weight,
-        h2Size: h2Size,
-        h2LineHeight: h2LineHeight,
-        h2Weight: h2Weight,
-        h3Size: h3Size,
-        h3LineHeight: h3LineHeight,
-        h3Weight: h3Weight,
-        h4Size: h4Size,
-        h4LineHeight: h4LineHeight,
-        h4Weight: h4Weight,
-        bodySize: bodySize,
-        bodyLineHeight: bodyLineHeight,
-        bodyWeight: bodyWeight,
-        buttonSize: buttonSize,
-        buttonLineHeight: buttonLineHeight,
-        buttonWeight: buttonWeight,
-        noPadding: false,
-        iconColor: "#000000",
-      }
-      
-      // Calculate WCAG level for this combination
-      combo.wcagLevel = calculateWCAGLevel(combo)
-      
-      newCombinations.push(combo)
-    }
-
-    setGeneratedCombinations(newCombinations)
+    // All tab should also be shuffled and mixed by background.
+    const shuffled = interleaveByBackground(allCombinations)
+    ;(window as any).allWCAGCombinations = shuffled
+    ;(window as any).wcagCombinationOffset = 15
+    setGeneratedCombinations(shuffled.slice(0, 15))
   }
 
   const generateCombinationsForWCAG = (targetLevel: 'AA' | 'AAA') => {
@@ -1477,96 +1584,102 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       return
     }
 
-    const newCombinations: StyleDefinition[] = []
+    const allCombinations: StyleDefinition[] = []
     const minTextContrast = targetLevel === 'AAA' ? 7 : 4.5
     const minButtonContrast = targetLevel === 'AAA' ? 4.5 : 3
+    const minButtonSurfaceContrast = 3
 
-    // Pre-calculate valid colors for target level
-    const validColorCache: Record<string, Record<string, ColorDefinition[]>> = {}
-    
-    colors.forEach(bgColor => {
-      validColorCache[bgColor.id] = {
-        text: colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast),
-        button: colors.filter(c => c.id !== bgColor.id),
-      }
+    // Generate exhaustively: all backgrounds × valid text colors × valid button combos
+    colors.forEach((bgColor) => {
+      const validTextColors = colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast)
+      
+      if (validTextColors.length === 0) return
+
+      validTextColors.forEach((textColor) => {
+        const validHeadingColors = colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast)
+        const validLinkColors = colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast)
+        
+        colors.forEach((btnBg) => {
+          if (btnBg.id === bgColor.id) return
+          if (getContrastRatio(bgColor.hex, btnBg.hex) < minButtonSurfaceContrast) return
+          const validBtnTexts = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
+          
+          if (validBtnTexts.length === 0) return
+
+          validBtnTexts.forEach((btnText) => {
+            const headingColor = validHeadingColors[0]
+            const linkColor = validLinkColors[0]
+            
+            if (!headingColor || !linkColor) return
+
+            const combo: StyleDefinition = {
+              id: `combo-${Date.now()}-${Math.random()}`,
+              name: `Combination`,
+              description: (headingColor.name === btnBg.name
+                ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
+                : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
+              ).replace(/^./, ch => ch.toUpperCase()),
+              background: bgColor.name,
+              textColor: textColor.name,
+              headingColor: headingColor.name,
+              buttonBg: btnBg.name,
+              buttonText: btnText.name,
+              buttonBgHover: btnBg.name,
+              buttonTextHover: btnText.name,
+              linkColor: linkColor.name,
+              h1Font: h1Font,
+              h2Font: h2Font,
+              h3Font: h3Font,
+              h4Font: h4Font,
+              bodyFont: bodyFont,
+              buttonFont: buttonFont,
+              h1Size: h1Size,
+              h1LineHeight: h1LineHeight,
+              h1Weight: h1Weight,
+              h2Size: h2Size,
+              h2LineHeight: h2LineHeight,
+              h2Weight: h2Weight,
+              h3Size: h3Size,
+              h3LineHeight: h3LineHeight,
+              h3Weight: h3Weight,
+              h4Size: h4Size,
+              h4LineHeight: h4LineHeight,
+              h4Weight: h4Weight,
+              bodySize: bodySize,
+              bodyLineHeight: bodyLineHeight,
+              bodyWeight: bodyWeight,
+              buttonSize: buttonSize,
+              buttonLineHeight: buttonLineHeight,
+              buttonWeight: buttonWeight,
+              noPadding: false,
+              // Keep icon contrast aligned with readable body text to avoid excluding dark backgrounds.
+              iconColor: textColor.hex,
+            }
+            
+            combo.wcagLevel = calculateWCAGLevel(combo)
+            
+            const meetsTargetLevel = targetLevel === 'AA'
+              ? combo.wcagLevel === 'AA' || combo.wcagLevel === 'AAA'
+              : combo.wcagLevel === 'AAA'
+
+            if (meetsTargetLevel) {
+              allCombinations.push(combo)
+            }
+          })
+        })
+      })
     })
 
-    // Generate combinations targeting specific WCAG level
-    let attempts = 0
-    const maxAttempts = 200
-
-    while (newCombinations.length < 15 && attempts < maxAttempts) {
-      attempts++
-
-      const bgColor = colors[Math.floor(Math.random() * colors.length)]
-      const validText = validColorCache[bgColor.id].text
-      const validBtn = validColorCache[bgColor.id].button
-
-      if (validText.length === 0 || validBtn.length === 0) continue
-
-      const textColor = validText[Math.floor(Math.random() * validText.length)]
-      const headingColor = validText[Math.floor(Math.random() * validText.length)]
-      const linkColor = validText[Math.floor(Math.random() * validText.length)]
-      
-      const btnBg = validBtn[Math.floor(Math.random() * validBtn.length)]
-      const btnTextOptions = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
-      
-      if (btnTextOptions.length === 0) continue
-      const btnText = btnTextOptions[Math.floor(Math.random() * btnTextOptions.length)]
-
-      const combo: StyleDefinition = {
-        id: `combo-${Date.now()}-${Math.random()}`,
-        name: `Combination ${newCombinations.length + 1}`,
-        description: (headingColor.name === btnBg.name
-          ? `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and buttons`
-          : `${bgColor.name.toLowerCase()} background with ${headingColor.name.toLowerCase()} headings and ${btnBg.name.toLowerCase()} buttons`
-        ).replace(/^./, ch => ch.toUpperCase()),
-        background: bgColor.name,
-        textColor: textColor.name,
-        headingColor: headingColor.name,
-        buttonBg: btnBg.name,
-        buttonText: btnText.name,
-        buttonBgHover: btnBg.name,
-        buttonTextHover: btnText.name,
-        linkColor: linkColor.name,
-        h1Font: h1Font,
-        h2Font: h2Font,
-        h3Font: h3Font,
-        h4Font: h4Font,
-        bodyFont: bodyFont,
-        buttonFont: buttonFont,
-        h1Size: h1Size,
-        h1LineHeight: h1LineHeight,
-        h1Weight: h1Weight,
-        h2Size: h2Size,
-        h2LineHeight: h2LineHeight,
-        h2Weight: h2Weight,
-        h3Size: h3Size,
-        h3LineHeight: h3LineHeight,
-        h3Weight: h3Weight,
-        h4Size: h4Size,
-        h4LineHeight: h4LineHeight,
-        h4Weight: h4Weight,
-        bodySize: bodySize,
-        bodyLineHeight: bodyLineHeight,
-        bodyWeight: bodyWeight,
-        buttonSize: buttonSize,
-        buttonLineHeight: buttonLineHeight,
-        buttonWeight: buttonWeight,
-        noPadding: false,
-        iconColor: "#000000",
-      }
-      
-      // Calculate WCAG level for this combination
-      combo.wcagLevel = calculateWCAGLevel(combo)
-      
-      // Only add if it matches the target level
-      if (combo.wcagLevel === targetLevel) {
-        newCombinations.push(combo)
-      }
-    }
-
-    setGeneratedCombinations(newCombinations)
+    // Mix by background first so batches do not cluster on one background color.
+    const shuffled = interleaveByBackground(allCombinations)
+    
+    // Store all combinations and reset offset
+    ;(window as any).allWCAGCombinations = shuffled
+    ;(window as any).wcagCombinationOffset = 0
+    
+    // Show first 15
+    setGeneratedCombinations(shuffled.slice(0, 15))
+    ;(window as any).wcagCombinationOffset = 15
   }
 
   const addCombinationToStyles = (combination: StyleDefinition) => {
@@ -3814,7 +3927,13 @@ ${iconTemplates}</div>`
             <button
               onClick={() => {
                 if (!showCombinationGenerator) {
-                  generateMoreCombinations()
+                  if (wcagFilter === 'AA') {
+                    generateCombinationsForWCAG('AA')
+                  } else if (wcagFilter === 'AAA') {
+                    generateCombinationsForWCAG('AAA')
+                  } else {
+                    generateCombinationsForAll()
+                  }
                 }
                 setShowCombinationGenerator(!showCombinationGenerator)
               }}
@@ -3860,8 +3979,8 @@ ${iconTemplates}</div>`
                                     generateCombinationsForWCAG('AA')
                                   } else if (level === 'AAA') {
                                     generateCombinationsForWCAG('AAA')
-                                  } else if (level === 'all' && generatedCombinations.length === 0) {
-                                    generateMoreCombinations()
+                                  } else {
+                                    generateCombinationsForAll()
                                   }
                                 }}
                                 className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
@@ -3886,13 +4005,7 @@ ${iconTemplates}</div>`
                 </div>
                 <Button 
                   onClick={() => {
-                    if (wcagFilter === 'AA') {
-                      generateCombinationsForWCAG('AA')
-                    } else if (wcagFilter === 'AAA') {
-                      generateCombinationsForWCAG('AAA')
-                    } else {
-                      generateMoreCombinations()
-                    }
+                    generateMoreCombinations()
                   }} 
                   size="sm" 
                   variant="outline"
@@ -3916,9 +4029,11 @@ ${iconTemplates}</div>`
                         {generatedCombinations
                           .filter((combo) => {
                             if (wcagFilter === 'all') return true
-                            return combo.wcagLevel === wcagFilter
+                            if (wcagFilter === 'AA') {
+                              return combo.wcagLevel === 'AA' || combo.wcagLevel === 'AAA'
+                            }
+                            return combo.wcagLevel === 'AAA'
                           })
-                          .slice(0, 15)
                           .map((combo, index) => (
                           <div
                             key={combo.id}
@@ -4465,24 +4580,73 @@ ${iconTemplates}</div>`
                         <div className="flex items-center justify-between mb-4">
                           <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold block">Preview</Label>
                           {(() => {
-                            const contrastResults = checkAllContrasts(bgColor, headingColor, textColor, linkColor, buttonBg, buttonText, style.iconColor || "#000000")
+                            const headingSizePx = parsePixelSize(style.h1Size || h1Size, 22)
+                            const headingWeightValue = parseFontWeightValue(style.h1Weight || h1Weight, 400)
+                            const bodySizePx = parsePixelSize(style.bodySize || bodySize, 15)
+                            const bodyWeightValue = parseFontWeightValue(style.bodyWeight || bodyWeight, 400)
+                            const linkSizePx = parsePixelSize(style.bodySize || bodySize, 15)
+                            const linkWeightValue = parseFontWeightValue(style.linkWeight || linkWeight || style.bodyWeight || bodyWeight, 400)
+                            const buttonSizePx = parsePixelSize(style.buttonSize || buttonSize, 15)
+                            const buttonWeightValue = parseFontWeightValue(style.buttonWeight || buttonWeight, 400)
+
+                            const textEvaluationConfig: TextEvaluationConfig = {
+                              headingLargeText: isLargeTextForWCAG(headingSizePx, headingWeightValue),
+                              bodyLargeText: isLargeTextForWCAG(bodySizePx, bodyWeightValue),
+                              linkLargeText: isLargeTextForWCAG(linkSizePx, linkWeightValue),
+                              buttonLargeText: isLargeTextForWCAG(buttonSizePx, buttonWeightValue),
+                            }
+
+                            const contrastResults = checkAllContrasts(
+                              bgColor,
+                              headingColor,
+                              textColor,
+                              linkColor,
+                              buttonBg,
+                              buttonText,
+                              style.iconColor || "#000000",
+                              textEvaluationConfig
+                            )
                             const level = getComplianceLevel(contrastResults)
-                            const badgeColor = level === 'AAA' ? 'bg-green-50 text-green-700' : level === 'AA' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'
-                            const borderColor = level === 'AAA' ? 'border-green-200' : level === 'AA' ? 'border-yellow-200' : 'border-red-200'
+                            const typographyDependentFail = level === 'FAIL' && isTypographyDependentFail(contrastResults)
+                            const badgeColor = typographyDependentFail
+                              ? 'bg-amber-50 text-amber-700'
+                              : level === 'AAA'
+                                ? 'bg-green-50 text-green-700'
+                                : level === 'AA'
+                                  ? 'bg-yellow-50 text-yellow-700'
+                                  : 'bg-red-50 text-red-700'
+                            const borderColor = typographyDependentFail
+                              ? 'border-amber-200'
+                              : level === 'AAA'
+                                ? 'border-green-200'
+                                : level === 'AA'
+                                  ? 'border-yellow-200'
+                                  : 'border-red-200'
+                            const badgeLabel = typographyDependentFail ? 'WCAG Typography-dependent' : `WCAG ${level}`
+                            const headingHint = getContrastHint(contrastResults.headingOnBg)
+                            const bodyHint = getContrastHint(contrastResults.bodyTextOnBg)
+                            const linkHint = getContrastHint(contrastResults.linkOnBg)
+                            const buttonHint = getContrastHint(contrastResults.buttonTextOnButtonBg)
+                            const isSuggestionPopoverOpen = activeContrastSuggestionStyleId === style.id
                             return (
                               <div className="flex items-center gap-1.5">
                               <TooltipProvider>
-                                <Tooltip delayDuration={0}>
+                                <Tooltip delayDuration={0} open={isSuggestionPopoverOpen ? false : undefined}>
                                   <TooltipTrigger asChild>
                                     <button 
-                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help flex items-center gap-1.5`}
+                                      className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help flex items-center gap-1.5 ${isSuggestionPopoverOpen ? 'pointer-events-none opacity-80' : ''}`}
                                     >
-                                      WCAG {level}
-                                      {level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
+                                      {badgeLabel}
+                                      {typographyDependentFail ? <AlertCircle size={14} /> : level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent side="top" showArrow={false} className="bg-white text-slate-900 border border-slate-200 shadow-lg p-3 max-w-md">
                                     <div className="space-y-2 text-xs">
+                                      {typographyDependentFail && (
+                                        <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                                          Some text fails only because current size/weight is treated as normal text.
+                                        </p>
+                                      )}
                                       <p className="font-semibold">Contrast Ratios:</p>
                                       <div className="space-y-1">
                                         <div className="flex justify-between gap-4 items-center">
@@ -4495,6 +4659,11 @@ ${iconTemplates}</div>`
                                             {contrastResults.headingOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.headingOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
                                           </div>
                                         </div>
+                                        {headingHint && (
+                                          <>
+                                            <p className="text-[11px] text-red-700 ml-5">{headingHint}</p>
+                                          </>
+                                        )}
                                         <div className="flex justify-between gap-4 items-center">
                                           <div className="flex items-center gap-2">
                                             <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: textColor }}></div>
@@ -4505,6 +4674,11 @@ ${iconTemplates}</div>`
                                             {contrastResults.bodyTextOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.bodyTextOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
                                           </div>
                                         </div>
+                                        {bodyHint && (
+                                          <>
+                                            <p className="text-[11px] text-red-700 ml-5">{bodyHint}</p>
+                                          </>
+                                        )}
                                         <div className="flex justify-between gap-4 items-center">
                                           <div className="flex items-center gap-2">
                                             <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: linkColor }}></div>
@@ -4515,6 +4689,11 @@ ${iconTemplates}</div>`
                                             {contrastResults.linkOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.linkOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
                                           </div>
                                         </div>
+                                        {linkHint && (
+                                          <>
+                                            <p className="text-[11px] text-red-700 ml-5">{linkHint}</p>
+                                          </>
+                                        )}
                                         <div className="flex justify-between gap-4 items-center">
                                           <div className="flex items-center gap-2">
                                             <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: buttonText }}></div>
@@ -4523,6 +4702,21 @@ ${iconTemplates}</div>`
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.buttonTextOnButtonBg.ratio}:1</span>
                                             {contrastResults.buttonTextOnButtonBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.buttonTextOnButtonBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                          </div>
+                                        </div>
+                                        {buttonHint && (
+                                          <>
+                                            <p className="text-[11px] text-red-700 ml-5">{buttonHint}</p>
+                                          </>
+                                        )}
+                                        <div className="flex justify-between gap-4 items-center">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: buttonBg }}></div>
+                                            <span>Button surface</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-mono">{contrastResults.buttonBgOnBg.ratio}:1</span>
+                                            {contrastResults.buttonBgOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.buttonBgOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
                                           </div>
                                         </div>
                                         <div className="flex justify-between gap-4 items-center">
@@ -4536,13 +4730,18 @@ ${iconTemplates}</div>`
                                           </div>
                                         </div>
                                       </div>
-                                      <p className="text-xs text-slate-600 pt-2 border-t">AA: 4.5:1 | AAA: 7:1</p>
+                                      <p className="text-xs text-slate-600 pt-2 border-t">Normal text AA/AAA: 4.5:1 / 7:1 | Large text AA/AAA: 3:1 / 4.5:1 | Button surface: 3:1</p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
                               {level === 'FAIL' && (
-                                <Popover>
+                                <Popover
+                                  open={activeContrastSuggestionStyleId === style.id}
+                                  onOpenChange={(open) => {
+                                    setActiveContrastSuggestionStyleId(open ? style.id : null)
+                                  }}
+                                >
                                   <PopoverTrigger asChild>
                                     <button title="Suggest accessible colours" className="text-slate-400 hover:text-slate-600 flex items-center">
                                       <Sparkles className="h-3.5 w-3.5" />
@@ -4618,6 +4817,27 @@ ${iconTemplates}</div>`
                                             </div>
                                           </div>
                                         ) : null
+                                      })()}
+                                      {!contrastResults.buttonBgOnBg.aa && (() => {
+                                        const alts = findAccessibleAlternatives(buttonBg, bgColor, colors, 3)
+                                        return (
+                                          <div>
+                                            <p className="text-slate-500 mb-1 font-medium">Button background</p>
+                                            {alts.length > 0 ? (
+                                              <div className="space-y-0.5">
+                                                {alts.map((alt) => (
+                                                  <button key={alt.id} onClick={() => updateStyleWithSmartDescription(style.id, "buttonBg", alt.name)} className="flex items-center gap-2 w-full hover:bg-slate-100 p-1 rounded text-left">
+                                                    <div className="w-3.5 h-3.5 rounded border shrink-0" style={{ backgroundColor: alt.hex }} />
+                                                    <span className="truncate">{alt.name}</span>
+                                                    <span className="ml-auto font-mono text-slate-400 shrink-0">{alt.ratio}:1</span>
+                                                  </button>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <p className="text-[11px] text-red-700">No palette colour meets 3:1 against the current background.</p>
+                                            )}
+                                          </div>
+                                        )
                                       })()}
                                       {!contrastResults.iconOnBg.aa && (() => {
                                         const alts = findAccessibleAlternatives(style.iconColor || "#000000", bgColor, colors)
