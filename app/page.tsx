@@ -4609,25 +4609,25 @@ ${iconTemplates}</div>`
                             const level = getComplianceLevel(contrastResults)
                             const typographyDependentFail = level === 'FAIL' && isTypographyDependentFail(contrastResults)
                             const badgeColor = typographyDependentFail
-                              ? 'bg-amber-50 text-amber-700'
+                              ? 'bg-yellow-50 text-yellow-700'
                               : level === 'AAA'
                                 ? 'bg-green-50 text-green-700'
                                 : level === 'AA'
                                   ? 'bg-yellow-50 text-yellow-700'
                                   : 'bg-red-50 text-red-700'
                             const borderColor = typographyDependentFail
-                              ? 'border-amber-200'
+                              ? 'border-yellow-200'
                               : level === 'AAA'
                                 ? 'border-green-200'
                                 : level === 'AA'
                                   ? 'border-yellow-200'
                                   : 'border-red-200'
-                            const badgeLabel = typographyDependentFail ? 'WCAG Typography-dependent' : `WCAG ${level}`
+                            const badgeLabel = typographyDependentFail ? 'WCAG AA' : `WCAG ${level}`
                             const headingHint = getContrastHint(contrastResults.headingOnBg)
                             const bodyHint = getContrastHint(contrastResults.bodyTextOnBg)
                             const linkHint = getContrastHint(contrastResults.linkOnBg)
                             const buttonHint = getContrastHint(contrastResults.buttonTextOnButtonBg)
-                            const isSuggestionPopoverOpen = activeContrastSuggestionStyleId === style.id
+                            const isSuggestionPopoverOpen = activeContrastSuggestionStyleId === style.id && level === 'FAIL'
                             return (
                               <div className="flex items-center gap-1.5">
                               <TooltipProvider>
