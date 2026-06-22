@@ -58,35 +58,33 @@ export function meetsWCAG_AAA(ratio: number, largeText: boolean = false): boolea
   return largeText ? ratio >= 4.5 : ratio >= 7
 }
 
+export interface TextEvaluationConfig {
+  headingLargeText?: boolean
+  bodyLargeText?: boolean
+  linkLargeText?: boolean
+  buttonLargeText?: boolean
+  iconLargeText?: boolean
+}
+
+interface ContrastCheck {
+  ratio: number
+  aa: boolean
+  aaa: boolean
+  largeText: boolean
+  requiredAa: number
+  requiredAaa: number
+}
+
 /**
  * Check all color combinations for a style
  */
 export interface ContrastResults {
-  headingOnBg: {
-    ratio: number
-    aa: boolean
-    aaa: boolean
-  }
-  bodyTextOnBg: {
-    ratio: number
-    aa: boolean
-    aaa: boolean
-  }
-  linkOnBg: {
-    ratio: number
-    aa: boolean
-    aaa: boolean
-  }
-  buttonTextOnButtonBg: {
-    ratio: number
-    aa: boolean
-    aaa: boolean
-  }
-  iconOnBg: {
-    ratio: number
-    aa: boolean
-    aaa: boolean
-  }
+  headingOnBg: ContrastCheck
+  bodyTextOnBg: ContrastCheck
+  linkOnBg: ContrastCheck
+  buttonTextOnButtonBg: ContrastCheck
+  buttonBgOnBg: ContrastCheck
+  iconOnBg: ContrastCheck
 }
 
 export function checkAllContrasts(
@@ -96,39 +94,71 @@ export function checkAllContrasts(
   linkColor: string,
   buttonBg: string,
   buttonText: string,
-  iconColor: string = "#000000"
+  iconColor: string = "#000000",
+  config: TextEvaluationConfig = {}
 ): ContrastResults {
+  const headingLargeText = config.headingLargeText ?? false
+  const bodyLargeText = config.bodyLargeText ?? false
+  const linkLargeText = config.linkLargeText ?? false
+  const buttonLargeText = config.buttonLargeText ?? true
+  const iconLargeText = config.iconLargeText ?? false
+
   const headingRatio = getContrastRatio(bgColor, headingColor)
   const bodyRatio = getContrastRatio(bgColor, bodyTextColor)
   const linkRatio = getContrastRatio(bgColor, linkColor)
   const buttonRatio = getContrastRatio(buttonBg, buttonText)
+  const buttonBgRatio = getContrastRatio(bgColor, buttonBg)
   const iconRatio = getContrastRatio(bgColor, iconColor)
 
   return {
     headingOnBg: {
       ratio: parseFloat(headingRatio.toFixed(2)),
-      aa: meetsWCAG_AA(headingRatio, false),
-      aaa: meetsWCAG_AAA(headingRatio, false),
+      aa: meetsWCAG_AA(headingRatio, headingLargeText),
+      aaa: meetsWCAG_AAA(headingRatio, headingLargeText),
+      largeText: headingLargeText,
+      requiredAa: headingLargeText ? 3 : 4.5,
+      requiredAaa: headingLargeText ? 4.5 : 7,
     },
     bodyTextOnBg: {
       ratio: parseFloat(bodyRatio.toFixed(2)),
-      aa: meetsWCAG_AA(bodyRatio, false),
-      aaa: meetsWCAG_AAA(bodyRatio, false),
+      aa: meetsWCAG_AA(bodyRatio, bodyLargeText),
+      aaa: meetsWCAG_AAA(bodyRatio, bodyLargeText),
+      largeText: bodyLargeText,
+      requiredAa: bodyLargeText ? 3 : 4.5,
+      requiredAaa: bodyLargeText ? 4.5 : 7,
     },
     linkOnBg: {
       ratio: parseFloat(linkRatio.toFixed(2)),
-      aa: meetsWCAG_AA(linkRatio, false),
-      aaa: meetsWCAG_AAA(linkRatio, false),
+      aa: meetsWCAG_AA(linkRatio, linkLargeText),
+      aaa: meetsWCAG_AAA(linkRatio, linkLargeText),
+      largeText: linkLargeText,
+      requiredAa: linkLargeText ? 3 : 4.5,
+      requiredAaa: linkLargeText ? 4.5 : 7,
     },
     buttonTextOnButtonBg: {
       ratio: parseFloat(buttonRatio.toFixed(2)),
-      aa: meetsWCAG_AA(buttonRatio, true), // buttons are considered large
-      aaa: meetsWCAG_AAA(buttonRatio, true),
+      aa: meetsWCAG_AA(buttonRatio, buttonLargeText),
+      aaa: meetsWCAG_AAA(buttonRatio, buttonLargeText),
+      largeText: buttonLargeText,
+      requiredAa: buttonLargeText ? 3 : 4.5,
+      requiredAaa: buttonLargeText ? 4.5 : 7,
+    },
+    // WCAG 1.4.11 (non-text contrast): component boundaries require at least 3:1.
+    buttonBgOnBg: {
+      ratio: parseFloat(buttonBgRatio.toFixed(2)),
+      aa: buttonBgRatio >= 3,
+      aaa: buttonBgRatio >= 3,
+      largeText: false,
+      requiredAa: 3,
+      requiredAaa: 3,
     },
     iconOnBg: {
       ratio: parseFloat(iconRatio.toFixed(2)),
-      aa: meetsWCAG_AA(iconRatio, false),
-      aaa: meetsWCAG_AAA(iconRatio, false),
+      aa: meetsWCAG_AA(iconRatio, iconLargeText),
+      aaa: meetsWCAG_AAA(iconRatio, iconLargeText),
+      largeText: iconLargeText,
+      requiredAa: iconLargeText ? 3 : 4.5,
+      requiredAaa: iconLargeText ? 4.5 : 7,
     },
   }
 }
@@ -142,6 +172,7 @@ export function getComplianceLevel(results: ContrastResults): "AAA" | "AA" | "FA
     results.bodyTextOnBg,
     results.linkOnBg,
     results.buttonTextOnButtonBg,
+    results.buttonBgOnBg,
     results.iconOnBg,
   ]
 

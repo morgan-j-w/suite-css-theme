@@ -16,16 +16,28 @@ export const cleanFontValue = (fontValue: string | undefined): string => {
 
 export const formatFontForCSS = (fontValue: string | undefined): string => {
   if (!fontValue) return "'Arial', sans-serif"
-  const cleaned = cleanFontValue(fontValue)
+  
+  // Remove font-family: prefix if present (case-insensitive)
+  let cleaned = fontValue.trim().replace(/^font-family\s*:\s*/i, "")
+  
+  // Use cleanFontValue to remove trailing semicolon
+  cleaned = cleanFontValue(cleaned)
+  
   // Split by comma to handle fallback fonts
   const fonts = cleaned.split(",").map((font) => {
-    const trimmed = font.trim()
+    let trimmed = font.trim()
+    
+    // Replace double quotes with single quotes
+    trimmed = trimmed.replace(/"/g, "'")
+    
     // Add single quotes if the font has spaces and isn't already quoted
-    if (trimmed.includes(" ") && !trimmed.startsWith("'") && !trimmed.startsWith('"')) {
+    if (trimmed.includes(" ") && !trimmed.startsWith("'")) {
       return `'${trimmed}'`
     }
+    
     return trimmed
   })
+  
   return fonts.join(", ")
 }
 
