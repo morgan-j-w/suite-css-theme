@@ -1,7 +1,7 @@
 {
   "schema": "atd-triage/1",
   "updated": "2026-08-14T00:00:00Z",
-  "batch": "Batch 4 — listing page and layout",
+  "batch": "Batch 5 — Step 4 standalones",
   "issues": [
     {
       "n": 25,
@@ -237,6 +237,39 @@
       "n": 89,
       "status": "blocked",
       "note": "Out of scope — this repo has no 'Saving theme' progress modal. The only saving affordance is the header button switching to 'Saving...' with a spinner (components/common/AppHeader.tsx:45-46). The modal QA saw, and the strings in the copy prompt's #90, belong to the suite's save flow."
+    },
+    {
+      "n": 67,
+      "status": "fixed",
+      "note": "Root cause: a unit mismatch, not a missing mapping. Step 2 stores button padding unitless ('10'); the Step 4 overrides store it with the unit ('10px'). The preview appended 'px' unconditionally, so an override rendered as '10pxpx' and the browser dropped the declaration — which is why size, weight and border radius worked (they are not re-suffixed) and padding did not. Added toCssPx, which accepts either form. Verified in the browser: setting all four edges to 40/41/42/43 now yields a computed padding of '40px 41px 42px 43px'.",
+      "files": [
+        "lib/utils/helpers.ts",
+        "app/page.tsx"
+      ],
+      "commit": "2366c978"
+    },
+    {
+      "n": 71,
+      "status": "fixed",
+      "note": "Step 3 and Step 4 each carried their own list; Step 4 offered only 300-800 with different labels (Regular/Semibold/Extrabold). Both now render from lib/font-weights.ts, the single source of truth, and getWeightLabel derives from it too. NO DATA MIGRATION NEEDED: every value Step 4 used to offer (300-800) is present in the shared 100-900 list, so themes saved against the old list still resolve — only the labels shown changed. Note the labels follow the casing spelled out in the ticket ('Extra light', 'Semi bold', 'Extra bold'), which differs from Step 3's previous 'Extra Light'/'Semi Bold'/'Extra Bold'. Verified in the browser: both steps now list the same nine options.",
+      "files": [
+        "lib/font-weights.ts",
+        "app/page.tsx"
+      ],
+      "commit": "2366c978"
+    },
+    {
+      "n": 78,
+      "status": "fixed",
+      "note": "The ticket's hypothesis was half right. The generator and the checker DID already share the contrast maths, but not the large-text configuration: the generator called checkAllContrasts without a TextEvaluationConfig, so it took the default buttonLargeText=true and required only 3:1 for AA, while the checker computed it from the real 15px/600 button and required 4.5:1. Combinations landing between the two were offered as passing and then failed. Both now call one evaluateStyleContrast, and isLargeTextForWCAG moved into lib/wcag.ts. Also removed the duplicate luminance/contrast implementation from lib/styles.ts, which was a second copy waiting to drift. Test added at lib/wcag.test.mts using QA's palette, runnable with `pnpm test` (Node's built-in runner plus type stripping, no new dependencies); it records that 244 combinations from that palette would have been misclassified by the old code.",
+      "files": [
+        "lib/wcag.ts",
+        "lib/styles.ts",
+        "lib/wcag.test.mts",
+        "app/page.tsx",
+        "package.json"
+      ],
+      "commit": "2366c978"
     }
   ]
 }
