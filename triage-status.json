@@ -1,0 +1,57 @@
+{
+  "schema": "atd-triage/1",
+  "updated": "2026-08-14T00:00:00Z",
+  "batch": "Batch 1 — shared input components",
+  "issues": [
+    {
+      "n": 25,
+      "status": "fixed",
+      "note": "Root cause: no `min` on any numeric input and no clamping in the handlers, so both the spinner and direct typing went below zero. Added a shared NumberField that sets min=0 and clamps on type; converted all 38 numeric inputs in Steps 2, 3 and 4 to it. Verified in a browser: 38/38 fields carry min=0, typing -5 clamps to 0, and the spinner stops at 0.",
+      "files": ["components/common/ThemeFields.tsx", "app/page.tsx"],
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 58,
+      "status": "fixed",
+      "note": "No separate change — covered by the NumberField fix in #25.",
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 72,
+      "status": "fixed",
+      "note": "No separate change — covered by the NumberField fix in #25.",
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 73,
+      "status": "fixed",
+      "note": "No separate change — covered by the NumberField fix in #25.",
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 24,
+      "status": "fixed",
+      "note": "Root cause: every field rendered through a `value || default` fallback chain, so clearing it produced an empty string, which is falsy, and the default was substituted on the same keystroke. NumberField and FontField now hold the in-progress text in local draft state so empty is representable while typing, and reapply the default on blur. Verified in a browser across Steps 2, 3 and 4.",
+      "files": ["components/common/ThemeFields.tsx", "app/page.tsx"],
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 61,
+      "status": "fixed",
+      "note": "No separate change — covered by the draft-state fix in #24.",
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 68,
+      "status": "fixed",
+      "note": "No separate change — covered by the draft-state fix in #24.",
+      "commit": "4c5bafe4"
+    },
+    {
+      "n": 76,
+      "status": "fixed",
+      "note": "No separate change — covered by the draft-state fix in #24 (FontField covers the Step 3 and Step 4 font fields).",
+      "commit": "4c5bafe4"
+    }
+  ]
+}
