@@ -1,5 +1,6 @@
 import { StyleDefinition, ColorDefinition } from "./types"
 import { formatFontForCSS } from "./utils/helpers"
+import { getContrastRatio } from "./wcag"
 
 export const generateCSS = (
   styles: StyleDefinition[],
@@ -283,27 +284,12 @@ export const hexToRgb = (hex: string): { r: number; g: number; b: number } | nul
     : null
 }
 
-export const getLuminance = (r: number, g: number, b: number): number => {
-  const [rs, gs, bs] = [r, g, b].map((c) => {
-    c = c / 255
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-  })
-  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs
-}
-
-export const getContrastRatio = (hex1: string, hex2: string): number => {
-  const rgb1 = hexToRgb(hex1)
-  const rgb2 = hexToRgb(hex2)
-  if (!rgb1 || !rgb2) return 0
-
-  const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b)
-  const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b)
-
-  const lighter = Math.max(lum1, lum2)
-  const darker = Math.min(lum1, lum2)
-
-  return (lighter + 0.05) / (darker + 0.05)
-}
+/**
+ * Re-exported from the WCAG module. This file used to carry its own identical
+ * copy of the luminance and contrast maths; two implementations of the same
+ * rule is exactly the drift issue #78 warned about, so there is now one.
+ */
+export { getContrastRatio }
 
 export const findAccessibleAlternatives = (
   failingColorHex: string,

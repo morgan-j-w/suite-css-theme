@@ -58,6 +58,14 @@ export function meetsWCAG_AAA(ratio: number, largeText: boolean = false): boolea
   return largeText ? ratio >= 4.5 : ratio >= 7
 }
 
+/**
+ * WCAG large-text threshold: 24px at normal weight, or 18.66px at bold (700+).
+ * Lives here so the generator and the checker cannot apply different rules.
+ */
+export function isLargeTextForWCAG(sizePx: number, fontWeight: number): boolean {
+  return fontWeight >= 700 ? sizePx >= 18.66 : sizePx >= 24
+}
+
 export interface TextEvaluationConfig {
   headingLargeText?: boolean
   bodyLargeText?: boolean

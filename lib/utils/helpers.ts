@@ -9,6 +9,19 @@ export const shuffleArray = <T,>(array: T[]): T[] => {
   return shuffled
 }
 
+/**
+ * Normalises a length that may or may not already carry its unit.
+ *
+ * Step 2 stores button padding unitless ("10") while the Step 4 overrides store
+ * it with the unit ("10px"), so a call site that appended "px" unconditionally
+ * produced "10pxpx" and the declaration was dropped. See issue #67.
+ */
+export const toCssPx = (value: string | undefined, fallback: string): string => {
+  const raw = (value ?? "").trim()
+  const chosen = raw === "" ? fallback : raw
+  return /^-?\d*\.?\d+$/.test(chosen) ? `${chosen}px` : chosen
+}
+
 export const cleanFontValue = (fontValue: string | undefined): string => {
   if (!fontValue) return ""
   return fontValue.trim().replace(/;$/, "")

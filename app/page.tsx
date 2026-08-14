@@ -23,8 +23,9 @@ import { ColorDefinition, StyleDefinition } from "@/lib/types"
 // Import utilities
 import { generateCSS, getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
-import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
-import { checkAllContrasts, getComplianceLevel, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
+import { cleanFontValue, formatFontForCSS, getAvailableFonts, toCssPx } from "@/lib/utils/helpers"
+import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
+import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
 import {
   validateBeforeAddingColour,
@@ -98,17 +99,7 @@ export default function ThemeGenerator() {
     return styleValue || globalValue || defaultValue
   }
 
-  const getWeightLabel = (value: string | undefined) => {
-    const weightMap: { [key: string]: string } = {
-      "300": "Light",
-      "400": "Regular",
-      "500": "Medium",
-      "600": "Semibold",
-      "700": "Bold",
-      "800": "Extrabold",
-    }
-    return weightMap[value || ""] || value || ""
-  }
+  const getWeightLabel = getFontWeightLabel
   
   // Import theme state from hook
   const themeState = useThemeState()
@@ -239,17 +230,6 @@ export default function ThemeGenerator() {
     }
   }
 
-  const fontWeightOptions = [
-    { value: "100", label: "Thin" },
-    { value: "200", label: "Extra Light" },
-    { value: "300", label: "Light" },
-    { value: "400", label: "Normal" },
-    { value: "500", label: "Medium" },
-    { value: "600", label: "Semi Bold" },
-    { value: "700", label: "Bold" },
-    { value: "800", label: "Extra Bold" },
-    { value: "900", label: "Black" },
-  ]
 
   // localStorage sync effects
   useEffect(() => { saveToLocalStorage("themeColors", colors) }, [colors])
@@ -928,11 +908,6 @@ export default function ThemeGenerator() {
     return Number.isFinite(parsed) ? parsed : fallback
   }
 
-  const isLargeTextForWCAG = (sizePx: number, fontWeight: number): boolean => {
-    // WCAG large text threshold: 24px regular OR 18.66px bold (700+).
-    return fontWeight >= 700 ? sizePx >= 18.66 : sizePx >= 24
-  }
-
   const getContrastHint = (result: ContrastResults["headingOnBg"]): string | null => {
     if (result.aa) return null
 
@@ -969,19 +944,49 @@ export default function ThemeGenerator() {
     )
   }
 
+  /**
+   * WCAG thresholds depend on whether text counts as "large", which depends on
+   * the style's font size and weight. The generator and the checker must derive
+   * this the same way: the generator used to fall back to checkAllContrasts'
+   * defaults, which assume button text IS large (3:1 for AA), while the checker
+   * computed it from the real 15px/600 button and required 4.5:1. Combinations
+   * landing between the two were offered as passing and then failed. See #78.
+   */
+  const buildTextEvaluationConfig = (style: StyleDefinition): TextEvaluationConfig => ({
+    headingLargeText: isLargeTextForWCAG(
+      parsePixelSize(style.h1Size || h1Size, 22),
+      parseFontWeightValue(style.h1Weight || h1Weight, 400),
+    ),
+    bodyLargeText: isLargeTextForWCAG(
+      parsePixelSize(style.bodySize || bodySize, 15),
+      parseFontWeightValue(style.bodyWeight || bodyWeight, 400),
+    ),
+    linkLargeText: isLargeTextForWCAG(
+      parsePixelSize(style.bodySize || bodySize, 15),
+      parseFontWeightValue(style.linkWeight || linkWeight || style.bodyWeight || bodyWeight, 400),
+    ),
+    buttonLargeText: isLargeTextForWCAG(
+      parsePixelSize(style.buttonSize || buttonSize, 15),
+      parseFontWeightValue(style.buttonWeight || buttonWeight, 400),
+    ),
+  })
+
+  /** The one contrast evaluation used by both the generator and the checker. */
+  const evaluateStyleContrast = (style: StyleDefinition): ContrastResults =>
+    checkAllContrasts(
+      getColorHexValue(style.background),
+      getColorHexValue(style.headingColor),
+      getColorHexValue(style.textColor),
+      getColorHexValue(style.linkColor),
+      getColorHexValue(style.buttonBg),
+      getColorHexValue(style.buttonText),
+      style.iconColor || "#000000",
+      buildTextEvaluationConfig(style),
+    )
+
   const calculateWCAGLevel = (combo: StyleDefinition): string => {
     try {
-      const bgHex = getColorHexValue(combo.background)
-      const headingHex = getColorHexValue(combo.headingColor)
-      const textHex = getColorHexValue(combo.textColor)
-      const linkHex = getColorHexValue(combo.linkColor)
-      const buttonBgHex = getColorHexValue(combo.buttonBg)
-      const buttonTextHex = getColorHexValue(combo.buttonText)
-      const iconHex = combo.iconColor || "#000000"
-      
-      const contrastResults = checkAllContrasts(bgHex, headingHex, textHex, linkHex, buttonBgHex, buttonTextHex, iconHex)
-      const level = getComplianceLevel(contrastResults)
-      return level
+      return getComplianceLevel(evaluateStyleContrast(combo))
     } catch (error) {
       return 'NONE'
     }
@@ -3152,7 +3157,7 @@ ${iconTemplates}</div>`
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {fontWeightOptions.map((option) => (
+                          {FONT_WEIGHT_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -3216,7 +3221,7 @@ ${iconTemplates}</div>`
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {fontWeightOptions.map((option) => (
+                          {FONT_WEIGHT_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -3280,7 +3285,7 @@ ${iconTemplates}</div>`
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {fontWeightOptions.map((option) => (
+                          {FONT_WEIGHT_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -3344,7 +3349,7 @@ ${iconTemplates}</div>`
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {fontWeightOptions.map((option) => (
+                          {FONT_WEIGHT_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -3419,7 +3424,7 @@ ${iconTemplates}</div>`
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {fontWeightOptions.map((option) => (
+                          {FONT_WEIGHT_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -3494,7 +3499,7 @@ ${iconTemplates}</div>`
                           <SelectValue placeholder="Select weight" />
                         </SelectTrigger>
                         <SelectContent>
-                          {fontWeightOptions.map((option) => (
+                          {FONT_WEIGHT_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -3523,7 +3528,7 @@ ${iconTemplates}</div>`
                       <SelectValue placeholder="Select weight" />
                     </SelectTrigger>
                     <SelectContent>
-                      {fontWeightOptions.map((option) => (
+                      {FONT_WEIGHT_OPTIONS.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
@@ -4595,32 +4600,9 @@ ${iconTemplates}</div>`
                         <div className="flex items-center justify-between mb-4">
                           <Label className="text-xs text-slate-500 uppercase tracking-wide font-semibold block">Preview</Label>
                           {(() => {
-                            const headingSizePx = parsePixelSize(style.h1Size || h1Size, 22)
-                            const headingWeightValue = parseFontWeightValue(style.h1Weight || h1Weight, 400)
-                            const bodySizePx = parsePixelSize(style.bodySize || bodySize, 15)
-                            const bodyWeightValue = parseFontWeightValue(style.bodyWeight || bodyWeight, 400)
-                            const linkSizePx = parsePixelSize(style.bodySize || bodySize, 15)
-                            const linkWeightValue = parseFontWeightValue(style.linkWeight || linkWeight || style.bodyWeight || bodyWeight, 400)
-                            const buttonSizePx = parsePixelSize(style.buttonSize || buttonSize, 15)
-                            const buttonWeightValue = parseFontWeightValue(style.buttonWeight || buttonWeight, 400)
-
-                            const textEvaluationConfig: TextEvaluationConfig = {
-                              headingLargeText: isLargeTextForWCAG(headingSizePx, headingWeightValue),
-                              bodyLargeText: isLargeTextForWCAG(bodySizePx, bodyWeightValue),
-                              linkLargeText: isLargeTextForWCAG(linkSizePx, linkWeightValue),
-                              buttonLargeText: isLargeTextForWCAG(buttonSizePx, buttonWeightValue),
-                            }
-
-                            const contrastResults = checkAllContrasts(
-                              bgColor,
-                              headingColor,
-                              textColor,
-                              linkColor,
-                              buttonBg,
-                              buttonText,
-                              style.iconColor || "#000000",
-                              textEvaluationConfig
-                            )
+                            // Same evaluation the generator uses, so a combination
+                            // it offers as AA/AAA cannot fail here (#78).
+                            const contrastResults = evaluateStyleContrast(style)
                             const level = getComplianceLevel(contrastResults)
                             const typographyDependentFail = level === 'FAIL' && isTypographyDependentFail(contrastResults)
                             const badgeColor = typographyDependentFail
@@ -4918,7 +4900,7 @@ ${iconTemplates}</div>`
                               lineHeight: `${style.buttonLineHeight || buttonLineHeight || '22px'}`,
                               fontWeight: style.buttonWeight || buttonWeight || '600',
                               borderRadius: style.buttonBorderRadius || buttonBorderRadius || '4px',
-                              padding: `${style.buttonPaddingTop || buttonPaddingTop || "10"}px ${style.buttonPaddingRight || buttonPaddingRight || "20"}px ${style.buttonPaddingBottom || buttonPaddingBottom || "10"}px ${style.buttonPaddingLeft || buttonPaddingLeft || "20"}px`,
+                              padding: `${toCssPx(style.buttonPaddingTop || buttonPaddingTop, "10")} ${toCssPx(style.buttonPaddingRight || buttonPaddingRight, "20")} ${toCssPx(style.buttonPaddingBottom || buttonPaddingBottom, "10")} ${toCssPx(style.buttonPaddingLeft || buttonPaddingLeft, "20")}`,
                               border: `${style.buttonBorderWidth || "0"}px solid ${getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg) || buttonBg}`,
                               cursor: 'pointer',
                             }}
@@ -5141,12 +5123,11 @@ ${iconTemplates}</div>`
                                       <SelectValue placeholder={getWeightLabel(style.h1Weight || h1Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">Regular</SelectItem>
-                                      <SelectItem value="500">Medium</SelectItem>
-                                      <SelectItem value="600">Semibold</SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                      <SelectItem value="800">Extrabold</SelectItem>
+                                      {FONT_WEIGHT_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -5194,12 +5175,11 @@ ${iconTemplates}</div>`
                                       <SelectValue placeholder={getWeightLabel(style.h2Weight || h2Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">Regular</SelectItem>
-                                      <SelectItem value="500">Medium</SelectItem>
-                                      <SelectItem value="600">Semibold</SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                      <SelectItem value="800">Extrabold</SelectItem>
+                                      {FONT_WEIGHT_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -5247,12 +5227,11 @@ ${iconTemplates}</div>`
                                       <SelectValue placeholder={getWeightLabel(style.h3Weight || h3Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">Regular</SelectItem>
-                                      <SelectItem value="500">Medium</SelectItem>
-                                      <SelectItem value="600">Semibold</SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                      <SelectItem value="800">Extrabold</SelectItem>
+                                      {FONT_WEIGHT_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -5300,12 +5279,11 @@ ${iconTemplates}</div>`
                                       <SelectValue placeholder={getWeightLabel(style.h4Weight || h4Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">Regular</SelectItem>
-                                      <SelectItem value="500">Medium</SelectItem>
-                                      <SelectItem value="600">Semibold</SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                      <SelectItem value="800">Extrabold</SelectItem>
+                                      {FONT_WEIGHT_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -5358,12 +5336,11 @@ ${iconTemplates}</div>`
                                       <SelectValue placeholder={getWeightLabel(style.bodyWeight || bodyWeight || "400")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">Regular</SelectItem>
-                                      <SelectItem value="500">Medium</SelectItem>
-                                      <SelectItem value="600">Semibold</SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                      <SelectItem value="800">Extrabold</SelectItem>
+                                      {FONT_WEIGHT_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -5383,12 +5360,11 @@ ${iconTemplates}</div>`
                                     <SelectValue placeholder={getWeightLabel(style.linkWeight || linkWeight || "400")} />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="300">Light</SelectItem>
-                                    <SelectItem value="400">Regular</SelectItem>
-                                    <SelectItem value="500">Medium</SelectItem>
-                                    <SelectItem value="600">Semibold</SelectItem>
-                                    <SelectItem value="700">Bold</SelectItem>
-                                    <SelectItem value="800">Extrabold</SelectItem>
+                                    {FONT_WEIGHT_OPTIONS.map((option) => (
+                                      <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -5440,12 +5416,11 @@ ${iconTemplates}</div>`
                                       <SelectValue placeholder={getWeightLabel(style.buttonWeight || buttonWeight || "600")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="300">Light</SelectItem>
-                                      <SelectItem value="400">Regular</SelectItem>
-                                      <SelectItem value="500">Medium</SelectItem>
-                                      <SelectItem value="600">Semibold</SelectItem>
-                                      <SelectItem value="700">Bold</SelectItem>
-                                      <SelectItem value="800">Extrabold</SelectItem>
+                                      {FONT_WEIGHT_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                          {option.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </div>
