@@ -1,7 +1,7 @@
 {
   "schema": "atd-triage/1",
   "updated": "2026-08-14T00:00:00Z",
-  "batch": "Batch 2 — blockers",
+  "batch": "Batch 3 — validation",
   "issues": [
     {
       "n": 25,
@@ -73,6 +73,141 @@
         "app/page.tsx",
         "hooks/useThemeState.ts"
       ]
+    },
+    {
+      "n": 7,
+      "status": "fixed",
+      "note": "Root cause differs from the ticket. The name input already refuses an empty value (components/common/ThemeContextPanel.tsx:26-30), so 'saved with no name' is not reachable that way — the silently untitled themes come from the default 'Untitled Theme' the wizard starts with. The guard therefore treats both an empty name and the untouched default as missing. Flagging: this means a user cannot deliberately name a theme 'Untitled Theme'.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 8,
+      "status": "blocked",
+      "note": "Cannot be done here. Checking a name against the account's other themes needs the themes list/API, and the ticket requires server-side validation — this repo has no themes endpoint, only app/api/auth/*. Client-side is equally impossible without a list of existing names. The agreed wording is parked in VALIDATION_MESSAGES.themeNameDuplicate for whoever wires up the suite-side check."
+    },
+    {
+      "n": 9,
+      "status": "fixed",
+      "note": "Empty palette now blocks both Next and Save: 'Add at least one colour before continuing.'",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 10,
+      "status": "fixed",
+      "note": "Hex must match #RRGGBB; '264653' is rejected on Next. Implemented as an error, per the message the ticket supplied — I did NOT auto-prepend '#', since the ticket said to ask first. Say the word if you want the auto-prepend instead.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 11,
+      "status": "fixed",
+      "note": "All colour checks trim first, so a whitespace-only hex counts as empty and gets the 'complete all colour details' message rather than being accepted.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 12,
+      "status": "fixed",
+      "note": "Duplicate names and duplicate hexes are both caught, compared case-insensitively and trimmed, so '#FFFFFF'/'#ffffff' and 'White'/'white' collide.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 13,
+      "status": "fixed",
+      "note": "'+ Add colour' with an empty name and hex now shows the 'complete all colour details before adding another colour' message instead of appending a blank row.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 14,
+      "status": "fixed",
+      "note": "Message replaced on the Step 1 next guard, per the coordination note in the tool-bugs prompt so the copy prompt does not touch this file again.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 15,
+      "status": "fixed",
+      "note": "Message replaced on the '+ Add colour' guard. Applies when the row has a hex but no name; a row missing both gets #13's message instead.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 59,
+      "status": "fixed",
+      "note": "Step 3 Next requires font, size and line height for H1-H4, body and button. Verified by unit test rather than in the browser: after the Batch 1 blur-restore, an emptied field repopulates before Next can be clicked, so the guard is now a backstop for data loaded with blanks rather than something reachable by typing.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 60,
+      "status": "fixed",
+      "note": "Same guard as #59; values are trimmed before testing so whitespace-only is treated as empty. Verified by unit test, for the reason given on #59.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 69,
+      "status": "fixed",
+      "note": "Saving with zero styles now blocks with 'Theme style is required before you can save.' Wired into all three save entry points (header button, Step 4 button, unsaved-changes dialog).",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 74,
+      "status": "fixed",
+      "note": "Step 4 Save applies the same typography guard with the 'before saving' wording, checking the global values and each style's effective overrides. An absent override means inherit and is allowed; a present-but-blank one is rejected.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
+    },
+    {
+      "n": 75,
+      "status": "fixed",
+      "note": "Same guard as #74, trimmed. Verified by unit test.",
+      "files": [
+        "lib/validators/theme-validator.ts",
+        "app/page.tsx"
+      ],
+      "commit": "74685980"
     }
   ]
 }
