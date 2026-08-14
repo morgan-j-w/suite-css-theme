@@ -33,6 +33,7 @@ import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
 import { DevInformationModal } from "@/components/common/DevInformationModal"
 import { ThemeContextPanel } from "@/components/common/ThemeContextPanel"
+import { NumberField, FontField } from "@/components/common/ThemeFields"
 
 // Import hooks
 import { useThemeState } from "@/hooks/useThemeState"
@@ -3062,30 +3063,26 @@ ${iconTemplates}</div>`
                 {/* Heading 1 */}
                 <div>
                   <Label>Heading 1 font</Label>
-                  <Input
+                  <FontField
                     className="mt-1 mb-3"
                     value={h1Font || "Arial, sans-serif"}
-                    onChange={(e) => {
-                      const value = e.target.value
+                    fallback="Arial, sans-serif"
+                    onValueChange={(next) => {
+                      const value = next
                       setH1Font(value)
                       updateAllStylesFonts("h1", value)
-                    }}
-                    onBlur={(e) => {
-                      const formatted = formatFontForCSS(e.target.value)
-                      setH1Font(formatted)
-                      updateAllStylesFonts("h1", formatted)
                     }}
                     placeholder="e.g., 'Hubot Sans', sans-serif"
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h1Size || "22px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="22"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH1Size(value)
                           updateAllStylesH1Size(value)
                         }}
@@ -3094,12 +3091,12 @@ ${iconTemplates}</div>`
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h1LineHeight || "30px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="30"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH1LineHeight(value)
                           updateAllStylesH1LineHeight(value)
                         }}
@@ -3130,30 +3127,26 @@ ${iconTemplates}</div>`
                 {/* Heading 2 */}
                 <div>
                   <Label>Heading 2 font</Label>
-                  <Input
+                  <FontField
                     className="mt-1 mb-3"
                     value={h2Font || "Arial, sans-serif"}
-                    onChange={(e) => {
-                      const value = e.target.value
+                    fallback="Arial, sans-serif"
+                    onValueChange={(next) => {
+                      const value = next
                       setH2Font(value)
                       updateAllStylesFonts("h2", value)
-                    }}
-                    onBlur={(e) => {
-                      const formatted = formatFontForCSS(e.target.value)
-                      setH2Font(formatted)
-                      updateAllStylesFonts("h2", formatted)
                     }}
                     placeholder="e.g., 'Hubot Sans', sans-serif"
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h2Size || "20px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="20"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH2Size(value)
                           updateAllStylesH2Size(value)
                         }}
@@ -3162,12 +3155,12 @@ ${iconTemplates}</div>`
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h2LineHeight || "28px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="28"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH2LineHeight(value)
                           updateAllStylesH2LineHeight(value)
                         }}
@@ -3198,30 +3191,26 @@ ${iconTemplates}</div>`
                 {/* Heading 3 */}
                 <div>
                   <Label>Heading 3 font</Label>
-                  <Input
+                  <FontField
                     className="mt-1 mb-3"
                     value={h3Font || "Arial, sans-serif"}
-                    onChange={(e) => {
-                      const value = e.target.value
+                    fallback="Arial, sans-serif"
+                    onValueChange={(next) => {
+                      const value = next
                       setH3Font(value)
                       updateAllStylesFonts("h3", value)
-                    }}
-                    onBlur={(e) => {
-                      const formatted = formatFontForCSS(e.target.value)
-                      setH3Font(formatted)
-                      updateAllStylesFonts("h3", formatted)
                     }}
                     placeholder="e.g., 'Hubot Sans', sans-serif"
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h3Size || "18px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="18"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH3Size(value)
                           updateAllStylesH3Size(value)
                         }}
@@ -3230,12 +3219,12 @@ ${iconTemplates}</div>`
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h3LineHeight || "26px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="26"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH3LineHeight(value)
                           updateAllStylesH3LineHeight(value)
                         }}
@@ -3266,30 +3255,26 @@ ${iconTemplates}</div>`
                 {/* Heading 4 */}
                 <div>
                   <Label>Heading 4 font</Label>
-                  <Input
+                  <FontField
                     className="mt-1 mb-3"
                     value={h4Font || "Arial, sans-serif"}
-                    onChange={(e) => {
-                      const value = e.target.value
+                    fallback="Arial, sans-serif"
+                    onValueChange={(next) => {
+                      const value = next
                       setH4Font(value)
                       updateAllStylesFonts("h4", value)
-                    }}
-                    onBlur={(e) => {
-                      const formatted = formatFontForCSS(e.target.value)
-                      setH4Font(formatted)
-                      updateAllStylesFonts("h4", formatted)
                     }}
                     placeholder="e.g., 'Hubot Sans', sans-serif"
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h4Size || "16px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="16"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH4Size(value)
                           updateAllStylesH4Size(value)
                         }}
@@ -3298,12 +3283,12 @@ ${iconTemplates}</div>`
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(h4LineHeight || "22px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="22"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setH4LineHeight(value)
                           updateAllStylesH4LineHeight(value)
                         }}
@@ -3341,18 +3326,14 @@ ${iconTemplates}</div>`
               <CardContent className="space-y-4">
                 <div>
                   <Label>Body font</Label>
-                  <Input
+                  <FontField
                     className="mt-1"
                     value={bodyFont || "Arial, sans-serif"}
-                    onChange={(e) => {
-                      const value = e.target.value
+                    fallback="Arial, sans-serif"
+                    onValueChange={(next) => {
+                      const value = next
                       setBodyFont(value)
                       updateAllStylesFonts("body", value)
-                    }}
-                    onBlur={(e) => {
-                      const formatted = formatFontForCSS(e.target.value)
-                      setBodyFont(formatted)
-                      updateAllStylesFonts("body", formatted)
                     }}
                     placeholder="e.g., 'Roboto', sans-serif;"
                   />
@@ -3363,12 +3344,12 @@ ${iconTemplates}</div>`
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
                       <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(bodySize || "15px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="15"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setBodySize(value)
                           updateAllStylesBodySize(value)
                         }}
@@ -3377,12 +3358,12 @@ ${iconTemplates}</div>`
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(bodyLineHeight || "22px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="22"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setBodyLineHeight(value)
                           updateAllStylesBodyLineHeight(value)
                         }}
@@ -3420,18 +3401,14 @@ ${iconTemplates}</div>`
               <CardContent className="space-y-4">
                 <div>
                   <Label>Button font</Label>
-                  <Input
+                  <FontField
                     className="mt-1"
                     value={buttonFont || "Arial, sans-serif"}
-                    onChange={(e) => {
-                      const value = e.target.value
+                    fallback="Arial, sans-serif"
+                    onValueChange={(next) => {
+                      const value = next
                       setButtonFont(value)
                       updateAllStylesFonts("button", value)
-                    }}
-                    onBlur={(e) => {
-                      const formatted = formatFontForCSS(e.target.value)
-                      setButtonFont(formatted)
-                      updateAllStylesFonts("button", formatted)
                     }}
                     placeholder="e.g., 'Inter', sans-serif;"
                   />
@@ -3442,12 +3419,12 @@ ${iconTemplates}</div>`
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
                       <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(buttonSize || "15px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="15"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setButtonSize(value)
                           updateAllStylesButtonSize(value)
                         }}
@@ -3456,12 +3433,12 @@ ${iconTemplates}</div>`
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
-                      <Input
+                      <NumberField
                         className="mt-1.5 w-full"
-                        type="number"
                         value={(buttonLineHeight || "22px").replace("px", "")}
-                        onChange={(e) => {
-                          const value = `${e.target.value}px`
+                        fallback="22"
+                        onValueChange={(next) => {
+                          const value = `${next}px`
                           setButtonLineHeight(value)
                           updateAllStylesButtonLineHeight(value)
                         }}
@@ -3714,12 +3691,12 @@ ${iconTemplates}</div>`
             <CardContent className="space-y-4">
               <div>
                 <Label>Padding <span className="text-xs text-gray-400">px</span></Label>
-                <Input
+                <NumberField
                   className="mt-2"
-                  type="number"
                   value={(themePadding || "25px").replace("px", "")}
-                  onChange={(e) => {
-                    const value = `${e.target.value}px`
+                  fallback="25"
+                  onValueChange={(next) => {
+                    const value = `${next}px`
                     setThemePadding(value)
                     setCssRefreshKey(prev => prev + 1)
                   }}
@@ -3729,12 +3706,12 @@ ${iconTemplates}</div>`
               </div>
               <div>
                 <Label>Title padding <span className="text-xs text-gray-400">px</span></Label>
-                <Input
+                <NumberField
                   className="mt-2"
-                  type="number"
                   value={titlePaddingBottom || "14"}
-                  onChange={(e) => {
-                    setTitlePaddingBottom(e.target.value)
+                  fallback="14"
+                  onValueChange={(next) => {
+                    setTitlePaddingBottom(next)
                     setCssRefreshKey(prev => prev + 1)
                   }}
                   placeholder="14"
@@ -3770,11 +3747,11 @@ ${iconTemplates}</div>`
                 </div>
                 <div>
                   <Label className="text-sm font-medium">Icon size <span className="text-xs text-gray-400">px</span></Label>
-                  <Input
+                  <NumberField
                     className="mt-2 w-full"
-                    type="number"
                     value={globalIconSize || "18"}
-                    onChange={(e) => setGlobalIconSize(e.target.value)}
+                    fallback="18"
+                    onValueChange={(next) => setGlobalIconSize(next)}
                     placeholder="18"
                   />
                 </div>
@@ -3830,48 +3807,48 @@ ${iconTemplates}</div>`
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   <div>
                     <Label className="text-xs text-muted-foreground">Top <span className="text-xs text-gray-400">px</span></Label>
-                    <Input
+                    <NumberField
                       className="mt-1"
-                      type="number"
                       value={buttonPaddingTop || "10"}
-                      onChange={(e) => {
-                        setButtonPaddingTop(e.target.value)
+                      fallback="10"
+                      onValueChange={(next) => {
+                        setButtonPaddingTop(next)
                         setCssRefreshKey(prev => prev + 1)
                       }}
                     />
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Right <span className="text-xs text-gray-400">px</span></Label>
-                    <Input
+                    <NumberField
                       className="mt-1"
-                      type="number"
                       value={buttonPaddingRight || "20"}
-                      onChange={(e) => {
-                        setButtonPaddingRight(e.target.value)
+                      fallback="20"
+                      onValueChange={(next) => {
+                        setButtonPaddingRight(next)
                         setCssRefreshKey(prev => prev + 1)
                       }}
                     />
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Bottom <span className="text-xs text-gray-400">px</span></Label>
-                    <Input
+                    <NumberField
                       className="mt-1"
-                      type="number"
                       value={buttonPaddingBottom || "10"}
-                      onChange={(e) => {
-                        setButtonPaddingBottom(e.target.value)
+                      fallback="10"
+                      onValueChange={(next) => {
+                        setButtonPaddingBottom(next)
                         setCssRefreshKey(prev => prev + 1)
                       }}
                     />
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Left <span className="text-xs text-gray-400">px</span></Label>
-                    <Input
+                    <NumberField
                       className="mt-1"
-                      type="number"
                       value={buttonPaddingLeft || "20"}
-                      onChange={(e) => {
-                        setButtonPaddingLeft(e.target.value)
+                      fallback="20"
+                      onValueChange={(next) => {
+                        setButtonPaddingLeft(next)
                         setCssRefreshKey(prev => prev + 1)
                       }}
                     />
@@ -3882,11 +3859,11 @@ ${iconTemplates}</div>`
               <div>
                 <Label className="text-sm font-medium">Button border radius <span className="text-xs text-gray-400">px</span></Label>
                 <div className="mt-2">
-                  <Input
-                    type="number"
+                  <NumberField
                     value={(buttonBorderRadius || "4px").replace("px", "")}
-                    onChange={(e) => {
-                      const value = `${e.target.value}px`
+                    fallback="4"
+                    onValueChange={(next) => {
+                      const value = `${next}px`
                       setButtonBorderRadius(value)
                       setCssRefreshKey(prev => prev + 1)
                     }}
@@ -4413,13 +4390,12 @@ ${iconTemplates}</div>`
                               <Square className="h-3 w-3 text-slate-400" />
                               <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
                             </div>
-                            <Input
+                            <NumberField
                               className="mt-1.5 text-xs bg-white w-full"
-                              type="number"
                               value={getDisplayValue(style.buttonBorderWidth, "", "0")}
-                              onChange={(e) => updateStyle(style.id, "buttonBorderWidth", e.target.value)}
+                              fallback={getDisplayValue(undefined, "", "0")}
+                              onValueChange={(next) => updateStyle(style.id, "buttonBorderWidth", next)}
                               placeholder="0"
-                              min="0"
                             />
                           </div>
 
@@ -5088,31 +5064,31 @@ ${iconTemplates}</div>`
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-slate-600">Heading 1 font</Label>
                               </div>
-                              <Input
+                              <FontField
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h1Font, h1Font, "Arial, sans-serif")}
-                                onChange={(e) => updateStyle(style.id, "h1Font", e.target.value)}
-                                onBlur={(e) => updateStyle(style.id, "h1Font", formatFontForCSS(e.target.value))}
+                                fallback={getDisplayFont(undefined, h1Font, "Arial, sans-serif")}
+                                onValueChange={(next) => updateStyle(style.id, "h1Font", next)}
                                 placeholder={getDisplayFont(undefined, h1Font, "Arial, sans-serif")}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
                                   <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h1Size, h1Size, "22")}
-                                    onChange={(e) => updateStyle(style.id, "h1Size", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h1Size, "22")}
+                                    onValueChange={(next) => updateStyle(style.id, "h1Size", `${next}px`)}
                                     placeholder="22"
                                   />
                                 </div>
                                 <div>
                                   <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h1LineHeight, h1LineHeight, "30")}
-                                    onChange={(e) => updateStyle(style.id, "h1LineHeight", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h1LineHeight, "30")}
+                                    onValueChange={(next) => updateStyle(style.id, "h1LineHeight", `${next}px`)}
                                     placeholder="30"
                                   />
                                 </div>
@@ -5141,31 +5117,31 @@ ${iconTemplates}</div>`
                             {/* Heading 2 */}
                             <div>
                               <Label className="text-xs text-slate-600">Heading 2 font</Label>
-                              <Input
+                              <FontField
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h2Font, h2Font, "Arial, sans-serif")}
-                                onChange={(e) => updateStyle(style.id, "h2Font", e.target.value)}
-                                onBlur={(e) => updateStyle(style.id, "h2Font", formatFontForCSS(e.target.value))}
+                                fallback={getDisplayFont(undefined, h2Font, "Arial, sans-serif")}
+                                onValueChange={(next) => updateStyle(style.id, "h2Font", next)}
                                 placeholder={getDisplayFont(undefined, h2Font, "Arial, sans-serif")}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
                                   <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h2Size, h2Size, "20")}
-                                    onChange={(e) => updateStyle(style.id, "h2Size", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h2Size, "20")}
+                                    onValueChange={(next) => updateStyle(style.id, "h2Size", `${next}px`)}
                                     placeholder="20"
                                   />
                                 </div>
                                 <div>
                                   <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h2LineHeight, h2LineHeight, "28")}
-                                    onChange={(e) => updateStyle(style.id, "h2LineHeight", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h2LineHeight, "28")}
+                                    onValueChange={(next) => updateStyle(style.id, "h2LineHeight", `${next}px`)}
                                     placeholder="28"
                                   />
                                 </div>
@@ -5194,31 +5170,31 @@ ${iconTemplates}</div>`
                             {/* Heading 3 */}
                             <div>
                               <Label className="text-xs text-slate-600">Heading 3 font</Label>
-                              <Input
+                              <FontField
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h3Font, h3Font, "Arial, sans-serif")}
-                                onChange={(e) => updateStyle(style.id, "h3Font", e.target.value)}
-                                onBlur={(e) => updateStyle(style.id, "h3Font", formatFontForCSS(e.target.value))}
+                                fallback={getDisplayFont(undefined, h3Font, "Arial, sans-serif")}
+                                onValueChange={(next) => updateStyle(style.id, "h3Font", next)}
                                 placeholder={getDisplayFont(undefined, h3Font, "Arial, sans-serif")}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
                                   <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h3Size, h3Size, "18")}
-                                    onChange={(e) => updateStyle(style.id, "h3Size", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h3Size, "18")}
+                                    onValueChange={(next) => updateStyle(style.id, "h3Size", `${next}px`)}
                                     placeholder="18"
                                   />
                                 </div>
                                 <div>
                                   <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h3LineHeight, h3LineHeight, "26")}
-                                    onChange={(e) => updateStyle(style.id, "h3LineHeight", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h3LineHeight, "26")}
+                                    onValueChange={(next) => updateStyle(style.id, "h3LineHeight", `${next}px`)}
                                     placeholder="26"
                                   />
                                 </div>
@@ -5247,31 +5223,31 @@ ${iconTemplates}</div>`
                             {/* Heading 4 */}
                             <div>
                               <Label className="text-xs text-slate-600">Heading 4 font</Label>
-                              <Input
+                              <FontField
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.h4Font, h4Font, "Arial, sans-serif")}
-                                onChange={(e) => updateStyle(style.id, "h4Font", e.target.value)}
-                                onBlur={(e) => updateStyle(style.id, "h4Font", formatFontForCSS(e.target.value))}
+                                fallback={getDisplayFont(undefined, h4Font, "Arial, sans-serif")}
+                                onValueChange={(next) => updateStyle(style.id, "h4Font", next)}
                                 placeholder={getDisplayFont(undefined, h4Font, "Arial, sans-serif")}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
                                   <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h4Size, h4Size, "16")}
-                                    onChange={(e) => updateStyle(style.id, "h4Size", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h4Size, "16")}
+                                    onValueChange={(next) => updateStyle(style.id, "h4Size", `${next}px`)}
                                     placeholder="16"
                                   />
                                 </div>
                                 <div>
                                   <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.h4LineHeight, h4LineHeight, "24")}
-                                    onChange={(e) => updateStyle(style.id, "h4LineHeight", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, h4LineHeight, "24")}
+                                    onValueChange={(next) => updateStyle(style.id, "h4LineHeight", `${next}px`)}
                                     placeholder="24"
                                   />
                                 </div>
@@ -5305,31 +5281,31 @@ ${iconTemplates}</div>`
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-slate-600">Body font</Label>
                               </div>
-                              <Input
+                              <FontField
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.bodyFont, bodyFont, "Arial, sans-serif")}
-                                onChange={(e) => updateStyle(style.id, "bodyFont", e.target.value)}
-                                onBlur={(e) => updateStyle(style.id, "bodyFont", formatFontForCSS(e.target.value))}
+                                fallback={getDisplayFont(undefined, bodyFont, "Arial, sans-serif")}
+                                onValueChange={(next) => updateStyle(style.id, "bodyFont", next)}
                                 placeholder={getDisplayFont(undefined, bodyFont, "Arial, sans-serif")}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
                                   <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.bodySize, bodySize, "16")}
-                                    onChange={(e) => updateStyle(style.id, "bodySize", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, bodySize, "16")}
+                                    onValueChange={(next) => updateStyle(style.id, "bodySize", `${next}px`)}
                                     placeholder="16"
                                   />
                                 </div>
                                 <div>
                                   <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.bodyLineHeight, bodyLineHeight, "24")}
-                                    onChange={(e) => updateStyle(style.id, "bodyLineHeight", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, bodyLineHeight, "24")}
+                                    onValueChange={(next) => updateStyle(style.id, "bodyLineHeight", `${next}px`)}
                                     placeholder="24"
                                   />
                                 </div>
@@ -5387,31 +5363,31 @@ ${iconTemplates}</div>`
                               <div className="flex items-center gap-2">
                                 <Label className="text-xs text-slate-600">Button font</Label>
                               </div>
-                              <Input
+                              <FontField
                                 className="mt-1 mb-3 text-xs bg-white w-full"
                                 value={getDisplayFont(style.buttonFont, buttonFont, "Arial, sans-serif")}
-                                onChange={(e) => updateStyle(style.id, "buttonFont", e.target.value)}
-                                onBlur={(e) => updateStyle(style.id, "buttonFont", formatFontForCSS(e.target.value))}
+                                fallback={getDisplayFont(undefined, buttonFont, "Arial, sans-serif")}
+                                onValueChange={(next) => updateStyle(style.id, "buttonFont", next)}
                                 placeholder={getDisplayFont(undefined, buttonFont, "Arial, sans-serif")}
                               />
                               <div className="grid grid-cols-3 gap-2 mb-6">
                                 <div>
                                   <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.buttonSize, buttonSize, "15")}
-                                    onChange={(e) => updateStyle(style.id, "buttonSize", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, buttonSize, "15")}
+                                    onValueChange={(next) => updateStyle(style.id, "buttonSize", `${next}px`)}
                                     placeholder="15"
                                   />
                                 </div>
                                 <div>
                                   <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
-                                  <Input
+                                  <NumberField
                                     className="mt-1 text-xs bg-white w-full"
-                                    type="number"
                                     value={getDisplayValue(style.buttonLineHeight, buttonLineHeight, "22")}
-                                    onChange={(e) => updateStyle(style.id, "buttonLineHeight", `${e.target.value}px`)}
+                                    fallback={getDisplayValue(undefined, buttonLineHeight, "22")}
+                                    onValueChange={(next) => updateStyle(style.id, "buttonLineHeight", `${next}px`)}
                                     placeholder="22"
                                   />
                                 </div>
@@ -5442,41 +5418,41 @@ ${iconTemplates}</div>`
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Top</Label>
-                                    <Input
+                                    <NumberField
                                       className="mt-1 text-xs bg-white w-full"
-                                      type="number"
                                       value={getDisplayValue(style.buttonPaddingTop, buttonPaddingTop, "10")}
-                                      onChange={(e) => updateStyle(style.id, "buttonPaddingTop", `${e.target.value}px`)}
+                                      fallback={getDisplayValue(undefined, buttonPaddingTop, "10")}
+                                      onValueChange={(next) => updateStyle(style.id, "buttonPaddingTop", `${next}px`)}
                                       placeholder="10"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Right</Label>
-                                    <Input
+                                    <NumberField
                                       className="mt-1 text-xs bg-white w-full"
-                                      type="number"
                                       value={getDisplayValue(style.buttonPaddingRight, buttonPaddingRight, "20")}
-                                      onChange={(e) => updateStyle(style.id, "buttonPaddingRight", `${e.target.value}px`)}
+                                      fallback={getDisplayValue(undefined, buttonPaddingRight, "20")}
+                                      onValueChange={(next) => updateStyle(style.id, "buttonPaddingRight", `${next}px`)}
                                       placeholder="20"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Bottom</Label>
-                                    <Input
+                                    <NumberField
                                       className="mt-1 text-xs bg-white w-full"
-                                      type="number"
                                       value={getDisplayValue(style.buttonPaddingBottom, buttonPaddingBottom, "10")}
-                                      onChange={(e) => updateStyle(style.id, "buttonPaddingBottom", `${e.target.value}px`)}
+                                      fallback={getDisplayValue(undefined, buttonPaddingBottom, "10")}
+                                      onValueChange={(next) => updateStyle(style.id, "buttonPaddingBottom", `${next}px`)}
                                       placeholder="10"
                                     />
                                   </div>
                                   <div>
                                     <Label className="text-xs text-slate-600">Left</Label>
-                                    <Input
+                                    <NumberField
                                       className="mt-1 text-xs bg-white w-full"
-                                      type="number"
                                       value={getDisplayValue(style.buttonPaddingLeft, buttonPaddingLeft, "20")}
-                                      onChange={(e) => updateStyle(style.id, "buttonPaddingLeft", `${e.target.value}px`)}
+                                      fallback={getDisplayValue(undefined, buttonPaddingLeft, "20")}
+                                      onValueChange={(next) => updateStyle(style.id, "buttonPaddingLeft", `${next}px`)}
                                       placeholder="20"
                                     />
                                   </div>
@@ -5486,11 +5462,11 @@ ${iconTemplates}</div>`
                               {/* Button Border Radius */}
                               <div>
                                 <Label className="text-xs font-semibold text-slate-700">Button border radius</Label>
-                                <Input
+                                <NumberField
                                   className="mt-1 text-xs bg-white w-full"
-                                  type="number"
                                   value={(getDisplayValue(style.buttonBorderRadius, buttonBorderRadius, "4")).replace("px", "")}
-                                  onChange={(e) => updateStyle(style.id, "buttonBorderRadius", `${e.target.value}px`)}
+                                  fallback={getDisplayValue(undefined, buttonBorderRadius, "4")}
+                                  onValueChange={(next) => updateStyle(style.id, "buttonBorderRadius", `${next}px`)}
                                   placeholder="4"
                                 />
                               </div>
