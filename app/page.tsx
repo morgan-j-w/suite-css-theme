@@ -26,6 +26,13 @@ import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts } from "@/lib/utils/helpers"
 import { checkAllContrasts, getComplianceLevel, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
+import {
+  validateBeforeAddingColour,
+  validatePalette,
+  validateTypographyForStep,
+  validateThemeForSave,
+  type TypographyValues,
+} from "@/lib/validators/theme-validator"
 
 // Import components
 import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
@@ -48,6 +55,8 @@ export default function ThemeGenerator() {
   const [copiedMedia, setCopiedMedia] = useState(false)
   const [colorImportError, setColorImportError] = useState("")
   const [colorNameError, setColorNameError] = useState("")
+  // Validation message for the Step 3 next guard and the Step 4 save guards.
+  const [stepError, setStepError] = useState("")
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const isInitializedRef = useRef(false)
@@ -388,9 +397,10 @@ export default function ThemeGenerator() {
   }, [styles])
 
   const addColor = () => {
-    // Check if the last color has a name
-    if (colors.length > 0 && colors[colors.length - 1].name.trim() === "") {
-      setColorNameError("Please give the last colour a name before adding another")
+    // Blocks a blank row being appended on top of an incomplete one.
+    const error = validateBeforeAddingColour(colors)
+    if (error) {
+      setColorNameError(error)
       return
     }
     setColorNameError("")
@@ -398,32 +408,52 @@ export default function ThemeGenerator() {
   }
 
   const validateColorsForStep = (): boolean => {
-    // Check if any color is missing a name
-    const unnamedColor = colors.some(c => c.name.trim() === "")
-    if (unnamedColor) {
-      setColorNameError("All colours must have a name before continuing")
-      return false
+    const error = validatePalette(colors)
+    setColorNameError(error ?? "")
+    return !error
+  }
+
+  const currentTypography = (): TypographyValues => ({
+    h1Font, h1Size, h1LineHeight,
+    h2Font, h2Size, h2LineHeight,
+    h3Font, h3Size, h3LineHeight,
+    h4Font, h4Size, h4LineHeight,
+    bodyFont, bodySize, bodyLineHeight,
+    buttonFont, buttonSize, buttonLineHeight,
+  })
+
+  const validateTypographyForNext = (): boolean => {
+    const error = validateTypographyForStep(currentTypography())
+    setStepError(error ?? "")
+    return !error
+  }
+
+  /** Shared by all three save entry points. */
+  const validateBeforeSave = (): boolean => {
+    const error = validateThemeForSave({
+      themeName,
+      colors,
+      styles,
+      typography: currentTypography(),
+    })
+    setStepError(error ?? "")
+    if (error) {
+      toast({ title: "Cannot save theme", description: error, variant: "destructive" })
     }
-    setColorNameError("")
-    return true
+    return !error
   }
 
   const removeColor = (id: string) => {
-    const updatedColors = colors.filter((c) => c.id !== id)
-    setColors(updatedColors)
-    // Clear error if no more unnamed colors
-    const hasUnnamed = updatedColors.some(c => c.name.trim() === "")
-    if (!hasUnnamed) {
-      setColorNameError("")
-    }
+    setColors(colors.filter((c) => c.id !== id))
+    // The message is recomputed on the next add/next attempt. Clearing it on any
+    // edit keeps the Next button, which is disabled while an error is showing,
+    // from becoming a dead end after the user has fixed the problem.
+    setColorNameError("")
   }
 
   const updateColor = (id: string, field: "name" | "hex", value: string) => {
     setColors(colors.map((c) => (c.id === id ? { ...c, [field]: value } : c)))
-    // Clear error when user updates color name
-    if (field === "name" && value.trim() !== "") {
-      setColorNameError("")
-    }
+    setColorNameError("")
   }
 
   const importColorsFromText = () => {
@@ -2706,6 +2736,7 @@ ${iconTemplates}</div>`
   }
 
   const handleSaveThemeFromHeader = async () => {
+    if (!validateBeforeSave()) return
     try {
       setIsSaving(true)
       // Simulate a slight delay to show loading state
@@ -2893,6 +2924,14 @@ ${iconTemplates}</div>`
                         return
                       }
                     }
+                    // Same guard as the Next button, so jumping ahead from step 3
+                    // cannot bypass the typography check.
+                    if (currentStep === 3 && step > currentStep) {
+                      if (!validateTypographyForNext()) {
+                        return
+                      }
+                    }
+                    setStepError("")
                     setCurrentStep(step)
                   }}
                   disabled={currentStep === 1 && !!colorNameError && step > currentStep}
@@ -5567,6 +5606,13 @@ ${iconTemplates}</div>`
         </div>
         </div>
 
+        {/* Validation message for the step 3 next guard and the step 4 save guards */}
+        {stepError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm font-medium text-red-700">{stepError}</p>
+          </div>
+        )}
+
         {/* Step Navigation Buttons */}
         <div className="flex items-center justify-between mt-2 gap-4">
           {currentStep > 1 && (
@@ -5586,6 +5632,11 @@ ${iconTemplates}</div>`
                 if (currentStep === 1 && !validateColorsForStep()) {
                   return
                 }
+                // Validate typography on step 3 before advancing
+                if (currentStep === 3 && !validateTypographyForNext()) {
+                  return
+                }
+                setStepError("")
                 setCurrentStep(Math.min(4, currentStep + 1))
               }}
               disabled={currentStep === 1 && !!colorNameError}
@@ -5597,6 +5648,7 @@ ${iconTemplates}</div>`
           {currentStep === 4 && (
             <Button
               onClick={() => {
+                if (!validateBeforeSave()) return
                 // Save theme
                 saveToLocalStorage("savedTheme", {
                   colors,
@@ -5674,6 +5726,7 @@ ${iconTemplates}</div>`
               </Button>
               <Button
                 onClick={() => {
+                  if (!validateBeforeSave()) return
                   // Save theme
                   saveToLocalStorage("savedTheme", {
                     colors,
