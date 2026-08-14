@@ -1,7 +1,7 @@
 {
   "schema": "atd-triage/1",
   "updated": "2026-08-14T00:00:00Z",
-  "batch": "Batch 3 — validation",
+  "batch": "Batch 4 — listing page and layout",
   "issues": [
     {
       "n": 25,
@@ -208,6 +208,35 @@
         "app/page.tsx"
       ],
       "commit": "74685980"
+    },
+    {
+      "n": 4,
+      "status": "blocked",
+      "note": "Out of scope — the theme listing table does not exist in this repository, so there is no Actions column to remove a sort icon from. Same boundary as #1 and #2: the listing lives in the suite's Account settings."
+    },
+    {
+      "n": 84,
+      "status": "fixed",
+      "note": "The builder's header panel (theme name and type badge) carried rounded-lg while the app header directly above it is square, so it read as a floating card. Removed the radius; verified in the browser, computed border-radius is now 0px.",
+      "files": [
+        "components/common/ThemeContextPanel.tsx"
+      ],
+      "commit": "a22561c5"
+    },
+    {
+      "n": 87,
+      "status": "blocked",
+      "note": "Out of scope — no listing table here, so there is no 'Created on' column to sort. Worth passing on to whoever owns the listing: #87 and #88 are almost certainly one bug, not two. Both columns hold dates, and a string comparison over formatted dates would explain both at once, so check the comparator before treating them separately."
+    },
+    {
+      "n": 88,
+      "status": "blocked",
+      "note": "Out of scope — no listing table here ('Modified on' column). Covered by the same comparator note as #87."
+    },
+    {
+      "n": 89,
+      "status": "blocked",
+      "note": "Out of scope — this repo has no 'Saving theme' progress modal. The only saving affordance is the header button switching to 'Saving...' with a spinner (components/common/AppHeader.tsx:45-46). The modal QA saw, and the strings in the copy prompt's #90, belong to the suite's save flow."
     }
   ]
 }
