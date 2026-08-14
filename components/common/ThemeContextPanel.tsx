@@ -32,7 +32,7 @@ export const ThemeContextPanel = ({
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+    <div className="bg-white border border-slate-200 p-6 shadow-sm">
       {/* Theme Name and Metadata Row */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6">
         {/* Theme Name Section */}
