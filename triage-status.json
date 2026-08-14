@@ -1,13 +1,16 @@
 {
   "schema": "atd-triage/1",
   "updated": "2026-08-14T00:00:00Z",
-  "batch": "Batch 1 — shared input components",
+  "batch": "Batch 2 — blockers",
   "issues": [
     {
       "n": 25,
       "status": "fixed",
       "note": "Root cause: no `min` on any numeric input and no clamping in the handlers, so both the spinner and direct typing went below zero. Added a shared NumberField that sets min=0 and clamps on type; converted all 38 numeric inputs in Steps 2, 3 and 4 to it. Verified in a browser: 38/38 fields carry min=0, typing -5 clamps to 0, and the spinner stops at 0.",
-      "files": ["components/common/ThemeFields.tsx", "app/page.tsx"],
+      "files": [
+        "components/common/ThemeFields.tsx",
+        "app/page.tsx"
+      ],
       "commit": "4c5bafe4"
     },
     {
@@ -32,7 +35,10 @@
       "n": 24,
       "status": "fixed",
       "note": "Root cause: every field rendered through a `value || default` fallback chain, so clearing it produced an empty string, which is falsy, and the default was substituted on the same keystroke. NumberField and FontField now hold the in-progress text in local draft state so empty is representable while typing, and reapply the default on blur. Verified in a browser across Steps 2, 3 and 4.",
-      "files": ["components/common/ThemeFields.tsx", "app/page.tsx"],
+      "files": [
+        "components/common/ThemeFields.tsx",
+        "app/page.tsx"
+      ],
       "commit": "4c5bafe4"
     },
     {
@@ -52,6 +58,21 @@
       "status": "fixed",
       "note": "No separate change — covered by the draft-state fix in #24 (FontField covers the Step 3 and Step 4 font fields).",
       "commit": "4c5bafe4"
+    },
+    {
+      "n": 1,
+      "status": "blocked",
+      "note": "Out of scope — the feature does not exist in this repository. This repo is the standalone wizard ('Brand Builder', app/page.tsx); the only routes are app/page.tsx and the three app/api/auth/* handlers. There is no theme listing page, no themes API, and no delete handler on any branch (checked main, hardening, suite-css-theme, suite-css-theme-clean). The Account settings listing lives in the wider suite, which the scope rules exclude. Needs: the suite's listing component and its delete endpoint.",
+      "files": []
+    },
+    {
+      "n": 2,
+      "status": "blocked",
+      "note": "Out of scope to fix — the Edit flow and its API live in the suite. BUT the diagnostic the ticket asks for is confirmed here, and the shape mismatch it predicts is real: 'Save Theme' writes a single localStorage key 'savedTheme' holding a nested 38-key object (app/page.tsx:2715, and identically at :5601 and :5678), while the load path (hooks/useThemeState.ts:61-107) reads ~38 separate flat keys ('themeColors', 'themeStyles', 'h1Font', ...) and never reads 'savedTheme' at all. Nothing in the repo reads it — it is write-only. Key names also disagree (payload 'colors'/'styles' vs loader 'themeColors'/'themeStyles'), and the payload omits themeName, themeType and linkWeight — the first two being exactly what a listing row would display. So a theme saved by the current version cannot be read back by it. Not patched: the serialisation shape is the contract with the suite's load endpoint, which is out of scope and not visible from here, so which shape is canonical needs a decision.",
+      "files": [
+        "app/page.tsx",
+        "hooks/useThemeState.ts"
+      ]
     }
   ]
 }
