@@ -1261,6 +1261,11 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const btnLineHeight = style.buttonLineHeight || buttonLineHeight || "22px"
       const btnWeight = style.buttonWeight || buttonWeight || "400"
       const linkWeightVal = style.linkWeight || linkWeight || "400"
+      // Links typography only writes a font-weight from medium (500) upwards.
+      // Thin, extra light, light and normal are left to inherit.
+      const linkWeightNumeric = parseInt(String(linkWeightVal).replace(/\D/g, "") || "400", 10)
+      const linkWeightDecl = linkWeightNumeric >= 500 ? `font-weight: ${linkWeightVal};` : ""
+      const READMORE_BTN = "a.btn-cm.btn-width-auto.sd-readmore-btn"
       const btnBorderWidth = style.buttonBorderWidth || "0"
       const btnBorderColor = getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg)
       const btnBorderColorHover = getColorHexValue(style.buttonBorderColorHover || style.buttonBgHover)
@@ -1289,10 +1294,10 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .header2{font-family: ${h2FontVal};font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}\n`
       css += `${className} .header3{font-family: ${h3FontVal}; font-size:${h3SizeVal};line-height:${h3LineHeightVal}; font-weight: ${h3WeightVal};}\n`
       css += `${className} .header4{font-family: ${h4FontVal}; font-size:${h4SizeVal};line-height:${h4LineHeightVal}; font-weight: ${h4WeightVal};}\n`
-      css += `${className} .figcaption a, ${className} a{color:${linkColor};text-decoration:underline;font-weight: ${linkWeightVal};}\n`
-      css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
-      css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor}; font-weight: ${linkWeightVal};}\n`
-      css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important; font-weight: ${linkWeightVal};}\n`
+      css += `${className} .figcaption a, ${className} a, ${READMORE_BTN}{color:${linkColor};text-decoration:underline;${linkWeightDecl}}\n`
+      css += `${className} .figcaption a:hover, ${className} a:hover, ${READMORE_BTN}:hover {text-decoration:none;}\n`
+      css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};${linkWeightDecl ? ` ${linkWeightDecl}` : ""}}\n`
+      css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;${linkWeightDecl ? ` ${linkWeightDecl}` : ""}}\n`
       css += `${className} .btn-cm, ${className} button.btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; border: ${btnBorderWidth}px solid ${btnBorderColor};}\n`
       css += `${className} .btn-cm:hover, ${className} .btn-cm:focus, ${className} button.btn-cm:hover, ${className} button.btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important; border-color: ${btnBorderColorHover} !important;}\n`
       
