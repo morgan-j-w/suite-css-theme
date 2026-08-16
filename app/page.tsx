@@ -481,6 +481,10 @@ export default function ThemeGenerator() {
     if (newColors.length > 0) {
       setColors([...colors, ...newColors])
       setBulkColorText("")
+      // Importing is one of the ways to resolve a palette error. Without this
+      // the Next button, which is disabled while an error is showing, stays
+      // disabled after the user has fixed the problem.
+      setColorNameError("")
       if (invalidEntries.length > 0) {
         setColorImportError(`Added ${newColors.length} colour(s), but ${invalidEntries.length} line(s) had invalid format.`)
       }
