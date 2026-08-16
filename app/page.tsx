@@ -3089,7 +3089,7 @@ White #FFFFFF, Black #000000`}
             {currentStep === 3 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Configure your typography</h2>
-                <p className="text-slate-600 mb-4">Set up fonts and sizing for headings, body text, and buttons.</p>
+                <p className="text-slate-600 mb-4">Configure fonts, font sizes and line heights for headings, body text and buttons.</p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Left Column: Typography Controls (scrollable) */}
@@ -3685,7 +3685,7 @@ White #FFFFFF, Black #000000`}
             {currentStep === 2 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Configure your theme</h2>
-                <p className="text-slate-600 mb-6">Set up article padding, icon settings and button styling for your theme.</p>
+                <p className="text-slate-600 mb-6">Configure spacing, icons, and button styles for your theme.</p>
 
                 {/* Theme Type Selector */}
                 <Card className="shadow-sm mb-6">
@@ -3710,11 +3710,11 @@ White #FFFFFF, Black #000000`}
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center space-x-3">
                             <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-300" />
-                            <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer theme</label>
+                            <label htmlFor="composer-theme" className="text-sm font-medium cursor-pointer">Email Composer</label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <RadioGroupItem value="events" id="events-theme" className="w-5 h-5 border-2 border-slate-300" />
-                            <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Events Desk / Landing Pages theme</label>
+                            <label htmlFor="events-theme" className="text-sm font-medium cursor-pointer">Landing Pages and Events Desk</label>
                           </div>
                         </div>
                       </RadioGroup>
@@ -3742,7 +3742,7 @@ White #FFFFFF, Black #000000`}
                   }}
                   placeholder="15"
                 />
-                <p className="text-xs text-muted-foreground mt-2">Used for block padding, image spacing, and content gaps throughout the theme</p>
+                <p className="text-xs text-muted-foreground mt-2">Controls the spacing around content, images and sections throughout your theme.</p>
               </div>
               <div>
                 <Label>Title padding <span className="text-xs text-gray-400">px</span></Label>
@@ -3756,7 +3756,7 @@ White #FFFFFF, Black #000000`}
                   }}
                   placeholder="14"
                 />
-                <p className="text-xs text-muted-foreground mt-2">Controls padding below headers in style blocks</p>
+                <p className="text-xs text-muted-foreground mt-2">Controls the spacing below headings within content blocks.</p>
               </div>
             </CardContent>
           </Card>
@@ -3770,7 +3770,7 @@ White #FFFFFF, Black #000000`}
               <div className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium">Icon style</Label>
-                  <p className="text-xs text-slate-500 mt-1 mb-2">Select an icon style for article sharing functionality</p>
+                  <p className="text-xs text-slate-500 mt-1 mb-2">Choose an icon style for sharing buttons.</p>
                   <Select
                     value={globalIconStyle || "material-sharp"}
                     onValueChange={(value) => setGlobalIconStyle(value)}
@@ -4124,7 +4124,7 @@ White #FFFFFF, Black #000000`}
           <Card>
             <CardHeader>
               <CardTitle>Theme styles</CardTitle>
-              <CardDescription className="pb-4">Manage your theme styles here — update colours and settings, use the arrows to move a style up or down, or click the icons to copy or delete a style.</CardDescription>
+              <CardDescription className="pb-4">Customise your theme styles, reorder, copy, or delete styles as needed for consistent branding across your account.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {styles.map((style, index) => {
@@ -4149,7 +4149,7 @@ White #FFFFFF, Black #000000`}
                               size="icon"
                               onClick={() => moveStyle(style.id, "up")}
                               disabled={index === 0}
-                              title="Move up"
+                              title="Move up theme style"
                             >
                               <ChevronUp className="h-4 w-4" />
                             </Button>
@@ -4158,18 +4158,18 @@ White #FFFFFF, Black #000000`}
                               size="icon"
                               onClick={() => moveStyle(style.id, "down")}
                               disabled={index === styles.length - 1}
-                              title="Move down"
+                              title="Move down theme style"
                             >
                               <ChevronDown className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => removeStyle(style.id)}>
+                            <Button variant="ghost" size="icon" onClick={() => removeStyle(style.id)} title="Delete theme style">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => duplicateStyle(style.id)}
-                              title="Duplicate style"
+                              title="Copy theme style"
                             >
                               <Copy className="h-4 w-4" />
                             </Button>
@@ -4393,7 +4393,7 @@ White #FFFFFF, Black #000000`}
                           <div>
                             <div className="flex items-center gap-1">
                               <Type className="h-3 w-3 text-slate-400" />
-                              <Label className="text-xs text-slate-600">Button text</Label>
+                              <Label className="text-xs text-slate-600">Button text colour</Label>
                             </div>
                             <Select
                               value={style.buttonText}
@@ -4522,7 +4522,7 @@ White #FFFFFF, Black #000000`}
                           <div>
                             <div className="flex items-center gap-1">
                               <Type className="h-3 w-3 text-slate-400" />
-                              <Label className="text-xs text-slate-600">Button text hover</Label>
+                              <Label className="text-xs text-slate-600">Button text colour hover</Label>
                             </div>
                             <Select
                               value={style.buttonTextHover}
