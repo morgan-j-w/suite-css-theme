@@ -41,6 +41,7 @@ import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
 import { DevInformationModal } from "@/components/common/DevInformationModal"
 import { ThemeContextPanel } from "@/components/common/ThemeContextPanel"
+import { ValidationMessage } from "@/components/common/ValidationMessage"
 import { NumberField, FontField } from "@/components/common/ThemeFields"
 
 // Import hooks
@@ -484,7 +485,7 @@ export default function ThemeGenerator() {
         setColorImportError(`Added ${newColors.length} colour(s), but ${invalidEntries.length} line(s) had invalid format.`)
       }
     } else if (bulkColorText.trim()) {
-      setColorImportError("No valid colors found. Use format: #HEX Name or Name #HEX (e.g., #0026C5 Bright Blue or Bright Blue #0026C5)")
+      setColorImportError("No valid colours found. Please add a colour name with a hex code (e.g., #ffffff White).")
     }
   }
 
@@ -2980,7 +2981,7 @@ ${iconTemplates}</div>`
             {currentStep === 1 && (
               <>
                 <h2 className="text-2xl font-bold mb-4">Set up your colour palette</h2>
-                <p className="text-slate-600 mb-4">Add the colours you'll use in your email themes. You can paste multiple colours at once.</p>
+                <p className="text-slate-600 mb-4">Create your colour palette for consistent branding across your themes. Paste multiple colours at once or add them one by one.</p>
           {/* Colours section - full width */}
           <Card className="shadow-sm !py-0">
             <CardHeader className="pb-2 pt-6">
@@ -2996,17 +2997,18 @@ ${iconTemplates}</div>`
                         <HelpCircle className="h-4 w-4 cursor-help text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent side="right" className="max-w-xs">
-                        <p>Enter hex codes on new lines or comma-separated on one line. You can place the hex code first or last:</p>
-                        <p className="mt-2 font-mono text-xs">#HEX Name</p>
-                        <p className="font-mono text-xs">Name #HEX</p>
-                        <p className="mt-2 font-mono text-xs">#HEX - Name</p>
-                        <p className="font-mono text-xs">Name - #HEX</p>
+                        <p>Paste one colour per line or separate multiple colours with commas.</p>
+                        <p className="mt-2">Supported formats: #HEX Colour name or Colour name #HEX.</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
                 <Textarea
-                  placeholder="Enter hex codes on new lines or comma-separated. (Format: #HEX Name or Name #HEX)"
+                  placeholder={`One colour per line or separate multiple colours with commas.
+Examples:
+#FFFFFF White
+#000000 Black
+White #FFFFFF, Black #000000`}
                   value={bulkColorText}
                   onChange={(e) => {
                     setBulkColorText(e.target.value)
@@ -3015,9 +3017,7 @@ ${iconTemplates}</div>`
                   className="min-h-[100px] text-sm font-mono"
                   style={{ backgroundColor: '#FFFFFF', borderColor: '#E6EDF3' }}
                 />
-                {colorImportError && (
-                  <p className="text-sm text-red-500">{colorImportError}</p>
-                )}
+                <ValidationMessage message={colorImportError} />
                 <Button onClick={importColorsFromText} disabled={!bulkColorText.trim()} variant="outline" className="w-full bg-slate-50 hover:bg-slate-100 border-slate-200">
                   <Upload className="h-4 w-4 mr-2" />
                   Import colours
@@ -3060,7 +3060,7 @@ ${iconTemplates}</div>`
                     {/* Color info below */}
                     <div className="p-3 space-y-2 flex-1 flex flex-col">
                       <Input
-                        placeholder="Color name"
+                        placeholder="Colour name"
                         value={color.name}
                         onChange={(e) => updateColor(color.id, "name", e.target.value)}
                         className="h-8 text-xs transition-all duration-150"
@@ -3075,11 +3075,7 @@ ${iconTemplates}</div>`
                   </div>
                 ))}
               </div>
-              {colorNameError && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm font-medium text-red-700">{colorNameError}</p>
-                </div>
-              )}
+              <ValidationMessage message={colorNameError} />
               <Button onClick={addColor} variant="outline" className="mt-4 bg-slate-50 hover:bg-slate-100 border-slate-200 w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Add colour
@@ -5582,11 +5578,7 @@ ${iconTemplates}</div>`
         </div>
 
         {/* Validation message for the step 3 next guard and the step 4 save guards */}
-        {stepError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm font-medium text-red-700">{stepError}</p>
-          </div>
-        )}
+        <ValidationMessage message={stepError} />
 
         {/* Step Navigation Buttons */}
         <div className="flex items-center justify-between mt-2 gap-4">
