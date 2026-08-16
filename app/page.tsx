@@ -25,6 +25,7 @@ import { generateCSS, getColorHex, getContrastRatio, findAccessibleAlternatives 
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts, toCssPx } from "@/lib/utils/helpers"
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
+import { buildIconTemplates } from "@/lib/icon-templates"
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
 import {
@@ -2662,40 +2663,11 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
   }
 
   const copyExportHtml = async () => {
-    const iconStyleMap: Record<string, string> = {
-      'material-rounded': 'material-rounded',
-      'material-outlined': 'material-outlined',
-      'material-sharp': 'material-sharp',
-    }
-    // For X icon only, swap the rounded/sharp styles due to icons8 naming
-    const xIconStyleMap: Record<string, string> = {
-      'material-rounded': 'material-sharp',
-      'material-outlined': 'material-outlined',
-      'material-sharp': 'material-rounded',
-    }
-    const iconSize = globalIconSize || "18"
-
-    const shareIcons = [
-      { name: 'Facebook', id: 'facebook', variable: 'FACEBOOK_SHARE_DOC' },
-      { name: 'X', id: 'twitterx--v1', variable: 'TWITTER_SHARE_DOC' },
-      { name: 'LinkedIn', id: 'linkedin', variable: 'LINKEDIN_SHARE_DOC' },
-      { name: 'Print', id: 'print', variable: 'PRINT_SHARE_DOC' },
-      { name: 'Email', id: 'new-post', variable: 'FORWARD_SHARE_DOC' },
-    ]
-
-    // Generate icon templates for each style
-    let iconTemplates = ''
-    styles.forEach((style, index) => {
-      const iconColor = (style.iconColor || "#000000").replace('#', '')
-      iconTemplates += `    <div class="text-style-${index + 1}"><br>\n`
-      shareIcons.forEach(icon => {
-        const classId = icon.id === 'twitterx--v1' ? 'twitter' : icon.id === 'new-post' ? 'forward' : icon.id
-        const mappedStyle = (icon.id === 'twitterx--v1' ? xIconStyleMap : iconStyleMap)[globalIconStyle || 'material-sharp']
-        iconTemplates += `        <a title="${icon.name}" class="sd-${classId}" style="text-decoration: none;" href="{!${icon.variable}!}">\n`
-        iconTemplates += `            <img alt="${icon.name}" src="https://img.icons8.com/${mappedStyle}/96/${iconColor}/${icon.id}.png" width="${iconSize}">\n`
-        iconTemplates += `        </a>\n`
-      })
-      iconTemplates += `    </div>\n`
+    // Built in lib/icon-templates.ts, which is covered by a test asserting the
+    // merge-tag braces are emitted literally.
+    const iconTemplates = buildIconTemplates(styles, {
+      iconStyle: globalIconStyle,
+      iconSize: globalIconSize,
     })
 
     // Determine which grid templates to use based on theme type
