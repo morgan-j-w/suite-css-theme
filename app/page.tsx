@@ -5100,11 +5100,12 @@ White #FFFFFF, Black #000000`}
                           <Switch
                             id={`typographyOverrides-${style.id}`}
                             checked={typographyOverridesOn(style)}
+                            className="data-[state=unchecked]:bg-slate-300"
                             onCheckedChange={(checked) => setTypographyOverridesOn(style.id, checked)}
                           />
                           <Label
                             htmlFor={`typographyOverrides-${style.id}`}
-                            className="font-semibold text-sm cursor-pointer"
+                            className="text-xs font-semibold text-slate-700 cursor-pointer"
                           >
                             Typography overrides
                           </Label>
