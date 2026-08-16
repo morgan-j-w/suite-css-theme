@@ -5129,9 +5129,6 @@ White #FFFFFF, Black #000000`}
                             </Tooltip>
                           </TooltipProvider>
                         </div>
-                        {!typographyOverridesOn(style) && (
-                          <span className="text-xs text-slate-500">Using global typography</span>
-                        )}
                       </div>
 
                       {typographyOverridesOn(style) && (
