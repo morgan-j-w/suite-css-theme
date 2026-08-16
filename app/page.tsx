@@ -26,6 +26,7 @@ import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
 import { cleanFontValue, formatFontForCSS, getAvailableFonts, toCssPx } from "@/lib/utils/helpers"
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
 import { buildIconTemplates } from "@/lib/icon-templates"
+import { splitTitlePadding } from "@/lib/title-padding"
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
 import {
@@ -1015,6 +1016,9 @@ export default function ThemeGenerator() {
     const bodySizeVal = bodySize || "15px"
     const bodyLineHeightVal = bodyLineHeight || "22px"
     const bodyWeightVal = bodyWeight || "400"
+    // The links block header and the text under it share the title padding:
+    // the text carries its own top padding, so the header takes the remainder.
+    const titlePaddingSplit = splitTitlePadding(titlePaddingBottom)
     const h1SizeVal = h1Size || "22px"
     const h1LineHeightVal = h1LineHeight || "30px"
     const h1WeightVal = h1Weight || "400"
@@ -1171,12 +1175,12 @@ a.btn-cm.btn-poll {width: 100% !important; padding: ${buttonPaddingTop}px 0px ${
 
 a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
-.link-text {text-align: left;  font-size: ${bodySizeVal}; line-height: ${bodyLineHeightVal}; font-weight: ${bodyWeightVal}; padding-top: 10px;}
+.link-text {text-align: left;  font-size: ${bodySizeVal}; line-height: ${bodyLineHeightVal}; font-weight: ${bodyWeightVal}; padding-top: ${titlePaddingSplit.linkTextPaddingTop}px;}
 .links-body {}
 .single-link {text-align: left;}
 .link-text a {text-align: left;}
 .single-link table {width: 100%;}
-#layout .block[data-sd-content="links"] .block-body .header-container .header {padding-bottom:0px;}
+#layout .block[data-sd-content="links"] .block-body .header-container .header {padding-bottom:${titlePaddingSplit.headerPaddingBottom}px;}
 
 .share-article {padding-top: 0px;}
 
