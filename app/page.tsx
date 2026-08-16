@@ -1032,6 +1032,9 @@ export default function ThemeGenerator() {
     const h4LineHeightVal = h4LineHeight || "24px"
     const h4WeightVal = h4Weight || "400"
     const paddingValue = themePadding.replace("px", "") || "25"
+    // Step 2 > Theme padding > Title padding, as entered. Distinct from the
+    // links-block split above, which subtracts the content's own top padding.
+    const titlePaddingValue = (titlePaddingBottom || "14").replace("px", "")
     const buttonPaddingValue = `${buttonPaddingTop}px ${buttonPaddingRight}px ${buttonPaddingBottom}px ${buttonPaddingLeft}px`
     const buttonBorderRadiusValue = `${buttonBorderRadius || "4px"}`
     
@@ -1196,6 +1199,24 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
 
 #layout .block[data-image-position="right"] .share-article, #layout .block[data-image-position="left"] .share-article {padding-top: ${paddingValue}px !Important;}
+
+/* Feedback block: uses the theme padding */
+#layout .block[data-sd-content="sd-feedback"] {padding: ${paddingValue}px;}
+
+/* Table headers and footers keep the block background rather than their own */
+#layout table thead tr th, #layout table tfoot tr td {background-color: transparent;}
+
+/* Session selector: wrapper takes the title padding, body takes the theme padding */
+.sd-session-selector-wrapper {padding-bottom: ${titlePaddingValue}px;}
+.sd-session-selector-main {padding-top: ${paddingValue}px;}
+
+/* Registration form spacing, from the theme padding */
+.regform-summary-container {padding-bottom: ${paddingValue}px;}
+#middle_0_wide .block[data-sd-content="subscription"], #middle_0_wide .block[data-sd-content="sd-total-summary"], #middle_0_wide .block[data-sd-content="event-reg-action"], #middle_0_wide .block[data-sd-content="sd-session-selector"] {padding-top: ${paddingValue}px;}
+
+/* Guest form spacing, from the theme padding */
+.form-group:last-child {margin-bottom: 0px !important;}
+.guestHeadingWrapper {padding-top: ${paddingValue}px; margin-top: ${paddingValue}px;}
 
 
 `
