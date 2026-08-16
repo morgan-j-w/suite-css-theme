@@ -1,5 +1,7 @@
 'use client'
 
+import { AlertCircle } from 'lucide-react'
+
 import { useToast } from '@/hooks/use-toast'
 import {
   Toast,
@@ -16,20 +18,49 @@ export function Toaster() {
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
+        const isError = props.variant === 'destructive'
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
+          <Toast
+            key={id}
+            {...props}
+            // The destructive variant is unreadable with this project's tokens:
+            // --destructive-foreground is defined as the same colour as
+            // --destructive, so it renders red text on a red background. These
+            // explicit colours match the error styling used elsewhere.
+            className={
+              isError
+                ? 'border-red-200 bg-red-50 text-red-700 [&>button]:text-red-700 [&>button]:opacity-70'
+                : undefined
+            }
+          >
+            <div className="flex items-start gap-3">
+              {isError && (
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
               )}
+              <div className="grid gap-1">
+                {title && (
+                  <ToastTitle className={isError ? 'text-red-800' : undefined}>
+                    {title}
+                  </ToastTitle>
+                )}
+                {description && (
+                  <ToastDescription className={isError ? 'text-red-700 opacity-100' : undefined}>
+                    {description}
+                  </ToastDescription>
+                )}
+              </div>
             </div>
             {action}
             <ToastClose />
           </Toast>
         )
       })}
-      <ToastViewport />
+      {/*
+        Anchored top-right rather than the shadcn default of bottom-right, so a
+        validation message appears next to the Save Theme button that triggered
+        it. The top padding clears the sticky app header.
+      */}
+      <ToastViewport className="sm:top-0 sm:bottom-auto sm:flex-col pt-20 md:pt-28 pr-4" />
     </ToastProvider>
   )
 }

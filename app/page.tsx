@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 
 // Import types
@@ -57,8 +57,6 @@ export default function ThemeGenerator() {
   const [copiedMedia, setCopiedMedia] = useState(false)
   const [colorImportError, setColorImportError] = useState("")
   const [colorNameError, setColorNameError] = useState("")
-  // Validation message for the Step 3 next guard and the Step 4 save guards.
-  const [stepError, setStepError] = useState("")
   const [showExitWarning, setShowExitWarning] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const isInitializedRef = useRef(false)
@@ -403,9 +401,14 @@ export default function ThemeGenerator() {
     buttonFont, buttonSize, buttonLineHeight,
   })
 
+  /** Validation failures surface as a toast beside the button that was clicked. */
+  const showValidationToast = (title: string, message: string) => {
+    toast({ title, description: message, variant: "destructive" })
+  }
+
   const validateTypographyForNext = (): boolean => {
     const error = validateTypographyForStep(currentTypography())
-    setStepError(error ?? "")
+    if (error) showValidationToast("Cannot continue", error)
     return !error
   }
 
@@ -417,10 +420,7 @@ export default function ThemeGenerator() {
       styles,
       typography: currentTypography(),
     })
-    setStepError(error ?? "")
-    if (error) {
-      toast({ title: "Cannot save theme", description: error, variant: "destructive" })
-    }
+    if (error) showValidationToast("Cannot save theme", error)
     return !error
   }
 
@@ -2061,7 +2061,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
         <a title="Print" class="sd-print" style="text-decoration: none;" href="{!PRINT_SHARE_DOC!}">
             <img alt="Print" src="[UPDATE_WITH_YOUR_PRINT_ICON_URL]" width="18">
         </a>
-        <a title="Send as Email" class="sd-email" style="text-decoration: none;" href="{!EMAIL_SHARE_DOC!}">
+        <a title="Send as Email" class="sd-email" style="text-decoration: none;" href="{!FORWARD_SHARE_DOC!}">
             <img alt="Email" src="[UPDATE_WITH_YOUR_EMAIL_ICON_URL]" width="18">
         </a>
     </div>`).join("\n")}
@@ -2673,7 +2673,7 @@ ${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
       { name: 'X', id: 'twitterx--v1', variable: 'TWITTER_SHARE_DOC' },
       { name: 'LinkedIn', id: 'linkedin', variable: 'LINKEDIN_SHARE_DOC' },
       { name: 'Print', id: 'print', variable: 'PRINT_SHARE_DOC' },
-      { name: 'Email', id: 'new-post', variable: 'EMAIL_SHARE_DOC' },
+      { name: 'Email', id: 'new-post', variable: 'FORWARD_SHARE_DOC' },
     ]
 
     // Generate icon templates for each style
@@ -2937,8 +2937,7 @@ ${iconTemplates}</div>`
                         return
                       }
                     }
-                    setStepError("")
-                    setCurrentStep(step)
+                        setCurrentStep(step)
                   }}
                   disabled={currentStep === 1 && !!colorNameError && step > currentStep}
                   className={`w-10 h-10 rounded-full font-semibold flex items-center justify-center transition-all ${
@@ -5577,9 +5576,6 @@ White #FFFFFF, Black #000000`}
         </div>
         </div>
 
-        {/* Validation message for the step 3 next guard and the step 4 save guards */}
-        <ValidationMessage message={stepError} />
-
         {/* Step Navigation Buttons */}
         <div className="flex items-center justify-between mt-2 gap-4">
           {currentStep > 1 && (
@@ -5603,7 +5599,6 @@ White #FFFFFF, Black #000000`}
                 if (currentStep === 3 && !validateTypographyForNext()) {
                   return
                 }
-                setStepError("")
                 setCurrentStep(Math.min(4, currentStep + 1))
               }}
               disabled={currentStep === 1 && !!colorNameError}
