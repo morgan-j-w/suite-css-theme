@@ -1,7 +1,7 @@
 {
   "schema": "atd-triage/1",
-  "updated": "2026-08-14T00:00:00Z",
-  "batch": "Batch 5 — Step 4 standalones",
+  "updated": "2026-08-16T00:00:00Z",
+  "batch": "Copy and text changes",
   "issues": [
     {
       "n": 25,
@@ -270,6 +270,191 @@
         "package.json"
       ],
       "commit": "2366c978"
+    },
+    {
+      "n": 5,
+      "status": "blocked",
+      "note": "Out of scope — no theme listing page in this repository. Same boundary as #1/#2/#4/#87/#88."
+    },
+    {
+      "n": 6,
+      "status": "blocked",
+      "note": "Out of scope — no listing table, so there is no Type column. Worth noting for whoever does it: the ticket's caution is right, the stored value should stay as-is and only the display label should become 'page/event'."
+    },
+    {
+      "n": 85,
+      "status": "blocked",
+      "note": "String not present. This repo brands itself 'Brand Builder' (app/layout.tsx:11 metadata title, and the h1 in components/common/AppHeader.tsx), not 'Advanced Theme Manager'. Renaming 'Brand Builder' would be a different change than the one asked for, so it needs your decision — the 'Advanced Theme Manager' occurrences are presumably in the suite's page title, breadcrumb and nav."
+    },
+    {
+      "n": 17,
+      "status": "fixed",
+      "note": "Step 1 intro replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 18,
+      "status": "fixed",
+      "note": "Textarea placeholder replaced with the multi-line version; line breaks preserved via a template literal, verified in the browser on the rendered placeholder attribute.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 19,
+      "status": "fixed",
+      "note": "Help text / info icon tooltip replaced. The hyphenated formats are gone, which is what the parser actually rejects.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 16,
+      "status": "fixed",
+      "note": "No separate change — covered by #19 as the prompt directed. They are the same element: one tooltip on the Paste colours info icon.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 20,
+      "status": "fixed",
+      "note": "Import colours error message replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 21,
+      "status": "fixed",
+      "note": "Same single edit as #20 for the text, plus the styling. There was no shared error component, so rather than pasting raw markup a third time I extracted components/common/ValidationMessage.tsx and pointed the import error, the colour validation error and the step 3/4 validation error at it. Verified the rendered markup matches the block QA supplied.",
+      "files": [
+        "app/page.tsx",
+        "components/common/ValidationMessage.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 22,
+      "status": "blocked",
+      "note": "Not a string in this codebase. The Step 1 swatch opens a native <input type=\"color\"> (app/page.tsx:3040) with no heading of its own — 'Choose a color' is the operating system / browser colour picker's own dialog title, which web code cannot change. Fixing this would mean replacing the native picker with an in-app dialog, which is a feature change, not copy."
+    },
+    {
+      "n": 23,
+      "status": "fixed",
+      "note": "Colour name field placeholder on Step 1.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "b2d37d9a"
+    },
+    {
+      "n": 53,
+      "status": "fixed",
+      "note": "Step 2 description replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 54,
+      "status": "fixed",
+      "note": "Both theme type option labels replaced. Also changed the matching theme type badge in components/common/ThemeContextPanel.tsx:82, which displayed the same two strings — leaving it would have had the badge say 'Email Composer theme' while the option said 'Email Composer'.",
+      "files": [
+        "app/page.tsx",
+        "components/common/ThemeContextPanel.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 55,
+      "status": "fixed",
+      "note": "Theme padding field description replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 56,
+      "status": "fixed",
+      "note": "Title padding field description replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 57,
+      "status": "fixed",
+      "note": "Icon style field description replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 64,
+      "status": "fixed",
+      "note": "Step 3 description replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 79,
+      "status": "fixed",
+      "note": "Step 4 description replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 82,
+      "status": "fixed",
+      "note": "Both colour picker labels replaced. Left the 'Button text' row in the WCAG contrast readout unchanged — it is a contrast result line, not a colour field, so 'Button text colour' would read wrongly there.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 81,
+      "status": "fixed",
+      "note": "All three action tooltips replaced.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 80,
+      "status": "fixed",
+      "note": "Delete icon had no title attribute; added one matching how the move/copy tooltips are implemented. Verified all four tooltips are present on a style.",
+      "files": [
+        "app/page.tsx"
+      ],
+      "commit": "1e09fd27"
+    },
+    {
+      "n": 90,
+      "status": "blocked",
+      "note": "Out of scope — no saving modal in this repo, so neither string exists. Same finding as #89: the only saving affordance here is the header button switching to 'Saving...'."
+    },
+    {
+      "n": 91,
+      "status": "blocked",
+      "note": "Out of scope — no theme listing, so there is no empty state to split from a loading state. The string 'No theme found in this account.' does not appear in this repository."
     }
   ]
 }
