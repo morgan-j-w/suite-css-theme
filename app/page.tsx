@@ -68,7 +68,9 @@ export default function ThemeGenerator() {
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [expandedTypography, setExpandedTypography] = useState<Set<string>>(new Set())
+  const [typographyEnabledIds, setTypographyEnabledIds] = useState<Set<string>>(new Set())
+  // Purely visual: which styles have their override fields folded away.
+  const [typographyCollapsedIds, setTypographyCollapsedIds] = useState<Set<string>>(new Set())
   const [showDevInfo, setShowDevInfo] = useState(false)
   const [copiedCss, setCopiedCss] = useState(false)
   const [copiedImport, setCopiedImport] = useState(false)
@@ -100,12 +102,18 @@ export default function ThemeGenerator() {
   })
 
   const typographyOverridesOn = (style: StyleDefinition): boolean =>
-    expandedTypography.has(style.id) || hasTypographyOverrides(style, typographyGlobals())
+    typographyEnabledIds.has(style.id) || hasTypographyOverrides(style, typographyGlobals())
 
   const setTypographyOverridesOn = (styleId: string, enabled: boolean) => {
-    const newSet = new Set(expandedTypography)
+    const newSet = new Set(typographyEnabledIds)
     if (enabled) {
       newSet.add(styleId)
+      // Enabling means the user wants to edit, so show the fields.
+      setTypographyCollapsedIds((prev) => {
+        const next = new Set(prev)
+        next.delete(styleId)
+        return next
+      })
     } else {
       newSet.delete(styleId)
       // Switching off reverts the style to the Step 3 typography.
@@ -113,7 +121,18 @@ export default function ThemeGenerator() {
         prev.map((s) => (s.id === styleId ? { ...s, ...clearedTypographyOverrides() } : s)),
       )
     }
-    setExpandedTypography(newSet)
+    setTypographyEnabledIds(newSet)
+  }
+
+  const typographyCollapsed = (styleId: string) => typographyCollapsedIds.has(styleId)
+
+  const toggleTypographyCollapsed = (styleId: string) => {
+    setTypographyCollapsedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(styleId)) next.delete(styleId)
+      else next.add(styleId)
+      return next
+    })
   }
 
 
@@ -5129,10 +5148,27 @@ White #FFFFFF, Black #000000`}
                             </Tooltip>
                           </TooltipProvider>
                         </div>
+                        {typographyOverridesOn(style) && (
+                          <button
+                            type="button"
+                            onClick={() => toggleTypographyCollapsed(style.id)}
+                            aria-expanded={!typographyCollapsed(style.id)}
+                            aria-controls={`typographyFields-${style.id}`}
+                            className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors"
+                            title={typographyCollapsed(style.id) ? 'Show typography fields' : 'Hide typography fields'}
+                          >
+                            {typographyCollapsed(style.id) ? 'Show' : 'Hide'}
+                            {typographyCollapsed(style.id) ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronUp className="h-4 w-4" />
+                            )}
+                          </button>
+                        )}
                       </div>
 
-                      {typographyOverridesOn(style) && (
-                        <div className="mt-4">
+                      {typographyOverridesOn(style) && !typographyCollapsed(style.id) && (
+                        <div className="mt-4" id={`typographyFields-${style.id}`}>
                           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Heading Typography Column */}
                             <div className="space-y-6">
