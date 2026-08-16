@@ -27,6 +27,7 @@ import { cleanFontValue, formatFontForCSS, getAvailableFonts, toCssPx } from "@/
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
 import { buildIconTemplates } from "@/lib/icon-templates"
 import { splitTitlePadding } from "@/lib/title-padding"
+import { clearedTypographyOverrides, hasTypographyOverrides } from "@/lib/typography-overrides"
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
 import {
@@ -80,12 +81,37 @@ export default function ThemeGenerator() {
   const [cssValidationResult, setCssValidationResult] = useState<any>(null)
   const { toast } = useToast()
 
-  const toggleTypographyExpanded = (styleId: string) => {
+  /**
+   * A style is treated as overriding typography when it has been switched on in
+   * this session or already carries override values from a loaded theme.
+   */
+  // Read lazily: the global typography state is destructured further down.
+  const typographyGlobals = () => ({
+    h1Font, h2Font, h3Font, h4Font, bodyFont, buttonFont,
+    h1Size, h1LineHeight, h1Weight,
+    h2Size, h2LineHeight, h2Weight,
+    h3Size, h3LineHeight, h3Weight,
+    h4Size, h4LineHeight, h4Weight,
+    bodySize, bodyLineHeight, bodyWeight,
+    linkWeight,
+    buttonSize, buttonLineHeight, buttonWeight,
+    buttonBorderRadius,
+    buttonPaddingTop, buttonPaddingRight, buttonPaddingBottom, buttonPaddingLeft,
+  })
+
+  const typographyOverridesOn = (style: StyleDefinition): boolean =>
+    expandedTypography.has(style.id) || hasTypographyOverrides(style, typographyGlobals())
+
+  const setTypographyOverridesOn = (styleId: string, enabled: boolean) => {
     const newSet = new Set(expandedTypography)
-    if (newSet.has(styleId)) {
-      newSet.delete(styleId)
-    } else {
+    if (enabled) {
       newSet.add(styleId)
+    } else {
+      newSet.delete(styleId)
+      // Switching off reverts the style to the Step 3 typography.
+      setStyles((prev) =>
+        prev.map((s) => (s.id === styleId ? { ...s, ...clearedTypographyOverrides() } : s)),
+      )
     }
     setExpandedTypography(newSet)
   }
@@ -5069,12 +5095,19 @@ White #FFFFFF, Black #000000`}
 
                     {/* Typography Overrides Section */}
                     <div className="mt-4 border-t pt-4">
-                      <button
-                        onClick={() => toggleTypographyExpanded(style.id)}
-                        className="w-full flex items-center justify-between hover:bg-slate-100 transition-colors p-2 rounded"
-                      >
+                      <div className="w-full flex items-center justify-between p-2 rounded">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">Typography overrides</span>
+                          <Switch
+                            id={`typographyOverrides-${style.id}`}
+                            checked={typographyOverridesOn(style)}
+                            onCheckedChange={(checked) => setTypographyOverridesOn(style.id, checked)}
+                          />
+                          <Label
+                            htmlFor={`typographyOverrides-${style.id}`}
+                            className="font-semibold text-sm cursor-pointer"
+                          >
+                            Typography overrides
+                          </Label>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -5086,14 +5119,12 @@ White #FFFFFF, Black #000000`}
                             </Tooltip>
                           </TooltipProvider>
                         </div>
-                        {expandedTypography.has(style.id) ? (
-                          <ChevronUp className="h-4 w-4 text-slate-600" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-slate-600" />
+                        {!typographyOverridesOn(style) && (
+                          <span className="text-xs text-slate-500">Using global typography</span>
                         )}
-                      </button>
+                      </div>
 
-                      {expandedTypography.has(style.id) && (
+                      {typographyOverridesOn(style) && (
                         <div className="mt-4">
                           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Heading Typography Column */}
@@ -5512,36 +5543,7 @@ White #FFFFFF, Black #000000`}
                                 if (s.id === style.id) {
                                   return {
                                     ...s,
-                                    h1Font: undefined,
-                                    h2Font: undefined,
-                                    h3Font: undefined,
-                                    h4Font: undefined,
-                                    bodyFont: undefined,
-                                    buttonFont: undefined,
-                                    h1Size: undefined,
-                                    h1LineHeight: undefined,
-                                    h1Weight: undefined,
-                                    h2Size: undefined,
-                                    h2LineHeight: undefined,
-                                    h2Weight: undefined,
-                                    h3Size: undefined,
-                                    h3LineHeight: undefined,
-                                    h3Weight: undefined,
-                                    h4Size: undefined,
-                                    h4LineHeight: undefined,
-                                    h4Weight: undefined,
-                                    bodySize: undefined,
-                                    bodyLineHeight: undefined,
-                                    bodyWeight: undefined,
-                                    linkWeight: undefined,
-                                    buttonSize: undefined,
-                                    buttonLineHeight: undefined,
-                                    buttonWeight: undefined,
-                                    buttonBorderRadius: undefined,
-                                    buttonPaddingTop: undefined,
-                                    buttonPaddingRight: undefined,
-                                    buttonPaddingBottom: undefined,
-                                    buttonPaddingLeft: undefined,
+                                    ...clearedTypographyOverrides(),
                                   }
                                 }
                                 return s
