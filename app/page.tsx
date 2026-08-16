@@ -944,6 +944,19 @@ export default function ThemeGenerator() {
     return Number.isFinite(parsed) ? parsed : fallback
   }
 
+  /**
+   * Row status icon. AA and AAA both count as a pass, so both are green; amber
+   * is reserved for the recoverable near miss where the pair would pass if the
+   * text were sized as large text.
+   */
+  const contrastIcon = (result: ContrastResults["headingOnBg"]) => {
+    if (result.aa) return <CheckCircle size={14} className="text-green-600" />
+    if (!result.largeText && result.ratio >= 3) {
+      return <AlertCircle size={14} className="text-yellow-600" />
+    }
+    return <X size={14} className="text-red-600" />
+  }
+
   const getContrastHint = (result: ContrastResults["headingOnBg"]): string | null => {
     if (result.aa) return null
 
@@ -4651,18 +4664,14 @@ White #FFFFFF, Black #000000`}
                             const typographyDependentFail = level === 'FAIL' && isTypographyDependentFail(contrastResults)
                             const badgeColor = typographyDependentFail
                               ? 'bg-yellow-50 text-yellow-700'
-                              : level === 'AAA'
+                              : level === 'AAA' || level === 'AA'
                                 ? 'bg-green-50 text-green-700'
-                                : level === 'AA'
-                                  ? 'bg-yellow-50 text-yellow-700'
-                                  : 'bg-red-50 text-red-700'
+                                : 'bg-red-50 text-red-700'
                             const borderColor = typographyDependentFail
                               ? 'border-yellow-200'
-                              : level === 'AAA'
+                              : level === 'AAA' || level === 'AA'
                                 ? 'border-green-200'
-                                : level === 'AA'
-                                  ? 'border-yellow-200'
-                                  : 'border-red-200'
+                                : 'border-red-200'
                             const badgeLabel = typographyDependentFail ? 'WCAG AA' : `WCAG ${level}`
                             const headingHint = getContrastHint(contrastResults.headingOnBg)
                             const bodyHint = getContrastHint(contrastResults.bodyTextOnBg)
@@ -4678,7 +4687,7 @@ White #FFFFFF, Black #000000`}
                                       className={`px-2 py-1 rounded text-xs font-semibold ${badgeColor} border ${borderColor} cursor-help flex items-center gap-1.5 ${isSuggestionPopoverOpen ? 'pointer-events-none opacity-80' : ''}`}
                                     >
                                       {badgeLabel}
-                                      {typographyDependentFail ? <AlertCircle size={14} /> : level === 'AAA' ? <Check size={14} /> : level === 'AA' ? <AlertCircle size={14} /> : null}
+                                      {typographyDependentFail ? <AlertCircle size={14} /> : level === 'AAA' || level === 'AA' ? <Check size={14} /> : null}
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent side="top" showArrow={false} className="bg-white text-slate-900 border border-slate-200 shadow-lg p-3 max-w-md">
@@ -4697,7 +4706,7 @@ White #FFFFFF, Black #000000`}
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.headingOnBg.ratio}:1</span>
-                                            {contrastResults.headingOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.headingOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                            {contrastIcon(contrastResults.headingOnBg)}
                                           </div>
                                         </div>
                                         {headingHint && (
@@ -4712,7 +4721,7 @@ White #FFFFFF, Black #000000`}
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.bodyTextOnBg.ratio}:1</span>
-                                            {contrastResults.bodyTextOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.bodyTextOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                            {contrastIcon(contrastResults.bodyTextOnBg)}
                                           </div>
                                         </div>
                                         {bodyHint && (
@@ -4727,7 +4736,7 @@ White #FFFFFF, Black #000000`}
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.linkOnBg.ratio}:1</span>
-                                            {contrastResults.linkOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.linkOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                            {contrastIcon(contrastResults.linkOnBg)}
                                           </div>
                                         </div>
                                         {linkHint && (
@@ -4742,7 +4751,7 @@ White #FFFFFF, Black #000000`}
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.buttonTextOnButtonBg.ratio}:1</span>
-                                            {contrastResults.buttonTextOnButtonBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.buttonTextOnButtonBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                            {contrastIcon(contrastResults.buttonTextOnButtonBg)}
                                           </div>
                                         </div>
                                         {buttonHint && (
@@ -4757,7 +4766,7 @@ White #FFFFFF, Black #000000`}
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.buttonBgOnBg.ratio}:1</span>
-                                            {contrastResults.buttonBgOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.buttonBgOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                            {contrastIcon(contrastResults.buttonBgOnBg)}
                                           </div>
                                         </div>
                                         <div className="flex justify-between gap-4 items-center">
@@ -4767,7 +4776,7 @@ White #FFFFFF, Black #000000`}
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.iconOnBg.ratio}:1</span>
-                                            {contrastResults.iconOnBg.aaa ? <CheckCircle size={14} className="text-green-600" /> : contrastResults.iconOnBg.aa ? <AlertCircle size={14} className="text-yellow-600" /> : <X size={14} className="text-red-600" />}
+                                            {contrastIcon(contrastResults.iconOnBg)}
                                           </div>
                                         </div>
                                       </div>
