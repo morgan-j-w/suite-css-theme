@@ -1161,10 +1161,10 @@ padding: ${paddingValue}px}
 .add-to-calendar-container td:first-child{font-size:14px;}
 
 /* Buttons */
-.read-more-wrapper .btn-cm, .link-button-wrapper .btn-cm{padding-left:${buttonPaddingLeft}px;text-decoration:none;padding-right:${buttonPaddingRight}px;width: auto;}
+.read-more-wrapper .btn-cm, .read-more-wrapper button.btn-cm, .link-button-wrapper .btn-cm, .link-button-wrapper button.btn-cm{padding-left:${buttonPaddingLeft}px;text-decoration:none;padding-right:${buttonPaddingRight}px;width: auto;}
 
 
-.btn-cm{/* All buttons styles */
+.btn-cm, button.btn-cm{/* All buttons styles */
 background-color:${firstStyleButtonBg}; border: 0px;
 color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
 
@@ -1212,7 +1212,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
 /* Registration form spacing, from the theme padding */
 .regform-summary-container {padding-bottom: ${paddingValue}px;}
-#middle_0_wide .block[data-sd-content="subscription"], #middle_0_wide .block[data-sd-content="sd-total-summary"], #middle_0_wide .block[data-sd-content="event-reg-action"], #middle_0_wide .block[data-sd-content="sd-session-selector"] {padding-top: ${paddingValue}px;}
+.regform-summary-container[sd-style="STS"] .discountCodeWrapper {padding-bottom: 20px;}
+#middle_0_wide .block[data-sd-content="subscription"], #middle_0_wide .block[data-sd-content="sd-total-summary"], #middle_0_wide .block[data-sd-content="event-reg-action"], #middle_0_wide .block[data-sd-content="sd-session-selector"] {padding: ${paddingValue}px;}
 
 /* Guest form spacing, from the theme padding */
 .form-group:last-child {margin-bottom: 0px !important;}
@@ -1221,6 +1222,11 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
 `
     css = baseCss
+
+    // Landing Pages and Events Desk themes only.
+    if (themeType === 'events') {
+      css += `#middle_0_wide .block {padding-left: inherit; padding-right: inherit;}\n\n`
+    }
 
     styles.forEach((style, index) => {
       const styleNum = index + 1
@@ -1287,8 +1293,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .figcaption a:hover, ${className} a:hover {text-decoration:none;}\n`
       css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor}; font-weight: ${linkWeightVal};}\n`
       css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important; font-weight: ${linkWeightVal};}\n`
-      css += `${className} .btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; border: ${btnBorderWidth}px solid ${btnBorderColor};}\n`
-      css += `${className} .btn-cm:hover,  ${className} .btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important; border-color: ${btnBorderColorHover} !important;}\n`
+      css += `${className} .btn-cm, ${className} button.btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; border: ${btnBorderWidth}px solid ${btnBorderColor};}\n`
+      css += `${className} .btn-cm:hover, ${className} .btn-cm:focus, ${className} button.btn-cm:hover, ${className} button.btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important; border-color: ${btnBorderColorHover} !important;}\n`
       
       // Add no padding CSS if noPadding is enabled
       if (style.noPadding) {
@@ -1296,6 +1302,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         css += `#layout ${className}.block[data-sd-content=article]:not([data-image-position]) .block-body>tbody>tr>.header, #layout ${className}.block[data-sd-content=article][data-image-position=bottom] .block-body>tbody>tr:not(.media-container)>.header, #layout ${className}.block[data-sd-content=article][data-image-position=top] .block-body>tbody>tr:not(.media-container)>.header {padding-bottom: ${titlePaddingBottom || "14"}px;}\n`
         css += `#layout ${className}.block[data-sd-content=map] td.gm-text-wrapper, #layout ${className}.block[data-sd-content=poll], #layout ${className}.block[data-sd-content=links], #layout ${className}.block[data-sd-content=rsvp], #layout ${className}.block[data-sd-content=calendar], #layout ${className}.block[data-sd-content=share], #layout ${className}.block[data-sd-content=list], #layout ${className}.block[data-sd-content=subscription] {padding: 0px;}\n`
         css += `#layout ${className}.block[data-sd-content="links"] .block-body .header-container .header {padding: 0px; padding-bottom: 0px;}\n`
+        css += `#middle_0_wide ${className}.block[data-sd-content="subscription"], #middle_0_wide ${className}.block[data-sd-content="sd-total-summary"], #middle_0_wide ${className}.block[data-sd-content="event-reg-action"], #middle_0_wide ${className}.block[data-sd-content="sd-session-selector"] {padding: 0px;}\n`
         css += `#layout ${className}.block .read-more {padding-top: 15px !Important;}\n`
         css += `${className} td.share-article {padding-top: ${paddingValue}px !Important;}\n`
       }
