@@ -32,6 +32,8 @@ import {
   validatePalette,
   validateTypographyForStep,
   validateThemeForSave,
+  stripHexWhitespace,
+  normaliseHexOnBlur,
   type TypographyValues,
 } from "@/lib/validators/theme-validator"
 
@@ -433,7 +435,8 @@ export default function ThemeGenerator() {
   }
 
   const updateColor = (id: string, field: "name" | "hex", value: string) => {
-    setColors(colors.map((c) => (c.id === id ? { ...c, [field]: value } : c)))
+    const next = field === "hex" ? stripHexWhitespace(value) : value
+    setColors(colors.map((c) => (c.id === id ? { ...c, [field]: next } : c)))
     setColorNameError("")
   }
 
@@ -3072,6 +3075,13 @@ White #FFFFFF, Black #000000`}
                         placeholder="#000000"
                         value={color.hex}
                         onChange={(e) => updateColor(color.id, "hex", e.target.value)}
+                        // Blocked at the keystroke so the caret does not jump;
+                        // updateColor also strips whitespace, which covers paste.
+                        onKeyDown={(e) => {
+                          if (e.key === " ") e.preventDefault()
+                        }}
+                        // Supply the "#" the user left off, once they are done typing.
+                        onBlur={(e) => updateColor(color.id, "hex", normaliseHexOnBlur(e.target.value))}
                         className="h-8 text-xs font-mono transition-all duration-150"
                       />
                     </div>

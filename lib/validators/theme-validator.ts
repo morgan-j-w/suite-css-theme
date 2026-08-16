@@ -39,6 +39,27 @@ export const isValidHex = (value: string | undefined): boolean =>
   HEX_PATTERN.test((value ?? "").trim())
 
 /**
+ * Applied as the user types. A hex value can never contain whitespace, so
+ * spaces are dropped rather than accepted and rejected later. This also covers
+ * pasting a value with stray spaces around it.
+ */
+export const stripHexWhitespace = (value: string): string => value.replace(/\s+/g, "")
+
+/**
+ * Applied when the user leaves the field: supplies the "#" they omitted.
+ *
+ * Only fills it in when what remains is plausibly a hex body, so genuine
+ * nonsense is left alone for the validator to report rather than being dressed
+ * up as a hex attempt. An incomplete body such as "26465" still gets its "#"
+ * and still fails validation, which is the intended outcome.
+ */
+export const normaliseHexOnBlur = (value: string): string => {
+  const trimmed = (value ?? "").trim()
+  if (trimmed === "" || trimmed.startsWith("#")) return trimmed
+  return /^[0-9a-fA-F]{1,6}$/.test(trimmed) ? `#${trimmed}` : trimmed
+}
+
+/**
  * Guards the "+ Add colour" button. Returns null when a new row may be added.
  *
  * The two messages differ by how much is missing: a row with nothing in it gets
