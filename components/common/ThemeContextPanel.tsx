@@ -71,12 +71,14 @@ export const ThemeContextPanel = ({
 
         {/* Metadata Row - Right Aligned */}
         <div className="flex items-center gap-2 w-full lg:w-auto lg:justify-end">
-          {/* Theme Type Badge */}
+          {/* Theme Type Badge. Violet and blue are used rather than green so the
+              type badge cannot be mistaken for the emerald "Saved" status pill
+              sitting beside it. */}
           {themeType && (
             <span
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${
                 themeType === "composer"
-                  ? "text-green-700 bg-green-100"
+                  ? "text-violet-700 bg-violet-100"
                   : "text-blue-700 bg-blue-100"
               }`}
             >
