@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,7 +11,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Trash2, Plus, ChevronUp, ChevronDown, Copy, Check, Sparkles, HelpCircle, Upload, X, CheckCircle, AlertCircle, PaintBucket, Type, Link, Square, Smile, Maximize2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Toaster } from "@/components/ui/toaster"
@@ -21,15 +20,15 @@ import { useToast } from "@/hooks/use-toast"
 import { ColorDefinition, StyleDefinition } from "@/lib/types"
 
 // Import utilities
-import { generateCSS, getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
-import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/storage"
-import { cleanFontValue, formatFontForCSS, getAvailableFonts, toCssPx } from "@/lib/utils/helpers"
+import { getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
+import { saveToLocalStorage } from "@/lib/storage"
+import { cleanFontValue, formatFontForCSS, toCssPx } from "@/lib/utils/helpers"
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
 import { buildIconTemplates } from "@/lib/icon-templates"
 import { splitTitlePadding } from "@/lib/title-padding"
 import { clearedTypographyOverrides, hasTypographyOverrides } from "@/lib/typography-overrides"
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
-import { validateCSS, formatValidationResults } from "@/lib/validators/css-validator"
+import { validateCSS } from "@/lib/validators/css-validator"
 import {
   validateBeforeAddingColour,
   validatePalette,
@@ -41,7 +40,6 @@ import {
 } from "@/lib/validators/theme-validator"
 
 // Import components
-import { SyntaxHighlightedCSS, SyntaxHighlightedHTML } from "@/components/common/SyntaxHighlight"
 import { PasswordModal } from "@/components/common/PasswordModal"
 import { AppHeader } from "@/components/common/AppHeader"
 import { DevInformationModal } from "@/components/common/DevInformationModal"
@@ -57,7 +55,6 @@ export default function ThemeGenerator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [passwordInput, setPasswordInput] = useState("")
   const [passwordError, setPasswordError] = useState("")
-  const [copied, setCopied] = useState(false)
   const [copiedHtml, setCopiedHtml] = useState(false)
   const [copiedMedia, setCopiedMedia] = useState(false)
   const [colorImportError, setColorImportError] = useState("")
@@ -221,9 +218,7 @@ export default function ThemeGenerator() {
     titlePaddingBottom,
     setTitlePaddingBottom,
     googleFontImport,
-    setGoogleFontImport,
     customImport,
-    setCustomImport,
     webfontImports,
     setWebfontImports,
     bulkColorText,
@@ -236,7 +231,6 @@ export default function ThemeGenerator() {
     setGeneratedCombinations,
     showCombinationGenerator,
     setShowCombinationGenerator,
-    cssRefreshKey,
     setCssRefreshKey,
     currentStep,
     setCurrentStep,
@@ -269,14 +263,6 @@ export default function ThemeGenerator() {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' })
-      setIsAuthenticated(false)
-    } catch (error) {
-      console.error("Logout failed:", error)
-    }
-  }
 
 
   // localStorage sync effects
@@ -1399,176 +1385,6 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
 
 
-  const generateHighContrastCombinations = () => {
-    if (colors.length < 2) {
-      alert("Please add at least 2 colours to generate combinations")
-      return
-    }
-
-    const combinations: StyleDefinition[] = []
-    const minTextContrastHigh = 4.5 // WCAG AA standard
-    const minButtonContrastHigh = 3 // Lower threshold for button text
-
-    // Generate combinations systematically
-    colors.forEach((bgColor) => {
-      colors.forEach((textColor) => {
-        if (bgColor.id === textColor.id) return
-        const textContrast = getContrastRatio(bgColor.hex, textColor.hex)
-        if (textContrast < minTextContrastHigh) return
-
-        colors.forEach((headingColor) => {
-          if (bgColor.id === headingColor.id) return
-          const headingContrast = getContrastRatio(bgColor.hex, headingColor.hex)
-          if (headingContrast < minTextContrastHigh) return
-
-          colors.forEach((linkColor) => {
-            if (bgColor.id === linkColor.id) return
-            const linkContrast = getContrastRatio(bgColor.hex, linkColor.hex)
-            if (linkContrast < minTextContrastHigh) return
-
-            colors.forEach((btnBg) => {
-              if (btnBg.id === bgColor.id) return
-              colors.forEach((btnText) => {
-                if (btnBg.id === btnText.id) return
-                const btnContrast = getContrastRatio(btnBg.hex, btnText.hex)
-                if (btnContrast < minButtonContrastHigh) return
-
-                // Create combination
-                const combo: StyleDefinition = {
-                  id: `combo-${Date.now()}-${Math.random()}`,
-                  name: `Combination ${combinations.length + 1}`,
-                  description: headingColor.name === btnBg.name 
-                    ? `${bgColor.name} background with ${headingColor.name} headings and buttons`
-                    : `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
-                  background: bgColor.name,
-                  textColor: textColor.name,
-                  headingColor: headingColor.name,
-                  buttonBg: btnBg.name,
-                  buttonText: btnText.name,
-                  linkColor: linkColor.name,
-                  h1Font: h1Font,
-                  h2Font: h2Font,
-                  h3Font: h3Font,
-                  h4Font: h4Font,
-                  bodyFont: bodyFont,
-                  buttonFont: buttonFont,
-                  h1Size: h1Size,
-                  h1LineHeight: h1LineHeight,
-                  h1Weight: h1Weight,
-                  h2Size: h2Size,
-                  h2LineHeight: h2LineHeight,
-                  h2Weight: h2Weight,
-                  h3Size: h3Size,
-                  h3LineHeight: h3LineHeight,
-                  h3Weight: h3Weight,
-                  h4Size: h4Size,
-                  h4LineHeight: h4LineHeight,
-                  h4Weight: h4Weight,
-                  bodySize: bodySize,
-                  bodyLineHeight: bodyLineHeight,
-                  bodyWeight: bodyWeight,
-                  buttonSize: buttonSize,
-                  buttonLineHeight: buttonLineHeight,
-                  buttonWeight: buttonWeight,
-                  noPadding: false,
-                  iconStyle: "ios-outline",
-                  iconColor: "#000000",
-                }
-                
-                combinations.push(combo)
-              })
-            })
-          })
-        })
-      })
-    })
-
-    const minTextContrast = 3
-    const minButtonContrast = 2
-
-    // Pre-calculate valid colors for each background once
-    const validColorCache: Record<string, Record<string, ColorDefinition[]>> = {}
-    
-    colors.forEach(bgColor => {
-      validColorCache[bgColor.id] = {
-        text: colors.filter(c => c.id !== bgColor.id && getContrastRatio(bgColor.hex, c.hex) >= minTextContrast),
-        button: colors.filter(c => c.id !== bgColor.id),
-      }
-    })
-
-    // Generate combinations using all backgrounds
-    colors.forEach((bgColor) => {
-      // Generate up to 2 variations per background color
-      for (let variation = 0; variation < 2; variation++) {
-        if (combinations.length >= 15) return
-
-        const validText = validColorCache[bgColor.id].text
-        const validBtn = validColorCache[bgColor.id].button
-
-        if (validText.length === 0 || validBtn.length === 0) return
-
-        // Pick diverse colors from valid options
-        const textColor = validText[Math.floor(Math.random() * validText.length)]
-        const headingColor = validText[Math.floor(Math.random() * validText.length)]
-        const linkColor = validText[Math.floor(Math.random() * validText.length)]
-        
-        const btnBg = validBtn[Math.floor(Math.random() * validBtn.length)]
-        const btnTextOptions = colors.filter(c => c.id !== btnBg.id && getContrastRatio(btnBg.hex, c.hex) >= minButtonContrast)
-      
-        if (btnTextOptions.length === 0) return
-        const btnText = btnTextOptions[Math.floor(Math.random() * btnTextOptions.length)]
-
-        const combo: StyleDefinition = {
-          id: `combo-${Date.now()}-${Math.random()}`,
-          name: `Combination ${combinations.length + 1}`,
-          description: headingColor.name === btnBg.name 
-            ? `${bgColor.name} background with ${headingColor.name} headings and buttons`
-            : `${bgColor.name} background with ${headingColor.name} headings and ${btnBg.name} buttons`,
-          background: bgColor.name,
-          textColor: textColor.name,
-          headingColor: headingColor.name,
-          buttonBg: btnBg.name,
-          buttonText: btnText.name,
-          linkColor: linkColor.name,
-          h1Font: h1Font,
-          h2Font: h2Font,
-          h3Font: h3Font,
-          h4Font: h4Font,
-          bodyFont: bodyFont,
-          buttonFont: buttonFont,
-          h1Size: h1Size,
-          h1LineHeight: h1LineHeight,
-          h1Weight: h1Weight,
-          h2Size: h2Size,
-          h2LineHeight: h2LineHeight,
-          h2Weight: h2Weight,
-          h3Size: h3Size,
-          h3LineHeight: h3LineHeight,
-          h3Weight: h3Weight,
-          h4Size: h4Size,
-          h4LineHeight: h4LineHeight,
-          h4Weight: h4Weight,
-          bodySize: bodySize,
-          bodyLineHeight: bodyLineHeight,
-          bodyWeight: bodyWeight,
-          buttonSize: buttonSize,
-          buttonLineHeight: buttonLineHeight,
-          buttonWeight: buttonWeight,
-          noPadding: false,
-          iconStyle: "ios-outline",
-          iconColor: "#000000",
-        }
-        
-        // Calculate WCAG level for this combination
-        combo.wcagLevel = calculateWCAGLevel(combo)
-        
-        combinations.push(combo)
-      }
-    })
-
-    setGeneratedCombinations(combinations)
-    setShowCombinationGenerator(true)
-  }
 
   const interleaveByBackground = (combinations: StyleDefinition[]) => {
     const grouped: Record<string, StyleDefinition[]> = {}
@@ -1834,353 +1650,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
     ])
   }
 
-  const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(generateCSS())
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const copyHtmlToClipboard = async () => {
-    const htmlContent = `<div class="read-more-button">
-    <div><!--[if mso]>
-        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                     href="http://" style="height:46px;v-text-anchor:middle;width:180px;" arcsize="20%"
-                    stroke="#f" fillcolor="#64ccc9">
-            <w:anchorlock></w:anchorlock>
-            <center style="color:#212529;font-family:Arial,sans-serif;font-size:16px;">
-                Read more
-            </center>
-        </v:roundrect>
-        <![endif]-->
-        <a class="btn-cm" href="http://">
-            Read more
-        </a>
-    </div>
-</div>
-
-<div class="grid-templates">
-        <div class="template grid grid-1 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="contenttable mso-full-width skip-mso" style="width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 1-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td class="mobileBlock" valign="top" align="left"> 
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-2 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">  
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-3 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
 
 
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="template grid grid-4 allow-top allow-bottom allow-move allow-delete">
-            <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <tbody>
-                <tr>
-                    <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="guttertable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td><!-- Gutter --></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock mccontentBlock" valign="top" align="left">
-                        <table class="mso-full-width contenttable skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td class="block" draggable="false" data-sd-content="none" valign="top">
-                                    <!-- Blank 4-column grid --><span class="glyphicon glyphicon-arrow-down"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                      </td>
-                      <td class="mobileBlock" valign="top" align="left">
-                        <table class="margintable sd-mobile-full-width skip-mso" cellspacing="0" cellpadding="0" border="0" align="left">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <!-- Margin -->
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-<div class="icon-templates">
-${styles.map((style, index) => `    <div class="text-style-${index + 1}"><br>
-        <a title="Facebook" class="sd-facebook" style="text-decoration: none;" href="{!FACEBOOK_SHARE_DOC!}">
-            <img alt="Facebook" src="[UPDATE_WITH_YOUR_FACEBOOK_ICON_URL]" width="18">
-        </a>
-        <a title="X" class="sd-twitter" style="text-decoration: none;" href="{!TWITTER_SHARE_DOC!}">
-            <img alt="X" src="[UPDATE_WITH_YOUR_X_ICON_URL]" width="18">
-        </a>
-        <a title="LinkedIn" class="sd-linkedin" style="text-decoration: none;" href="{!LINKEDIN_SHARE_DOC!}">
-            <img alt="LinkedIn" src="[UPDATE_WITH_YOUR_LINKEDIN_ICON_URL]" width="18">
-        </a>
-        <a title="Print" class="sd-print" style="text-decoration: none;" href="{!PRINT_SHARE_DOC!}">
-            <img alt="Print" src="[UPDATE_WITH_YOUR_PRINT_ICON_URL]" width="18">
-        </a>
-        <a title="Send as Email" class="sd-email" style="text-decoration: none;" href="{!FORWARD_SHARE_DOC!}">
-            <img alt="Email" src="[UPDATE_WITH_YOUR_EMAIL_ICON_URL]" width="18">
-        </a>
-    </div>`).join("\n")}
-</div>`
-    await navigator.clipboard.writeText(htmlContent)
-    setCopiedHtml(true)
-    setTimeout(() => setCopiedHtml(false), 2000)
-  }
-
-  const copyMediaToClipboard = async () => {
-    const breakpoint = themeType === 'events' ? '1023px' : '650px'
-    const mediaQuery = getMediaQuery(breakpoint)
-    await navigator.clipboard.writeText(mediaQuery)
-    setCopiedMedia(true)
-    setTimeout(() => setCopiedMedia(false), 2000)
-  }
 
   const copyExportCss = async () => {
     const css = generateCSS()
@@ -2811,9 +2282,6 @@ ${iconTemplates}</div>`
     setTimeout(() => setCopiedImport(false), 2000)
   }
 
-  const refreshCSS = () => {
-    setCssRefreshKey(prev => prev + 1)
-  }
 
   const handleSaveThemeFromHeader = async () => {
     if (!validateBeforeSave()) return
@@ -2883,71 +2351,6 @@ ${iconTemplates}</div>`
     }
   }
 
-  const resetAllSettings = () => {
-    if (
-      confirm(
-        "Are you sure you want to reset all settings? This will clear your colour palette, fonts, typography settings, and styles. This action cannot be undone.",
-      )
-    ) {
-      // Clear localStorage
-      localStorage.removeItem("themeColors")
-      localStorage.removeItem("h1Font")
-      localStorage.removeItem("h2Font")
-      localStorage.removeItem("h3Font")
-      localStorage.removeItem("h4Font")
-      localStorage.removeItem("bodyFont")
-      localStorage.removeItem("buttonFont")
-      localStorage.removeItem("h1Size")
-      localStorage.removeItem("h1LineHeight")
-      localStorage.removeItem("h1Weight")
-      localStorage.removeItem("h2Size")
-      localStorage.removeItem("h2LineHeight")
-      localStorage.removeItem("h2Weight")
-      localStorage.removeItem("h3Size")
-      localStorage.removeItem("h3LineHeight")
-      localStorage.removeItem("h3Weight")
-      localStorage.removeItem("h4Size")
-      localStorage.removeItem("h4LineHeight")
-      localStorage.removeItem("h4Weight")
-      localStorage.removeItem("bodySize")
-      localStorage.removeItem("bodyLineHeight")
-      localStorage.removeItem("bodyWeight")
-      localStorage.removeItem("buttonSize")
-      localStorage.removeItem("buttonLineHeight")
-      localStorage.removeItem("buttonWeight")
-      localStorage.removeItem("themeStyles")
-
-      setColors([
-        { id: "1", name: "White", hex: "#FFFFFF" },
-        { id: "2", name: "Black", hex: "#000000" },
-      ])
-      setH1Font("")
-      setH2Font("")
-      setH3Font("")
-      setH4Font("")
-      setBodyFont("")
-      setButtonFont("")
-      setH1Size("")
-      setH1LineHeight("")
-      setH1Weight("400")
-      setH2Size("")
-      setH2LineHeight("")
-      setH2Weight("400")
-      setH3Size("")
-      setH3LineHeight("")
-      setH3Weight("400")
-      setH4Size("")
-      setH4LineHeight("")
-      setH4Weight("400")
-      setBodySize("")
-      setBodyLineHeight("")
-      setBodyWeight("400")
-      setButtonSize("")
-      setButtonLineHeight("")
-      setButtonWeight("400")
-      setStyles([])
-    }
-  }
 
   // Show password form if not authenticated (client-side only)
   if (isClient && !isAuthenticated) {
@@ -3121,6 +2524,8 @@ White #FFFFFF, Black #000000`}
                       <Button
                         variant="ghost"
                         size="icon"
+                        aria-label={`Delete ${color.name || "this"} colour`}
+                        title={`Delete ${color.name || "this"} colour`}
                         onClick={(e) => {
                           e.stopPropagation()
                           removeColor(color.id)
@@ -4131,7 +3536,7 @@ White #FFFFFF, Black #000000`}
                             }
                             return combo.wcagLevel === 'AAA'
                           })
-                          .map((combo, index) => (
+                          .map((combo) => (
                           <div
                             key={combo.id}
                             className="relative text-left p-3 border rounded-lg group cursor-pointer transition-all"
@@ -4229,6 +3634,7 @@ White #FFFFFF, Black #000000`}
                               size="icon"
                               onClick={() => moveStyle(style.id, "up")}
                               disabled={index === 0}
+                              aria-label="Move up theme style"
                               title="Move up theme style"
                             >
                               <ChevronUp className="h-4 w-4" />
@@ -4238,17 +3644,20 @@ White #FFFFFF, Black #000000`}
                               size="icon"
                               onClick={() => moveStyle(style.id, "down")}
                               disabled={index === styles.length - 1}
+                              aria-label="Move down theme style"
                               title="Move down theme style"
                             >
                               <ChevronDown className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => removeStyle(style.id)} title="Delete theme style">
+                            <Button variant="ghost" size="icon" onClick={() => removeStyle(style.id)} aria-label="Delete theme style"
+                              title="Delete theme style">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => duplicateStyle(style.id)}
+                              aria-label="Copy theme style"
                               title="Copy theme style"
                             >
                               <Copy className="h-4 w-4" />
