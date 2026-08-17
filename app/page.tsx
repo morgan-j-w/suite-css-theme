@@ -2502,7 +2502,7 @@ White #FFFFFF, Black #000000`}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {colors.map((color) => (
-                  <div key={color.id} className="border border-slate-200 rounded-xl overflow-hidden bg-white group flex flex-col">
+                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col">
                     {/* Color swatch - dominant visual element */}
                     <div
                       className="w-full cursor-pointer relative transition-all duration-150 ease-out rounded-t-xl"
@@ -2601,7 +2601,7 @@ White #FFFFFF, Black #000000`}
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h1Size || "22px").replace("px", "")}
@@ -2615,7 +2615,7 @@ White #FFFFFF, Black #000000`}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h1LineHeight || "30px").replace("px", "")}
@@ -2665,7 +2665,7 @@ White #FFFFFF, Black #000000`}
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h2Size || "20px").replace("px", "")}
@@ -2679,7 +2679,7 @@ White #FFFFFF, Black #000000`}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h2LineHeight || "28px").replace("px", "")}
@@ -2729,7 +2729,7 @@ White #FFFFFF, Black #000000`}
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h3Size || "18px").replace("px", "")}
@@ -2743,7 +2743,7 @@ White #FFFFFF, Black #000000`}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h3LineHeight || "26px").replace("px", "")}
@@ -2793,7 +2793,7 @@ White #FFFFFF, Black #000000`}
                   />
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h4Size || "16px").replace("px", "")}
@@ -2807,7 +2807,7 @@ White #FFFFFF, Black #000000`}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(h4LineHeight || "22px").replace("px", "")}
@@ -2868,7 +2868,7 @@ White #FFFFFF, Black #000000`}
                   <Label className="text-sm font-medium">Body copy</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(bodySize || "15px").replace("px", "")}
@@ -2882,7 +2882,7 @@ White #FFFFFF, Black #000000`}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(bodyLineHeight || "22px").replace("px", "")}
@@ -2943,7 +2943,7 @@ White #FFFFFF, Black #000000`}
                   <Label className="text-sm font-medium">Button</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-1">
                     <div>
-                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Size <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(buttonSize || "15px").replace("px", "")}
@@ -2957,7 +2957,7 @@ White #FFFFFF, Black #000000`}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-gray-400">px</span></Label>
+                      <Label className="text-xs text-muted-foreground">Line height <span className="text-xs text-slate-500">px</span></Label>
                       <NumberField
                         className="mt-1.5 w-full"
                         value={(buttonLineHeight || "22px").replace("px", "")}
@@ -3215,7 +3215,7 @@ White #FFFFFF, Black #000000`}
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Padding <span className="text-xs text-gray-400">px</span></Label>
+                <Label>Padding <span className="text-xs text-slate-500">px</span></Label>
                 <NumberField
                   className="mt-2"
                   value={(themePadding || "25px").replace("px", "")}
@@ -3230,7 +3230,7 @@ White #FFFFFF, Black #000000`}
                 <p className="text-xs text-muted-foreground mt-2">Controls the spacing around content, images and sections throughout your theme.</p>
               </div>
               <div>
-                <Label>Title padding <span className="text-xs text-gray-400">px</span></Label>
+                <Label>Title padding <span className="text-xs text-slate-500">px</span></Label>
                 <NumberField
                   className="mt-2"
                   value={titlePaddingBottom || "14"}
@@ -3271,7 +3271,7 @@ White #FFFFFF, Black #000000`}
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Icon size <span className="text-xs text-gray-400">px</span></Label>
+                  <Label className="text-sm font-medium">Icon size <span className="text-xs text-slate-500">px</span></Label>
                   <NumberField
                     className="mt-2 w-full"
                     value={globalIconSize || "18"}
@@ -3331,7 +3331,7 @@ White #FFFFFF, Black #000000`}
                 <Label className="text-sm font-medium">Button padding</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Top <span className="text-xs text-gray-400">px</span></Label>
+                    <Label className="text-xs text-muted-foreground">Top <span className="text-xs text-slate-500">px</span></Label>
                     <NumberField
                       className="mt-1"
                       value={buttonPaddingTop || "10"}
@@ -3343,7 +3343,7 @@ White #FFFFFF, Black #000000`}
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Right <span className="text-xs text-gray-400">px</span></Label>
+                    <Label className="text-xs text-muted-foreground">Right <span className="text-xs text-slate-500">px</span></Label>
                     <NumberField
                       className="mt-1"
                       value={buttonPaddingRight || "20"}
@@ -3355,7 +3355,7 @@ White #FFFFFF, Black #000000`}
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Bottom <span className="text-xs text-gray-400">px</span></Label>
+                    <Label className="text-xs text-muted-foreground">Bottom <span className="text-xs text-slate-500">px</span></Label>
                     <NumberField
                       className="mt-1"
                       value={buttonPaddingBottom || "10"}
@@ -3367,7 +3367,7 @@ White #FFFFFF, Black #000000`}
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Left <span className="text-xs text-gray-400">px</span></Label>
+                    <Label className="text-xs text-muted-foreground">Left <span className="text-xs text-slate-500">px</span></Label>
                     <NumberField
                       className="mt-1"
                       value={buttonPaddingLeft || "20"}
@@ -3382,7 +3382,7 @@ White #FFFFFF, Black #000000`}
               </div>
 
               <div>
-                <Label className="text-sm font-medium">Button border radius <span className="text-xs text-gray-400">px</span></Label>
+                <Label className="text-sm font-medium">Button border radius <span className="text-xs text-slate-500">px</span></Label>
                 <div className="mt-2">
                   <NumberField
                     value={(buttonBorderRadius || "4px").replace("px", "")}
@@ -3917,7 +3917,7 @@ White #FFFFFF, Black #000000`}
                           <div>
                             <div className="flex items-center gap-1">
                               <Square className="h-3 w-3 text-slate-400" />
-                              <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-gray-400">px</span></Label>
+                              <Label className="text-xs text-slate-600">Button border width <span className="text-xs text-slate-500">px</span></Label>
                             </div>
                             <NumberField
                               className="mt-1.5 text-xs bg-white w-full"
@@ -4595,7 +4595,7 @@ White #FFFFFF, Black #000000`}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
-                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h1Size, h1Size, "22")}
@@ -4605,7 +4605,7 @@ White #FFFFFF, Black #000000`}
                                   />
                                 </div>
                                 <div>
-                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h1LineHeight, h1LineHeight, "30")}
@@ -4647,7 +4647,7 @@ White #FFFFFF, Black #000000`}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
-                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h2Size, h2Size, "20")}
@@ -4657,7 +4657,7 @@ White #FFFFFF, Black #000000`}
                                   />
                                 </div>
                                 <div>
-                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h2LineHeight, h2LineHeight, "28")}
@@ -4699,7 +4699,7 @@ White #FFFFFF, Black #000000`}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
-                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h3Size, h3Size, "18")}
@@ -4709,7 +4709,7 @@ White #FFFFFF, Black #000000`}
                                   />
                                 </div>
                                 <div>
-                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h3LineHeight, h3LineHeight, "26")}
@@ -4751,7 +4751,7 @@ White #FFFFFF, Black #000000`}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
-                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h4Size, h4Size, "16")}
@@ -4761,7 +4761,7 @@ White #FFFFFF, Black #000000`}
                                   />
                                 </div>
                                 <div>
-                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.h4LineHeight, h4LineHeight, "24")}
@@ -4808,7 +4808,7 @@ White #FFFFFF, Black #000000`}
                               />
                               <div className="grid grid-cols-3 gap-2">
                                 <div>
-                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.bodySize, bodySize, "16")}
@@ -4818,7 +4818,7 @@ White #FFFFFF, Black #000000`}
                                   />
                                 </div>
                                 <div>
-                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.bodyLineHeight, bodyLineHeight, "24")}
@@ -4888,7 +4888,7 @@ White #FFFFFF, Black #000000`}
                               />
                               <div className="grid grid-cols-3 gap-2 mb-6">
                                 <div>
-                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Size <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.buttonSize, buttonSize, "15")}
@@ -4898,7 +4898,7 @@ White #FFFFFF, Black #000000`}
                                   />
                                 </div>
                                 <div>
-                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-gray-400">px</span></Label>
+                                  <Label className="text-xs text-slate-600">Line height <span className="text-xs text-slate-500">px</span></Label>
                                   <NumberField
                                     className="mt-1 text-xs bg-white w-full"
                                     value={getDisplayValue(style.buttonLineHeight, buttonLineHeight, "22")}
@@ -4929,7 +4929,7 @@ White #FFFFFF, Black #000000`}
 
                               {/* Button Padding */}
                               <div className="mb-6">
-                                <Label className="text-xs font-semibold text-slate-700">Button padding <span className="text-xs text-gray-400">px</span></Label>
+                                <Label className="text-xs font-semibold text-slate-700">Button padding <span className="text-xs text-slate-500">px</span></Label>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1.5">
                                   <div>
                                     <Label className="text-xs text-slate-600">Top</Label>
