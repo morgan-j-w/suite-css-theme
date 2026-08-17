@@ -25,21 +25,22 @@ export function Toaster() {
             {...props}
             // The destructive variant is unreadable with this project's tokens:
             // --destructive-foreground is defined as the same colour as
-            // --destructive, so it renders red text on a red background. These
-            // explicit colours match the error styling used elsewhere.
+            // --destructive, so it renders red text on a red background. One ink
+            // for icon, title and body, matching ValidationMessage; hierarchy
+            // comes from weight rather than from three shades of red.
             className={
               isError
-                ? 'border-red-200 bg-red-50 text-red-700 [&>button]:text-red-700 [&>button]:opacity-70'
+                ? 'border-red-200 bg-red-50 text-red-700 [&>button]:text-red-700 [&>button]:opacity-60 [&>button]:hover:opacity-100'
                 : undefined
             }
           >
             <div className="flex items-start gap-3">
               {isError && (
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-700" />
               )}
               <div className="grid gap-1">
                 {title && (
-                  <ToastTitle className={isError ? 'text-red-800' : undefined}>
+                  <ToastTitle className={isError ? 'text-red-700' : undefined}>
                     {title}
                   </ToastTitle>
                 )}
