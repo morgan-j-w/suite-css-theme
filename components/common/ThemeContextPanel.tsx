@@ -73,7 +73,13 @@ export const ThemeContextPanel = ({
         <div className="flex items-center gap-2 w-full lg:w-auto lg:justify-end">
           {/* Theme Type Badge */}
           {themeType && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded-full">
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${
+                themeType === "composer"
+                  ? "text-green-700 bg-green-100"
+                  : "text-blue-700 bg-blue-100"
+              }`}
+            >
               {themeType === "composer" ? (
                 <Mail className="h-3.5 w-3.5" />
               ) : (
