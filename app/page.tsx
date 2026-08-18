@@ -1306,7 +1306,11 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       // Thin, extra light, light and normal are left to inherit.
       const linkWeightNumeric = parseInt(String(linkWeightVal).replace(/\D/g, "") || "400", 10)
       const linkWeightDecl = linkWeightNumeric >= 500 ? `font-weight: ${linkWeightVal};` : ""
-      const READMORE_BTN = "a.btn-cm.btn-width-auto.sd-readmore-btn"
+      // Scoped to the style, like every other colour rule. Unscoped, this
+      // selector is identical in every style block, so the last one in the file
+      // wins and every read-more button in the email takes that style's link
+      // colour regardless of the block it sits in.
+      const READMORE_BTN = `${className} a.btn-cm.btn-width-auto.sd-readmore-btn`
       const btnBorderWidth = style.buttonBorderWidth || "0"
       const btnBorderColor = getColorHexValue((style.buttonBorderColor && style.buttonBorderColor !== "none") ? style.buttonBorderColor : style.buttonBg)
       const btnBorderColorHover = getColorHexValue(style.buttonBorderColorHover || style.buttonBgHover)
