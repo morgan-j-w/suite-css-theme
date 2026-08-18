@@ -1284,7 +1284,6 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 .sd-session-selector-main {padding-top: ${paddingValue}px;}
 
 /* Registration form spacing, from the theme padding */
-.regform-summary-container {padding-bottom: ${paddingValue}px;}
 .regform-summary-container[sd-style="STS"] .discountCodeWrapper {padding-bottom: 20px;}
 #middle_0_wide .block[data-sd-content="subscription"], #middle_0_wide .block[data-sd-content="sd-total-summary"], #middle_0_wide .block[data-sd-content="event-reg-action"], #middle_0_wide .block[data-sd-content="sd-session-selector"] {padding: ${paddingValue}px;}
 
@@ -1298,7 +1297,12 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
     // Landing Pages and Events Desk themes only.
     if (themeType === 'events') {
-      css += `#middle_0_wide .block {padding-left: inherit; padding-right: inherit;}\n\n`
+      // Overrides the suite's own horizontal padding on these blocks.
+      css += `#middle_0_wide .block {padding-left: 0px; padding-right: 0px;}\n`
+      // Resets Bootstrap's default table margin.
+      css += `.table {margin-bottom: 0px;}\n`
+      // Intro text sits directly above content, so it takes the title padding.
+      css += `.intro-text {padding-top: 0px; padding-bottom: ${titlePaddingValue}px;}\n\n`
     }
 
     styles.forEach((style, index) => {
