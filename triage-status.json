@@ -1,7 +1,7 @@
 {
   "schema": "atd-triage/1",
-  "updated": "2026-08-16T00:00:00Z",
-  "batch": "Copy and text changes",
+  "updated": "2026-08-18T00:00:00Z",
+  "batch": "Post-triage refinements",
   "issues": [
     {
       "n": 25,
@@ -92,32 +92,32 @@
     {
       "n": 9,
       "status": "fixed",
-      "note": "Empty palette now blocks both Next and Save: 'Add at least one colour before continuing.'",
+      "note": "Empty palette blocks both Next and Save. Subsequently tightened at your request: a palette consisting only of the seeded White/Black defaults is also treated as 'no palette entered', since the tool supplies those rather than the user choosing them. Renaming or recolouring a default makes it count as a real colour. Same message throughout.",
       "files": [
         "lib/validators/theme-validator.ts",
         "app/page.tsx"
       ],
-      "commit": "74685980"
+      "commit": "ca2c0f0d"
     },
     {
       "n": 10,
       "status": "fixed",
-      "note": "Hex must match #RRGGBB; '264653' is rejected on Next. Implemented as an error, per the message the ticket supplied — I did NOT auto-prepend '#', since the ticket said to ask first. Say the word if you want the auto-prepend instead.",
+      "note": "Superseded by your later decision. Originally implemented as an error with the supplied message. Now the missing '#' is supplied on blur instead, so '264653' becomes '#264653' and validates. The error message remains for values that are not a plausible hex body, such as 'reddish' or an over-long string; an incomplete body like '26465' still gains its '#' and still fails, which shows the '#' was not the problem.",
       "files": [
         "lib/validators/theme-validator.ts",
         "app/page.tsx"
       ],
-      "commit": "74685980"
+      "commit": "dd3430be"
     },
     {
       "n": 11,
       "status": "fixed",
-      "note": "All colour checks trim first, so a whitespace-only hex counts as empty and gets the 'complete all colour details' message rather than being accepted.",
+      "note": "Now prevented rather than detected. Space is blocked at the keystroke so the caret does not jump, and hex values are stripped of whitespace on change, which also covers pasting. The validator still treats whitespace-only as empty for values arriving from elsewhere, such as a loaded theme.",
       "files": [
         "lib/validators/theme-validator.ts",
         "app/page.tsx"
       ],
-      "commit": "74685980"
+      "commit": "dd3430be"
     },
     {
       "n": 12,
@@ -334,12 +334,12 @@
     {
       "n": 21,
       "status": "fixed",
-      "note": "Same single edit as #20 for the text, plus the styling. There was no shared error component, so rather than pasting raw markup a third time I extracted components/common/ValidationMessage.tsx and pointed the import error, the colour validation error and the step 3/4 validation error at it. Verified the rendered markup matches the block QA supplied.",
+      "note": "Error styling unified with the destructive toast at your request: the shared ValidationMessage component now carries the same icon, layout and single red ink (red-700, the shade specified here), plus role=alert so screen readers announce it. The surrounding markup differs from the snippet supplied, but the palette and text treatment match.",
       "files": [
-        "app/page.tsx",
-        "components/common/ValidationMessage.tsx"
+        "components/common/ValidationMessage.tsx",
+        "app/page.tsx"
       ],
-      "commit": "b2d37d9a"
+      "commit": "ef397ad1"
     },
     {
       "n": 22,
@@ -367,12 +367,12 @@
     {
       "n": 54,
       "status": "fixed",
-      "note": "Both theme type option labels replaced. Also changed the matching theme type badge in components/common/ThemeContextPanel.tsx:82, which displayed the same two strings — leaving it would have had the badge say 'Email Composer theme' while the option said 'Email Composer'.",
+      "note": "Both option labels replaced, and the matching theme type badge in ThemeContextPanel updated so the two cannot disagree. The badge is now colour coded at your request: violet for Email Composer, blue for Landing Pages and Events Desk.",
       "files": [
         "app/page.tsx",
         "components/common/ThemeContextPanel.tsx"
       ],
-      "commit": "1e09fd27"
+      "commit": "08a18498"
     },
     {
       "n": 55,

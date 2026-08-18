@@ -1,4 +1,5 @@
-import { ColorDefinition, StyleDefinition } from "@/lib/types"
+// Type-only and relative, so Node's type stripping can run this file directly.
+import type { ColorDefinition, StyleDefinition } from "../types"
 
 /**
  * Validation for the Advanced Theme Designer wizard.
@@ -79,13 +80,6 @@ export const validateBeforeAddingColour = (colors: ColorDefinition[]): string | 
 }
 
 /**
- * Guards leaving Step 1. Returns null when the palette is good.
- *
- * Order matters and is deliberate: an empty palette is reported before missing
- * fields, missing fields before malformed ones, and duplicates last, so the
- * user is always shown the most fundamental problem first.
- */
-/**
  * The palette the wizard seeds itself with. These are supplied by the tool, not
  * chosen by the user, so a palette consisting only of these counts as "no
  * colour palette entered" for issue #9.
@@ -101,6 +95,13 @@ const isSeededDefault = (colour: ColorDefinition): boolean => {
   return SEEDED_DEFAULTS.some((d) => d.name === name && d.hex === hex)
 }
 
+/**
+ * Guards leaving Step 1. Returns null when the palette is good.
+ *
+ * Order matters and is deliberate: an empty palette is reported before missing
+ * fields, missing fields before malformed ones, and duplicates last, so the
+ * user is always shown the most fundamental problem first.
+ */
 export const validatePalette = (colors: ColorDefinition[]): string | null => {
   if (colors.length === 0) return VALIDATION_MESSAGES.emptyPalette
 

@@ -1223,7 +1223,6 @@ a.btn-cm.btn-poll {width: 100% !important; padding: ${buttonPaddingTop}px 0px ${
 a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 
 .link-text {text-align: left;  font-size: ${bodySizeVal}; line-height: ${bodyLineHeightVal}; font-weight: ${bodyWeightVal}; padding-top: ${titlePaddingSplit.linkTextPaddingTop}px;}
-.links-body {}
 .single-link {text-align: left;}
 .link-text a {text-align: left;}
 .single-link table {width: 100%;}
@@ -1232,8 +1231,6 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 .share-article {padding-top: 0px;}
 
 
-#layout .block[data-sd-content="links"] {}
-#layout .block[data-sd-content="links"] .block-body .header-container .header {} 
 
 .header1{font-family: ${h1FontVal}; font-size:${h1SizeVal};line-height:${h1LineHeightVal}; font-weight: ${h1WeightVal};}
 .header2{font-family: ${h2FontVal}; font-size:${h2SizeVal};line-height:${h2LineHeightVal}; font-weight: ${h2WeightVal};}

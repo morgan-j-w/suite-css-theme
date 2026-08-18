@@ -6,3 +6,6 @@ out
 .env.production
 yarn.lock
 pnpm-lock.yaml
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo

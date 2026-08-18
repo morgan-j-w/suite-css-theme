@@ -7,7 +7,7 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "test": "node --test lib/*.test.mts"
+    "test": "node --test lib/*.test.mts lib/validators/*.test.mts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
