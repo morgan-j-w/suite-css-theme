@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { formatFontForCSS } from "@/lib/utils/helpers"
 
 /**
@@ -115,6 +116,47 @@ export function FontField({
         const committed = draft === null || draft.trim() === "" ? fallback : draft
         setDraft(null)
         onValueChange(formatFontForCSS(committed))
+        onBlur?.(e)
+      }}
+    />
+  )
+}
+
+type DraftTextareaProps = Omit<
+  React.ComponentProps<typeof Textarea>,
+  "value" | "onChange"
+> & {
+  value: string
+  onValueChange: (next: string) => void
+}
+
+/**
+ * A textarea that keeps keystrokes local and commits once on blur.
+ *
+ * Every style lives in one array, so updating a style on each keystroke
+ * re-renders every other style card too - around 24ms per style on screen, which
+ * is a visible stutter by the time a theme has a few styles. Committing on blur
+ * keeps typing flat regardless of how many styles exist. The cost is that
+ * anything derived from the value, such as the preview text, updates when the
+ * field is left rather than per character.
+ */
+export function DraftTextarea({
+  value,
+  onValueChange,
+  onBlur,
+  ...props
+}: DraftTextareaProps) {
+  const { shown, draft, setDraft } = useDraft(value)
+
+  return (
+    <Textarea
+      {...props}
+      value={shown}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={(e) => {
+        const committed = draft ?? value
+        setDraft(null)
+        if (committed !== value) onValueChange(committed)
         onBlur?.(e)
       }}
     />

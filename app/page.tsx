@@ -46,7 +46,7 @@ import { AppHeader } from "@/components/common/AppHeader"
 import { DevInformationModal } from "@/components/common/DevInformationModal"
 import { ThemeContextPanel } from "@/components/common/ThemeContextPanel"
 import { ValidationMessage } from "@/components/common/ValidationMessage"
-import { NumberField, FontField } from "@/components/common/ThemeFields"
+import { NumberField, FontField, DraftTextarea } from "@/components/common/ThemeFields"
 
 // Import hooks
 import { useThemeState } from "@/hooks/useThemeState"
@@ -406,10 +406,6 @@ export default function ThemeGenerator() {
     
     styleTag.textContent = webfontImports
   }, [webfontImports, isClient])
-
-  useEffect(() => {
-    localStorage.setItem("themeStyles", JSON.stringify(styles))
-  }, [styles])
 
   const addColor = () => {
     // Blocks a blank row being appended on top of an incomplete one.
@@ -3725,9 +3721,9 @@ White #FFFFFF, Black #000000`}
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <Textarea
+                          <DraftTextarea
                             value={style.description}
-                            onChange={(e) => updateStyle(style.id, "description", e.target.value)}
+                            onValueChange={(next) => updateStyle(style.id, "description", next)}
                             placeholder="Style description"
                             className="mt-1.5 min-h-[60px] bg-white"
                           />
