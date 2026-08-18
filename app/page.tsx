@@ -26,6 +26,7 @@ import { cleanFontValue, escapeCssString, formatFontForCSS, toCssPx } from "@/li
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
 import { buildIconTemplates } from "@/lib/icon-templates"
 import { splitTitlePadding } from "@/lib/title-padding"
+import { renameColourInStyles } from "@/lib/colour-references"
 import { clearedTypographyOverrides, hasTypographyOverrides } from "@/lib/typography-overrides"
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS } from "@/lib/validators/css-validator"
@@ -465,6 +466,22 @@ export default function ThemeGenerator() {
     // edit keeps the Next button, which is disabled while an error is showing,
     // from becoming a dead end after the user has fixed the problem.
     setColorNameError("")
+  }
+
+  /**
+   * Styles refer to colours by name, so renaming one has to rewrite every style
+   * that used it - otherwise the name-to-hex lookup misses and the style
+   * silently falls back to black. Captured on focus and applied on blur, so a
+   * rename is one event rather than one per keystroke.
+   */
+  const renamingFromRef = useRef<string | null>(null)
+
+  const applyColourRename = (nextName: string) => {
+    const previousName = renamingFromRef.current
+    renamingFromRef.current = null
+    if (!previousName || previousName.trim() === "" || nextName.trim() === "") return
+    if (previousName.trim().toLowerCase() === nextName.trim().toLowerCase()) return
+    setStyles((prev) => renameColourInStyles(prev, previousName, nextName))
   }
 
   const updateColor = (id: string, field: "name" | "hex", value: string) => {
@@ -1025,6 +1042,24 @@ export default function ThemeGenerator() {
     ),
   })
 
+  /**
+   * A button with a visible border is identified by that border, so the border
+   * is what WCAG 1.4.11 measures against the page. Without one, the fill is.
+   */
+  const buttonBoundaryColour = (style: StyleDefinition): string => {
+    const width = parseFloat(String(style.buttonBorderWidth ?? "0").replace(/[^\d.]/g, ""))
+    const hasBorder =
+      Number.isFinite(width) && width > 0 &&
+      !!style.buttonBorderColor && style.buttonBorderColor !== "none"
+    return getColorHexValue(hasBorder ? style.buttonBorderColor : style.buttonBg)
+  }
+
+  const styleHasButtonBorder = (style: StyleDefinition): boolean => {
+    const width = parseFloat(String(style.buttonBorderWidth ?? "0").replace(/[^\d.]/g, ""))
+    return Number.isFinite(width) && width > 0 &&
+      !!style.buttonBorderColor && style.buttonBorderColor !== "none"
+  }
+
   /** The one contrast evaluation used by both the generator and the checker. */
   const evaluateStyleContrast = (style: StyleDefinition): ContrastResults =>
     checkAllContrasts(
@@ -1036,6 +1071,7 @@ export default function ThemeGenerator() {
       getColorHexValue(style.buttonText),
       style.iconColor || "#000000",
       buildTextEvaluationConfig(style),
+      buttonBoundaryColour(style),
     )
 
   const calculateWCAGLevel = (combo: StyleDefinition): string => {
@@ -2548,6 +2584,8 @@ White #FFFFFF, Black #000000`}
                         placeholder="Colour name"
                         value={color.name}
                         onChange={(e) => updateColor(color.id, "name", e.target.value)}
+                        onFocus={() => { renamingFromRef.current = color.name }}
+                        onBlur={(e) => applyColourRename(e.target.value)}
                         className="h-8 text-xs transition-all duration-150"
                       />
                       <Input
@@ -4197,7 +4235,7 @@ White #FFFFFF, Black #000000`}
                                         <div className="flex justify-between gap-4 items-center">
                                           <div className="flex items-center gap-2">
                                             <div className="w-3 h-3 border border-slate-400" style={{ backgroundColor: buttonBg }}></div>
-                                            <span>Button surface</span>
+                                            <span>{styleHasButtonBorder(style) ? 'Button border' : 'Button surface'}</span>
                                           </div>
                                           <div className="flex items-center gap-2">
                                             <span className="font-mono">{contrastResults.buttonBgOnBg.ratio}:1</span>

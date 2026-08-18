@@ -103,7 +103,13 @@ export function checkAllContrasts(
   buttonBg: string,
   buttonText: string,
   iconColor: string = "#000000",
-  config: TextEvaluationConfig = {}
+  config: TextEvaluationConfig = {},
+  /**
+   * The colour that actually delineates the button against the page. For a
+   * filled button that is the fill, but a bordered button is identified by its
+   * border, which is what WCAG 1.4.11 measures. Defaults to the fill.
+   */
+  buttonBoundaryColor?: string,
 ): ContrastResults {
   const headingLargeText = config.headingLargeText ?? false
   const bodyLargeText = config.bodyLargeText ?? false
@@ -115,7 +121,7 @@ export function checkAllContrasts(
   const bodyRatio = getContrastRatio(bgColor, bodyTextColor)
   const linkRatio = getContrastRatio(bgColor, linkColor)
   const buttonRatio = getContrastRatio(buttonBg, buttonText)
-  const buttonBgRatio = getContrastRatio(bgColor, buttonBg)
+  const buttonBgRatio = getContrastRatio(bgColor, buttonBoundaryColor || buttonBg)
   const iconRatio = getContrastRatio(bgColor, iconColor)
 
   return {
@@ -151,7 +157,9 @@ export function checkAllContrasts(
       requiredAa: buttonLargeText ? 3 : 4.5,
       requiredAaa: buttonLargeText ? 4.5 : 7,
     },
-    // WCAG 1.4.11 (non-text contrast): component boundaries require at least 3:1.
+    // WCAG 1.4.11 (non-text contrast): component boundaries require at least
+    // 3:1. Measured against the border when the button has one, since that is
+    // the visual information identifying the component.
     buttonBgOnBg: {
       ratio: parseFloat(buttonBgRatio.toFixed(2)),
       aa: buttonBgRatio >= 3,

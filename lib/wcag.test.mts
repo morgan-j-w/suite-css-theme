@@ -151,3 +151,34 @@ test("#78: omitting the config would misclassify real combinations", () => {
   console.log(`      ${misclassified.length} combinations would have been misclassified`)
   console.log(`      e.g. ${misclassified[0]}`)
 })
+
+test("1.4.11: a bordered button is measured by its border, not its fill", () => {
+  const page = "#ffffff", fill = "#ffffff", navy = "#1b2a4a"
+  // White button on a white page: the fill alone is invisible.
+  const withoutBorder = checkAllContrasts(page, "#000000", "#000000", "#000000", fill, "#000000")
+  assert.equal(withoutBorder.buttonBgOnBg.aa, false)
+  assert.equal(withoutBorder.buttonBgOnBg.ratio, 1)
+
+  // The same button with a navy border is clearly identifiable.
+  const withBorder = checkAllContrasts(page, "#000000", "#000000", "#000000", fill, "#000000",
+    "#000000", {}, navy)
+  assert.equal(withBorder.buttonBgOnBg.aa, true)
+  assert.ok(withBorder.buttonBgOnBg.ratio > 3, `got ${withBorder.buttonBgOnBg.ratio}:1`)
+
+  // The button text is still judged against the fill it sits on, not the border.
+  assert.equal(withBorder.buttonTextOnButtonBg.ratio, withoutBorder.buttonTextOnButtonBg.ratio)
+})
+
+test("1.4.11: the boundary defaults to the fill when no border is given", () => {
+  const filled = checkAllContrasts("#ffffff", "#000000", "#000000", "#000000", "#264653", "#ffffff")
+  const explicit = checkAllContrasts("#ffffff", "#000000", "#000000", "#000000", "#264653", "#ffffff",
+    "#000000", {}, "#264653")
+  assert.equal(filled.buttonBgOnBg.ratio, explicit.buttonBgOnBg.ratio)
+})
+
+test("1.4.11: a low-contrast border still fails", () => {
+  // A border that barely differs from the page does not identify the component.
+  const r = checkAllContrasts("#ffffff", "#000000", "#000000", "#000000", "#ffffff", "#000000",
+    "#000000", {}, "#f2f2f2")
+  assert.equal(r.buttonBgOnBg.aa, false)
+})
