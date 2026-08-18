@@ -22,7 +22,7 @@ import { ColorDefinition, StyleDefinition } from "@/lib/types"
 // Import utilities
 import { getColorHex, getContrastRatio, findAccessibleAlternatives } from "@/lib/styles"
 import { saveToLocalStorage } from "@/lib/storage"
-import { cleanFontValue, formatFontForCSS, toCssPx } from "@/lib/utils/helpers"
+import { cleanFontValue, escapeCssString, formatFontForCSS, toCssPx } from "@/lib/utils/helpers"
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
 import { buildIconTemplates } from "@/lib/icon-templates"
 import { splitTitlePadding } from "@/lib/title-padding"
@@ -1326,8 +1326,14 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       const defaultDescription = style.headingColor === style.buttonBg
         ? `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and buttons`
         : `${capitalizeFirst(style.background)} background with ${style.headingColor.toLowerCase()} headings and ${style.buttonBg.toLowerCase()} buttons`
+      // The No padding toggle already writes the prefix into the description, so
+      // only the generated fallback needs it added here. Prefixing both produced
+      // "No padding - No padding - ...".
+      const styleDescription = escapeCssString(
+        style.description || `${descriptionPrefix}${defaultDescription}`,
+      )
       css += `/* Style ${styleNum} */\n`
-      css += `.style-selector ${className} .info::after{content:'${descriptionPrefix}${style.description || defaultDescription}';}\n`
+      css += `.style-selector ${className} .info::after{content:'${styleDescription}';}\n`
       css += `#layout ${className} .header{padding-bottom:${titlePaddingBottom || "14"}px;}\n`
       css += `${className} {background-color:${bgColor};color:${textColor};font-family: ${bodyFontVal}; font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-weight: ${bodyWeightVal};}\n`
       css += `${className} .main{color:${textColor};font-size:${bodySizeVal};line-height:${bodyLineHeightVal}; font-family: ${bodyFontVal}; }\n`

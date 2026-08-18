@@ -1,4 +1,19 @@
-import { GoogleFont } from "@/lib/types"
+// Type-only and relative, so Node's type stripping can run this file directly.
+import type { GoogleFont } from "../types"
+
+/**
+ * Escapes a value for use inside a single-quoted CSS string.
+ *
+ * An unescaped apostrophe closes the string early, which invalidates the
+ * declaration and, because of how the browser resyncs after a parse error, can
+ * take the following rule down with it. Newlines are folded to spaces since a
+ * literal newline is not legal inside a CSS string either.
+ */
+export const escapeCssString = (value: string): string =>
+  value
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/[\r\n]+/g, " ")
 
 export const shuffleArray = <T,>(array: T[]): T[] => {
   const shuffled = [...array]
