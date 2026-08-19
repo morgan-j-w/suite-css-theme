@@ -1159,7 +1159,7 @@ padding:0 8px;font-family: ${bodyFontVal}; text-align:center;border-left:1px sol
 margin:8px 4px 0;}
 
 .map-info-body{/* Spacing around the text in the Google Map block */
-padding: 35px !Important;}
+padding: ${paddingValue}px !Important;}
 
 .choice-container table td{/* Vertical gap after poll buttons */
 padding-bottom:10px;}
@@ -1302,7 +1302,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       // Resets Bootstrap's default table margin.
       css += `.table {margin-bottom: 0px;}\n`
       // Intro text sits directly above content, so it takes the title padding.
-      css += `.intro-text {padding-top: 0px; padding-bottom: ${titlePaddingValue}px;}\n\n`
+      css += `.intro-text {padding-top: 0px; padding-bottom: ${titlePaddingValue}px;}\n`
+      css += `.regform-summary-container .regform-summary-header, .regform-summary-desc, .regform-summary-session {padding-bottom: ${titlePaddingValue}px;}\n\n`
     }
 
     styles.forEach((style, index) => {
