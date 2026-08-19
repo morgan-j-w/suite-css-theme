@@ -2557,7 +2557,7 @@ White #FFFFFF, Black #000000`}
                   <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col">
                     {/* Color swatch - dominant visual element */}
                     <div
-                      className="w-full cursor-pointer relative transition-all duration-150 ease-out rounded-t-xl"
+                      className="w-full cursor-pointer relative transition-all duration-150 ease-out rounded-t-lg"
                       style={{ backgroundColor: color.hex, height: 'calc(var(--spacing) * 8)' }}
                       onClick={() => {
                         // Trigger color picker
