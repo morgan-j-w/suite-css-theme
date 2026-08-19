@@ -31,6 +31,7 @@ import { clearedTypographyOverrides, hasTypographyOverrides } from "@/lib/typogr
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS } from "@/lib/validators/css-validator"
 import {
+  VALIDATION_MESSAGES,
   validateBeforeAddingColour,
   validatePalette,
   validateTypographyForStep,
@@ -242,6 +243,14 @@ export default function ThemeGenerator() {
   // The duplicate message names no colour, so the offending swatches are
   // marked instead. See issue #12.
   const duplicateColourIds = useMemo(() => findDuplicateColourIds(colors), [colors])
+  /**
+   * Shown as soon as a clash exists rather than waiting for a next/add attempt,
+   * so the ringed swatches are never left unexplained. Any attempt-driven
+   * message takes precedence, since that is the one the user just triggered.
+   */
+  const liveDuplicateMessage =
+    duplicateColourIds.size > 0 ? VALIDATION_MESSAGES.duplicateColours : ""
+
 
   // Authentication handlers
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -2629,7 +2638,7 @@ White #FFFFFF, Black #000000`}
                   </div>
                 ))}
               </div>
-              <ValidationMessage message={colorNameError} />
+              <ValidationMessage message={colorNameError || liveDuplicateMessage} />
               <Button onClick={addColor} variant="outline" className="mt-4 bg-slate-50 hover:bg-slate-100 border-slate-200 w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Add colour
