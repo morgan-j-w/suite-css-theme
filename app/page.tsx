@@ -1242,7 +1242,7 @@ padding: ${paddingValue}px}
 
 .btn-cm, button.btn-cm{/* All buttons styles */
 background-color:${firstStyleButtonBg}; border: 0px;
-color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;mso-hide:all;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
+color:${firstStyleButtonText};display:inline-block;font-family: ${buttonFontVal}; font-weight:700; text-align:center; text-decoration:none;width:100%;-webkit-text-size-adjust:none;padding:${buttonPaddingValue}; transition: all .4s ease; font-size: 14px; line-height: 19px; vertical-align: middle; width: auto; border-radius: ${buttonBorderRadiusValue};}
 
 
 a.btn-cm.btn-accept, a.btn-cm.btn-decline {width: 100%;}
