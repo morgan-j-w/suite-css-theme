@@ -126,6 +126,32 @@ export const validatePalette = (colors: ColorDefinition[]): string | null => {
   return null
 }
 
+/**
+ * The ids of colours that clash with another colour, by name or by hex.
+ *
+ * The duplicate message names no colour, by design, so the UI highlights the
+ * offending swatches instead. Blank names and hexes are ignored: an incomplete
+ * row is reported by its own message, and two empty fields are not a clash the
+ * user can act on.
+ */
+export const findDuplicateColourIds = (colors: ColorDefinition[]): Set<string> => {
+  const byName = new Map<string, string[]>()
+  const byHex = new Map<string, string[]>()
+
+  for (const colour of colors) {
+    const name = (colour.name ?? "").trim().toLowerCase()
+    const hex = (colour.hex ?? "").trim().toLowerCase()
+    if (name !== "") byName.set(name, [...(byName.get(name) ?? []), colour.id])
+    if (hex !== "") byHex.set(hex, [...(byHex.get(hex) ?? []), colour.id])
+  }
+
+  const clashing = new Set<string>()
+  for (const group of [...byName.values(), ...byHex.values()]) {
+    if (group.length > 1) group.forEach((id) => clashing.add(id))
+  }
+  return clashing
+}
+
 export interface TypographyValues {
   h1Font: string
   h1Size: string

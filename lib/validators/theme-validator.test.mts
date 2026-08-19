@@ -12,6 +12,7 @@ import {
   validateTypographyForSave,
   validateThemeForSave,
   isThemeNameMissing,
+  findDuplicateColourIds,
 } from "./theme-validator.ts"
 
 /**
@@ -223,4 +224,40 @@ test("the save guards fire in order of severity", () => {
 
 test("a complete theme saves", () => {
   assert.equal(validateThemeForSave(completeTheme()), null)
+})
+
+test("#12 duplicate colours are identified by id for highlighting", () => {
+  // Ids must be distinct, as they are in the app; two swatches can share a
+  // name and hex while remaining separate rows.
+  const withId = (id: string, name: string, hex: string) => ({ id, name, hex })
+  const palette = [
+    withId("1", "Black", "#000000"),
+    withId("2", "White", "#FFFFFF"),
+    withId("3", "Blue 01", "#002664"),
+    withId("4", "Grey 04", "#EBEBEB"),
+    withId("5", "White", "#FFFFFF"),
+    withId("6", "Blue 01 hover", "#26477B"),
+  ]
+  const dupes = findDuplicateColourIds(palette)
+  // Both White rows clash, on name and on hex - and both are flagged, so the
+  // user can see the pair rather than just one of them.
+  assert.deepEqual([...dupes].sort(), ["2", "5"])
+  assert.ok(!dupes.has("1"), "Black is untouched")
+  assert.ok(!dupes.has("3"), "Blue 01 is untouched")
+})
+
+test("#12 a clash on hex alone is flagged, and on name alone", () => {
+  const sameHex = [{ id: "a", name: "Snow", hex: "#ffffff" }, { id: "b", name: "Paper", hex: "#FFFFFF" }]
+  assert.equal(findDuplicateColourIds(sameHex).size, 2, "same hex, different names")
+  const sameName = [{ id: "a", name: "White", hex: "#ffffff" }, { id: "b", name: "white", hex: "#eeeeee" }]
+  assert.equal(findDuplicateColourIds(sameName).size, 2, "same name, different hexes")
+})
+
+test("#12 blank rows are not treated as clashing", () => {
+  const withBlanks = [{ id: "a", name: "", hex: "" }, { id: "b", name: "", hex: "" }, { id: "c", name: "Black", hex: "#000000" }]
+  assert.equal(findDuplicateColourIds(withBlanks).size, 0)
+})
+
+test("#12 a clean palette flags nothing", () => {
+  assert.equal(findDuplicateColourIds([c("Black", "#000000"), c("White", "#ffffff")]).size, 0)
 })

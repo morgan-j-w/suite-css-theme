@@ -35,6 +35,7 @@ import {
   validatePalette,
   validateTypographyForStep,
   validateThemeForSave,
+  findDuplicateColourIds,
   stripHexWhitespace,
   normaliseHexOnBlur,
   type TypographyValues,
@@ -238,6 +239,9 @@ export default function ThemeGenerator() {
   } = themeState
 
   const namedColors = useMemo(() => colors.filter((c) => c.name.trim() !== ""), [colors])
+  // The duplicate message names no colour, so the offending swatches are
+  // marked instead. See issue #12.
+  const duplicateColourIds = useMemo(() => findDuplicateColourIds(colors), [colors])
 
   // Authentication handlers
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -2554,7 +2558,18 @@ White #FFFFFF, Black #000000`}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {colors.map((color) => (
-                  <div key={color.id} className="border border-slate-200 rounded-lg overflow-hidden bg-white group flex flex-col">
+                  <div
+                    key={color.id}
+                    // Not signalled by colour alone: the title and aria-label
+                    // say why the swatch is marked.
+                    title={duplicateColourIds.has(color.id) ? "Duplicate colour — each name and hex must be unique" : undefined}
+                    aria-label={duplicateColourIds.has(color.id) ? `${color.name || "This colour"} is a duplicate` : undefined}
+                    className={`rounded-lg overflow-hidden bg-white group flex flex-col border ${
+                      duplicateColourIds.has(color.id)
+                        ? "border-red-400 ring-2 ring-red-300"
+                        : "border-slate-200"
+                    }`}
+                  >
                     {/* Color swatch - dominant visual element */}
                     <div
                       className="w-full cursor-pointer relative transition-all duration-150 ease-out rounded-t-lg"
