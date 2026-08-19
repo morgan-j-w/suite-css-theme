@@ -1304,7 +1304,8 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       // Intro text sits directly above content, so it takes the title padding.
       css += `.intro-text {padding-top: 0px; padding-bottom: ${titlePaddingValue}px;}\n`
       css += `.regform-summary-container {padding-bottom: 0px;}\n`
-      css += `.regform-summary-container .regform-summary-header, .regform-summary-desc, .regform-summary-session {padding-bottom: ${titlePaddingValue}px;}\n\n`
+      css += `.regform-summary-container .regform-summary-header, .regform-summary-desc, .regform-summary-session {padding-bottom: ${titlePaddingValue}px;}\n`
+      css += `.regform-action-button-container[sd-action-btn-style="STS"] .btn-cm {width: auto;}\n\n`
     }
 
     styles.forEach((style, index) => {
