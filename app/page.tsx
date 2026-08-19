@@ -1303,6 +1303,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `.table {margin-bottom: 0px;}\n`
       // Intro text sits directly above content, so it takes the title padding.
       css += `.intro-text {padding-top: 0px; padding-bottom: ${titlePaddingValue}px;}\n`
+      css += `.regform-summary-container {padding-bottom: 0px;}\n`
       css += `.regform-summary-container .regform-summary-header, .regform-summary-desc, .regform-summary-session {padding-bottom: ${titlePaddingValue}px;}\n\n`
     }
 
