@@ -428,7 +428,7 @@ export default function ThemeGenerator() {
       return
     }
     setColorNameError("")
-    setColors([...colors, { id: Date.now().toString(), name: "", hex: "#000000" }])
+    setColors([...colors, { id: Date.now().toString(), name: "", hex: "" }])
   }
 
   const validateColorsForStep = (): boolean => {
@@ -2591,7 +2591,7 @@ White #FFFFFF, Black #000000`}
                     >
                       <input
                         type="color"
-                        value={color.hex}
+                        value={color.hex || "#000000"}
                         onChange={(e) => updateColor(color.id, "hex", e.target.value)}
                         className="absolute inset-0 w-0 h-0 opacity-0"
                         data-color-id={color.id}
@@ -3414,6 +3414,7 @@ White #FFFFFF, Black #000000`}
                       className="mt-1"
                       value={buttonPaddingTop || "10"}
                       fallback="10"
+                      placeholder="10"
                       onValueChange={(next) => {
                         setButtonPaddingTop(next)
                         setCssRefreshKey(prev => prev + 1)
@@ -3426,6 +3427,7 @@ White #FFFFFF, Black #000000`}
                       className="mt-1"
                       value={buttonPaddingRight || "20"}
                       fallback="20"
+                      placeholder="20"
                       onValueChange={(next) => {
                         setButtonPaddingRight(next)
                         setCssRefreshKey(prev => prev + 1)
@@ -3438,6 +3440,7 @@ White #FFFFFF, Black #000000`}
                       className="mt-1"
                       value={buttonPaddingBottom || "10"}
                       fallback="10"
+                      placeholder="10"
                       onValueChange={(next) => {
                         setButtonPaddingBottom(next)
                         setCssRefreshKey(prev => prev + 1)
@@ -3450,6 +3453,7 @@ White #FFFFFF, Black #000000`}
                       className="mt-1"
                       value={buttonPaddingLeft || "20"}
                       fallback="20"
+                      placeholder="20"
                       onValueChange={(next) => {
                         setButtonPaddingLeft(next)
                         setCssRefreshKey(prev => prev + 1)
