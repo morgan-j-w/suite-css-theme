@@ -2589,12 +2589,21 @@ White #FFFFFF, Black #000000`}
                         if (colorInput) colorInput.click()
                       }}
                     >
+                      {/*
+                        A mouse convenience: the visible swatch clicks this to
+                        open the native picker. It is zero-sized and invisible,
+                        so leaving it focusable put a keyboard user on an unnamed
+                        control they could not see. The hex field below is the
+                        accessible way to set the value.
+                      */}
                       <input
                         type="color"
                         value={color.hex || "#000000"}
                         onChange={(e) => updateColor(color.id, "hex", e.target.value)}
                         className="absolute inset-0 w-0 h-0 opacity-0"
                         data-color-id={color.id}
+                        tabIndex={-1}
+                        aria-hidden="true"
                       />
                       {/* Delete button in top right */}
                       <Button
@@ -2712,7 +2721,7 @@ White #FFFFFF, Black #000000`}
                         setH1Weight(value)
                         updateAllStylesH1Weight(value)
                       }}>
-                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                        <SelectTrigger aria-label="Heading 1 font weight" className="mt-1.5 h-9 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -2776,7 +2785,7 @@ White #FFFFFF, Black #000000`}
                         setH2Weight(value)
                         updateAllStylesH2Weight(value)
                       }}>
-                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                        <SelectTrigger aria-label="Heading 2 font weight" className="mt-1.5 h-9 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -2840,7 +2849,7 @@ White #FFFFFF, Black #000000`}
                         setH3Weight(value)
                         updateAllStylesH3Weight(value)
                       }}>
-                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                        <SelectTrigger aria-label="Heading 3 font weight" className="mt-1.5 h-9 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -2904,7 +2913,7 @@ White #FFFFFF, Black #000000`}
                         setH4Weight(value)
                         updateAllStylesH4Weight(value)
                       }}>
-                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                        <SelectTrigger aria-label="Heading 4 font weight" className="mt-1.5 h-9 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -2979,7 +2988,7 @@ White #FFFFFF, Black #000000`}
                         setBodyWeight(value)
                         updateAllStylesBodyWeight(value)
                       }}>
-                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                        <SelectTrigger aria-label="Body copy font weight" className="mt-1.5 h-9 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -3054,7 +3063,7 @@ White #FFFFFF, Black #000000`}
                         setButtonWeight(value)
                         updateAllStylesButtonWeight(value)
                       }}>
-                        <SelectTrigger className="mt-1.5 h-9 w-full">
+                        <SelectTrigger aria-label="Button font weight" className="mt-1.5 h-9 w-full">
                           <SelectValue placeholder="Select weight" />
                         </SelectTrigger>
                         <SelectContent>
@@ -3083,7 +3092,7 @@ White #FFFFFF, Black #000000`}
                     setLinkWeight(value)
                     updateAllStylesLinkWeight(value)
                   }}>
-                    <SelectTrigger className="mt-1.5 h-9 w-full">
+                    <SelectTrigger aria-label="Link font weight" className="mt-1.5 h-9 w-full">
                       <SelectValue placeholder="Select weight" />
                     </SelectTrigger>
                     <SelectContent>
@@ -3338,7 +3347,7 @@ White #FFFFFF, Black #000000`}
                     value={globalIconStyle || "material-sharp"}
                     onValueChange={(value) => setGlobalIconStyle(value)}
                   >
-                    <SelectTrigger className="mt-2 w-full">
+                    <SelectTrigger aria-label="Icon style" className="mt-2 w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -3782,7 +3791,7 @@ White #FFFFFF, Black #000000`}
                               value={style.background}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "background", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Background colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.background) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -3829,7 +3838,7 @@ White #FFFFFF, Black #000000`}
                                 updateStyleWithSmartDescription(style.id, "headingColor", value)
                               }
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Heading colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.headingColor) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -3864,7 +3873,7 @@ White #FFFFFF, Black #000000`}
                               value={style.textColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "textColor", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Text colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.textColor) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -3899,7 +3908,7 @@ White #FFFFFF, Black #000000`}
                               value={style.linkColor}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "linkColor", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Link colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.linkColor) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -3935,7 +3944,7 @@ White #FFFFFF, Black #000000`}
                               value={style.buttonBg}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonBg", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Button background colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.buttonBg) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -3970,7 +3979,7 @@ White #FFFFFF, Black #000000`}
                               value={style.buttonText}
                               onValueChange={(value) => updateStyleWithSmartDescription(style.id, "buttonText", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Button text colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.buttonText) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -4021,7 +4030,7 @@ White #FFFFFF, Black #000000`}
                                 updateStyle(style.id, "buttonBorderColor", value)
                               }}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Button border colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <div className="flex items-center gap-2 max-w-[200px]">
                                   {style.buttonBorderColor && style.buttonBorderColor !== "none" ? (
                                     <>
@@ -4064,7 +4073,7 @@ White #FFFFFF, Black #000000`}
                               value={style.buttonBgHover}
                               onValueChange={(value) => updateStyle(style.id, "buttonBgHover", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Button background hover colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.buttonBgHover) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -4099,7 +4108,7 @@ White #FFFFFF, Black #000000`}
                               value={style.buttonTextHover}
                               onValueChange={(value) => updateStyle(style.id, "buttonTextHover", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Button text hover colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   {colors.find((c) => c.name === style.buttonTextHover) && (
                                     <div className="flex items-center gap-2 max-w-[200px]">
@@ -4134,7 +4143,7 @@ White #FFFFFF, Black #000000`}
                               value={style.iconColor || "#000000"}
                               onValueChange={(value) => updateStyle(style.id, "iconColor", value)}
                             >
-                              <SelectTrigger className="w-full mt-1.5 h-8 text-xs bg-white">
+                              <SelectTrigger aria-label={`Icon colour for ${style.name}`} className="w-full mt-1.5 h-8 text-xs bg-white">
                                 <SelectValue>
                                   <div className="flex items-center gap-2 max-w-[200px]">
                                     <div
@@ -4702,7 +4711,7 @@ White #FFFFFF, Black #000000`}
                                     value={style.h1Weight || h1Weight || "700"}
                                     onValueChange={(value) => updateStyle(style.id, "h1Weight", value)}
                                   >
-                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectTrigger aria-label={`Heading 1 font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                       <SelectValue placeholder={getWeightLabel(style.h1Weight || h1Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -4754,7 +4763,7 @@ White #FFFFFF, Black #000000`}
                                     value={style.h2Weight || h2Weight || "700"}
                                     onValueChange={(value) => updateStyle(style.id, "h2Weight", value)}
                                   >
-                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectTrigger aria-label={`Heading 2 font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                       <SelectValue placeholder={getWeightLabel(style.h2Weight || h2Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -4806,7 +4815,7 @@ White #FFFFFF, Black #000000`}
                                     value={style.h3Weight || h3Weight || "700"}
                                     onValueChange={(value) => updateStyle(style.id, "h3Weight", value)}
                                   >
-                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectTrigger aria-label={`Heading 3 font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                       <SelectValue placeholder={getWeightLabel(style.h3Weight || h3Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -4858,7 +4867,7 @@ White #FFFFFF, Black #000000`}
                                     value={style.h4Weight || h4Weight || "700"}
                                     onValueChange={(value) => updateStyle(style.id, "h4Weight", value)}
                                   >
-                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectTrigger aria-label={`Heading 4 font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                       <SelectValue placeholder={getWeightLabel(style.h4Weight || h4Weight || "700")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -4915,7 +4924,7 @@ White #FFFFFF, Black #000000`}
                                     value={style.bodyWeight || bodyWeight || "400"}
                                     onValueChange={(value) => updateStyle(style.id, "bodyWeight", value)}
                                   >
-                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectTrigger aria-label={`Body font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                       <SelectValue placeholder={getWeightLabel(style.bodyWeight || bodyWeight || "400")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -4939,7 +4948,7 @@ White #FFFFFF, Black #000000`}
                                   value={style.linkWeight || linkWeight || "400"}
                                   onValueChange={(value) => updateStyle(style.id, "linkWeight", value)}
                                 >
-                                  <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                  <SelectTrigger aria-label={`Link font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                     <SelectValue placeholder={getWeightLabel(style.linkWeight || linkWeight || "400")} />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -4995,7 +5004,7 @@ White #FFFFFF, Black #000000`}
                                     value={style.buttonWeight || buttonWeight || "600"}
                                     onValueChange={(value) => updateStyle(style.id, "buttonWeight", value)}
                                   >
-                                    <SelectTrigger className="mt-1 h-8 text-xs bg-white w-full">
+                                    <SelectTrigger aria-label={`Button font weight for ${style.name}`} className="mt-1 h-8 text-xs bg-white w-full">
                                       <SelectValue placeholder={getWeightLabel(style.buttonWeight || buttonWeight || "600")} />
                                     </SelectTrigger>
                                     <SelectContent>
