@@ -2492,7 +2492,7 @@ ${iconTemplates}</div>`
                       : "bg-slate-200 text-slate-600 cursor-pointer hover:bg-slate-300"
                   }`}
                   style={{
-                    backgroundColor: step === currentStep ? "#ec2176" : step < currentStep ? "#21cdec" : undefined
+                    backgroundColor: step === currentStep ? "#d81b67" : step < currentStep ? "#21cdec" : undefined
                   }}
                 >
                   {step < currentStep ? "✓" : step}
@@ -2509,7 +2509,7 @@ ${iconTemplates}</div>`
           <div className="h-1 bg-slate-200 rounded-full">
             <div
               className="h-full rounded-full transition-all"
-              style={{ width: `${(currentStep - 1) * (100 / 3)}%`, backgroundColor: "#ec2176" }}
+              style={{ width: `${(currentStep - 1) * (100 / 3)}%`, backgroundColor: "#d81b67" }}
             />
           </div>
         </div>
@@ -3533,7 +3533,7 @@ White #FFFFFF, Black #000000`}
               className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" style={{ color: "#ec2176" }} />
+                <Sparkles className="h-5 w-5" style={{ color: "#d81b67" }} />
                 <span className="font-semibold text-slate-900">Generate colour combinations</span>
                 <TooltipProvider>
                   <Tooltip>

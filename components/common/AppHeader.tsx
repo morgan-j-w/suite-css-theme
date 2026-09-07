@@ -37,9 +37,9 @@ export const AppHeader = ({ onSaveTheme, hasUnsavedChanges, isSaving, onDevInfo 
         <Button 
           onClick={onSaveTheme} 
           className="text-white text-xs md:text-sm py-2 md:py-2 px-4 md:px-4 w-full md:w-auto disabled:opacity-50 flex items-center justify-center gap-2" 
-          style={{ backgroundColor: '#EC2076' }} 
-          onMouseEnter={(e) => !isSaving && (e.currentTarget.style.backgroundColor = '#d41864')} 
-          onMouseLeave={(e) => !isSaving && (e.currentTarget.style.backgroundColor = '#EC2076')}
+          style={{ backgroundColor: '#D81B67' }}
+          onMouseEnter={(e) => !isSaving && (e.currentTarget.style.backgroundColor = '#C01355')}
+          onMouseLeave={(e) => !isSaving && (e.currentTarget.style.backgroundColor = '#D81B67')}
           disabled={isSaving}
         >
           {isSaving && <Loader className="w-4 h-4 animate-spin" />}
