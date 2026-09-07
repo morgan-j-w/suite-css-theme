@@ -92,7 +92,7 @@
     {
       "n": 9,
       "status": "fixed",
-      "note": "Empty palette blocks both Next and Save. Subsequently tightened at your request: a palette consisting only of the seeded White/Black defaults is also treated as 'no palette entered', since the tool supplies those rather than the user choosing them. Renaming or recolouring a default makes it count as a real colour. Same message throughout.",
+      "note": "Empty palette blocks both Next and Save. Was briefly tightened so that a palette of only the seeded White/Black counted as 'no palette entered', then reverted at your request: that treated a deliberate black-and-white theme as unfinished. Final rule is the simple one — any colour at all lets the user continue, only a completely empty palette blocks. Same message throughout.",
       "files": [
         "lib/validators/theme-validator.ts",
         "app/page.tsx"

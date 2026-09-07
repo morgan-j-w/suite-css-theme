@@ -80,23 +80,12 @@ export const validateBeforeAddingColour = (colors: ColorDefinition[]): string | 
 }
 
 /**
- * The palette the wizard seeds itself with. These are supplied by the tool, not
- * chosen by the user, so a palette consisting only of these counts as "no
- * colour palette entered" for issue #9.
- */
-const SEEDED_DEFAULTS = [
-  { name: "white", hex: "#ffffff" },
-  { name: "black", hex: "#000000" },
-]
-
-const isSeededDefault = (colour: ColorDefinition): boolean => {
-  const name = (colour.name ?? "").trim().toLowerCase()
-  const hex = (colour.hex ?? "").trim().toLowerCase()
-  return SEEDED_DEFAULTS.some((d) => d.name === name && d.hex === hex)
-}
-
-/**
  * Guards leaving Step 1. Returns null when the palette is good.
+ *
+ * Any colour at all is enough to continue, including the White and Black the
+ * wizard seeds itself with; only a completely empty palette blocks. An earlier
+ * revision also rejected a palette of nothing but those seeded defaults, but
+ * that treated a deliberate black-and-white theme as an unfinished one.
  *
  * Order matters and is deliberate: an empty palette is reported before missing
  * fields, missing fields before malformed ones, and duplicates last, so the
@@ -104,10 +93,6 @@ const isSeededDefault = (colour: ColorDefinition): boolean => {
  */
 export const validatePalette = (colors: ColorDefinition[]): string | null => {
   if (colors.length === 0) return VALIDATION_MESSAGES.emptyPalette
-
-  // Nothing but the seeded White/Black still means the user has not entered a
-  // palette. Covers both defaults remaining and only one of them remaining.
-  if (colors.every(isSeededDefault)) return VALIDATION_MESSAGES.emptyPalette
 
   const anythingMissing = colors.some((c) => blank(c.name) || blank(c.hex))
   if (anythingMissing) return VALIDATION_MESSAGES.coloursIncomplete

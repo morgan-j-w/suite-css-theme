@@ -83,19 +83,17 @@ test("#13/#15 the add colour guard", () => {
   assert.equal(validateBeforeAddingColour([]), null, "an empty palette is allowed")
 })
 
-test("#9 an empty palette blocks", () => {
+test("#9 only a completely empty palette blocks", () => {
   assert.equal(validatePalette([]), M.emptyPalette)
 })
 
-test("#9 a palette of only the seeded defaults is not a palette", () => {
-  assert.equal(validatePalette([c("White", "#ffffff"), c("Black", "#000000")]), M.emptyPalette)
-  assert.equal(validatePalette([c("White", "#ffffff")]), M.emptyPalette, "one default left")
-  assert.equal(
-    validatePalette([c("white", "#FFFFFF"), c("BLACK", "#000000")]),
-    M.emptyPalette,
-    "case-insensitive",
-  )
-  // Renaming or recolouring a default makes it the user's own choice.
+test("#9 any colour is enough to continue, including the seeded defaults", () => {
+  // Deleting every colour is the only case that blocks. A palette left as the
+  // seeded White/Black is a legitimate black-and-white theme.
+  assert.equal(validatePalette([c("White", "#ffffff"), c("Black", "#000000")]), null, "both defaults")
+  assert.equal(validatePalette([c("White", "#ffffff")]), null, "one default left")
+  assert.equal(validatePalette([c("Black", "#000000")]), null, "the other default left")
+  assert.equal(validatePalette([c("white", "#FFFFFF")]), null, "case does not matter")
   assert.equal(validatePalette([c("Snow", "#ffffff")]), null, "renamed")
   assert.equal(validatePalette([c("White", "#fefefe")]), null, "recoloured")
   assert.equal(
