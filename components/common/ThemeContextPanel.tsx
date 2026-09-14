@@ -39,8 +39,9 @@ export const ThemeContextPanel = ({
     <div className="bg-white border border-slate-200 p-6 shadow-sm">
       {/* Theme Name and Metadata Row */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6">
-        {/* Theme Name Section */}
-        <div>
+        {/* Theme Name Section. min-w-0 lets it shrink instead of squeezing the
+            badges beside it, which is what forced the type badge to wrap. */}
+        <div className="min-w-0 lg:flex-1">
           {isEditing ? (
             <div className="flex gap-2 items-center w-full">
               <Input
@@ -65,23 +66,27 @@ export const ThemeContextPanel = ({
                 setEditValue(themeName)
                 setIsEditing(true)
               }}
-              className="group flex items-center gap-2 text-2xl font-bold text-slate-900 hover:text-slate-700 rounded-lg px-3 py-2 -mx-3 transition-all hover:bg-slate-100"
+              className="group flex items-start gap-2 w-full text-left text-2xl font-bold text-slate-900 hover:text-slate-700 rounded-lg px-3 py-2 -mx-3 transition-all hover:bg-slate-100"
               title="Click to rename"
             >
-              {themeName}
-              <Pencil className="h-5 w-5 text-slate-400 group-hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-all" />
+              {/* text-left is load-bearing: a button centres its text by
+                  default, which only shows once a name is long enough to wrap. */}
+              <span className="min-w-0 break-words">{themeName}</span>
+              <Pencil className="h-5 w-5 shrink-0 mt-1 text-slate-400 group-hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-all" />
             </button>
           )}
         </div>
 
         {/* Metadata Row - Right Aligned */}
-        <div className="flex items-center gap-2 w-full lg:w-auto lg:justify-end">
+        {/* shrink-0 keeps the badges at their natural width however long the
+            name is; without it they are compressed until their labels wrap. */}
+        <div className="flex items-center gap-2 w-full lg:w-auto lg:shrink-0 lg:justify-end">
           {/* Theme Type Badge. Violet and blue are used rather than green so the
               type badge cannot be mistaken for the emerald "Saved" status pill
               sitting beside it. */}
           {themeType && (
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${
+              className={`inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${
                 themeType === "composer"
                   ? "text-violet-700 bg-violet-100"
                   : "text-blue-700 bg-blue-100"
@@ -97,12 +102,12 @@ export const ThemeContextPanel = ({
           )}
           {/* Status Pill */}
           {isDirty ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
+            <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />
               Unsaved changes
             </span>
           ) : savedTimeAgo ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">
+            <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">
               <Check className="h-3.5 w-3.5" />
               {savedTimeAgo}
             </span>
