@@ -37,6 +37,7 @@ import {
   validateTypographyForStep,
   validateThemeForSave,
   findDuplicateColourIds,
+  sanitiseThemeName,
   stripHexWhitespace,
   normaliseHexOnBlur,
   type TypographyValues,
@@ -329,7 +330,9 @@ export default function ThemeGenerator() {
     // Load theme name and saved time from localStorage
     const savedThemeName = localStorage.getItem("themeName")
     if (savedThemeName) {
-      setThemeName(savedThemeName)
+      // Sanitised on the way back in as well, so a name stored before this rule
+      // existed is cleaned up rather than carried forward.
+      setThemeName(sanitiseThemeName(savedThemeName))
     }
     
     const savedThemeType = localStorage.getItem("themeType")

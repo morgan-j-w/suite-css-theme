@@ -13,6 +13,8 @@ import {
   validateThemeForSave,
   isThemeNameMissing,
   findDuplicateColourIds,
+  sanitiseThemeName,
+  THEME_NAME_MAX_LENGTH,
 } from "./theme-validator.ts"
 
 /**
@@ -222,6 +224,40 @@ test("the save guards fire in order of severity", () => {
 
 test("a complete theme saves", () => {
   assert.equal(validateThemeForSave(completeTheme()), null)
+})
+
+test("theme names are capped at 250 characters", () => {
+  assert.equal(sanitiseThemeName("a".repeat(300)).length, THEME_NAME_MAX_LENGTH)
+  assert.equal(sanitiseThemeName("a".repeat(250)).length, 250, "exactly at the cap is kept")
+  assert.equal(sanitiseThemeName("Nino's theme"), "Nino's theme", "a normal name is untouched")
+  // The tester's 250-character name arrives intact.
+  const reported =
+    "Long name The production Terrano closely resembles the concept, if with a more " +
+    "conventional rear-end treatment. The boomerang-shaped tail-lights of the concept " +
+    "appear to have been replaced with more vertically oriented ones, while there's a more conv"
+  assert.equal(sanitiseThemeName(reported), reported)
+})
+
+test("angle brackets are stripped from theme names", () => {
+  // The reported payload: React escaped it, but it still reached the suite and
+  // broke loading the theme.
+  assert.equal(
+    sanitiseThemeName("(Nino) September Theme 2026 - <b onmouseover=alert('Wufff!')>Click me for XSS!</b>"),
+    "(Nino) September Theme 2026 - b onmouseover=alert('Wufff!')Click me for XSS!/b",
+  )
+  assert.equal(sanitiseThemeName("<script>alert(1)</script>"), "scriptalert(1)/script")
+  assert.equal(sanitiseThemeName("<img src=x onerror=alert(1)>"), "img src=x onerror=alert(1)")
+  // Nothing left that a parser could read as a tag.
+  for (const attack of ["<b>x</b>", "<<script>>", "a > b < c"]) {
+    assert.ok(!/[<>]/.test(sanitiseThemeName(attack)), `bracket survived in ${attack}`)
+  }
+})
+
+test("sanitising handles both rules at once", () => {
+  const nasty = "<b>" + "x".repeat(300) + "</b>"
+  const cleaned = sanitiseThemeName(nasty)
+  assert.ok(!/[<>]/.test(cleaned))
+  assert.equal(cleaned.length, THEME_NAME_MAX_LENGTH)
 })
 
 test("#12 duplicate colours are identified by id for highlighting", () => {

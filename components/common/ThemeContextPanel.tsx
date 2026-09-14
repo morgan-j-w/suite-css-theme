@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Check, Pencil, Mail, Monitor } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { sanitiseThemeName, THEME_NAME_MAX_LENGTH } from "@/lib/validators/theme-validator"
 
 interface ThemeContextPanelProps {
   themeName?: string
@@ -23,8 +24,11 @@ export const ThemeContextPanel = ({
   const [editValue, setEditValue] = useState(themeName)
 
   const handleSaveName = () => {
-    if (editValue.trim()) {
-      onThemeNameChange?.(editValue.trim())
+    // Sanitised again on commit: maxLength caps typing but not every paste path,
+    // and a name restored from storage may predate this rule.
+    const cleaned = sanitiseThemeName(editValue).trim()
+    if (cleaned) {
+      onThemeNameChange?.(cleaned)
     } else {
       setEditValue(themeName)
     }
@@ -41,7 +45,8 @@ export const ThemeContextPanel = ({
             <div className="flex gap-2 items-center w-full">
               <Input
                 value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
+                maxLength={THEME_NAME_MAX_LENGTH}
+                onChange={(e) => setEditValue(sanitiseThemeName(e.target.value))}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSaveName()
                   if (e.key === "Escape") {

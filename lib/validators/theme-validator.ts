@@ -199,6 +199,28 @@ export const isThemeNameMissing = (themeName: string): boolean => {
   return trimmed === "" || trimmed.toLowerCase() === DEFAULT_THEME_NAME.toLowerCase()
 }
 
+/**
+ * Longest theme name accepted. Beyond this the name wraps over several lines in
+ * the context panel and pushes the type badge out of shape.
+ */
+export const THEME_NAME_MAX_LENGTH = 250
+
+/**
+ * Applied as the user types, in the same spirit as stripHexWhitespace: a theme
+ * name can never legitimately contain angle brackets, so they are dropped at the
+ * point of entry rather than accepted and rejected later.
+ *
+ * This is what stops a name like `<b onmouseover=alert(1)>Click me</b>` being
+ * stored. React escapes it on the way out, so it never executed inside this
+ * tool, but the stored name still travelled to the suite, where loading the
+ * theme failed. Removing the brackets leaves the visible words intact and
+ * leaves nothing that can be parsed as markup.
+ *
+ * Length is capped here too, so a paste is truncated rather than refused.
+ */
+export const sanitiseThemeName = (value: string): string =>
+  (value ?? "").replace(/[<>]/g, "").slice(0, THEME_NAME_MAX_LENGTH)
+
 /** Guards every save entry point. */
 export const validateThemeForSave = (params: {
   themeName: string
