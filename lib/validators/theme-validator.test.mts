@@ -15,6 +15,10 @@ import {
   findDuplicateColourIds,
   sanitiseThemeName,
   THEME_NAME_MAX_LENGTH,
+  normaliseThemeType,
+  isThemeType,
+  THEME_TYPES,
+  DEFAULT_THEME_TYPE,
 } from "./theme-validator.ts"
 
 /**
@@ -250,6 +254,50 @@ test("angle brackets are stripped from theme names", () => {
   // Nothing left that a parser could read as a tag.
   for (const attack of ["<b>x</b>", "<<script>>", "a > b < c"]) {
     assert.ok(!/[<>]/.test(sanitiseThemeName(attack)), `bracket survived in ${attack}`)
+  }
+})
+
+test("the two theme types are the strings the generators compare against", () => {
+  // page.tsx branches on these literals in three places: the events-only CSS
+  // block, the grid templates and the mobile breakpoint. If this list and those
+  // literals ever disagree, a theme silently generates for the wrong type.
+  assert.deepEqual([...THEME_TYPES], ["composer", "events"])
+  assert.equal(DEFAULT_THEME_TYPE, "composer")
+})
+
+test("a recognised theme type is passed through untouched", () => {
+  assert.equal(normaliseThemeType("composer"), "composer")
+  assert.equal(normaliseThemeType("events"), "events")
+})
+
+test("an unrecognised theme type falls back to composer", () => {
+  // The badge used to read anything-but-composer as events while every
+  // generator read anything-but-events as composer, so each of these showed an
+  // Events badge over composer CSS and the 650px email breakpoint.
+  for (const rogue of ["Events", "events ", "landing", "EVENTS", "", "email"]) {
+    assert.equal(normaliseThemeType(rogue), "composer", `${JSON.stringify(rogue)} should fall back`)
+  }
+})
+
+test("an absent theme type falls back to composer", () => {
+  // localStorage.getItem returns null when the key has never been written.
+  assert.equal(normaliseThemeType(null), "composer")
+  assert.equal(normaliseThemeType(undefined), "composer")
+})
+
+test("isThemeType accepts only the two types", () => {
+  assert.ok(isThemeType("composer"))
+  assert.ok(isThemeType("events"))
+  for (const rogue of ["Events", "landing", "", null, undefined, 7, {}, ["events"]]) {
+    assert.ok(!isThemeType(rogue), `${JSON.stringify(rogue)} is not a theme type`)
+  }
+})
+
+test("normalising always yields a value the generators recognise", () => {
+  // The property that closes the divergence: whatever goes in, what comes out
+  // is one of the literals page.tsx tests for, so badge and output agree.
+  for (const input of ["composer", "events", "Events", "landing", "", null, undefined]) {
+    assert.ok(THEME_TYPES.includes(normaliseThemeType(input)))
   }
 })
 

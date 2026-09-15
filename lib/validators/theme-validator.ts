@@ -221,6 +221,38 @@ export const THEME_NAME_MAX_LENGTH = 250
 export const sanitiseThemeName = (value: string): string =>
   (value ?? "").replace(/[<>]/g, "").slice(0, THEME_NAME_MAX_LENGTH)
 
+/**
+ * The two theme types, in the exact spelling every generator branch compares
+ * against. Exported as the single source of truth so a call site tests against
+ * this list rather than a string literal typed out again.
+ */
+export const THEME_TYPES = ["composer", "events"] as const
+
+export type ThemeType = (typeof THEME_TYPES)[number]
+
+/** What an unrecognised or absent type falls back to. */
+export const DEFAULT_THEME_TYPE: ThemeType = "composer"
+
+export const isThemeType = (value: unknown): value is ThemeType =>
+  typeof value === "string" && (THEME_TYPES as readonly string[]).includes(value)
+
+/**
+ * Applied wherever a theme type enters the app from outside its own state:
+ * localStorage on rehydrate, and the radio group's string callback.
+ *
+ * Without this an unrecognised stored value diverged silently. The badge asked
+ * `=== "composer"` and so rendered anything else as the events label, while
+ * every generator asks `=== "events"` and so fell through to composer output.
+ * A value such as "Events" or a stale spelling therefore showed an Events badge
+ * over composer CSS, composer grid templates and the 650px email breakpoint —
+ * correct-looking in the tool, wrong in the suite, with nothing to see.
+ *
+ * Normalising on the way in means an unknown value becomes composer for the
+ * badge and the generators alike, so the two can no longer disagree.
+ */
+export const normaliseThemeType = (value: string | null | undefined): ThemeType =>
+  isThemeType(value) ? value : DEFAULT_THEME_TYPE
+
 /** Guards every save entry point. */
 export const validateThemeForSave = (params: {
   themeName: string

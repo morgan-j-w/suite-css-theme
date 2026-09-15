@@ -3,14 +3,43 @@
 import { useState } from "react"
 import { Check, Pencil, Mail, Monitor } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { sanitiseThemeName, THEME_NAME_MAX_LENGTH } from "@/lib/validators/theme-validator"
+import {
+  sanitiseThemeName,
+  THEME_NAME_MAX_LENGTH,
+  DEFAULT_THEME_TYPE,
+  type ThemeType,
+} from "@/lib/validators/theme-validator"
+
+/**
+ * Badge appearance per theme type. Label, icon and colours all come from this
+ * one lookup, keyed by the same strings the generators compare against, so the
+ * badge cannot describe one theme type while the output is built for the other.
+ *
+ * Violet and blue are used rather than green so the type badge cannot be
+ * mistaken for the emerald "Saved" status pill sitting beside it.
+ *
+ * `satisfies` is what keeps this honest: adding a third theme type to
+ * THEME_TYPES fails to compile until its badge is defined here.
+ */
+const THEME_TYPE_BADGE = {
+  composer: {
+    label: "Email Composer",
+    Icon: Mail,
+    className: "text-violet-700 bg-violet-100",
+  },
+  events: {
+    label: "Landing Pages and Events Desk",
+    Icon: Monitor,
+    className: "text-blue-700 bg-blue-100",
+  },
+} as const satisfies Record<ThemeType, { label: string; Icon: typeof Mail; className: string }>
 
 interface ThemeContextPanelProps {
   themeName?: string
   onThemeNameChange?: (name: string) => void
   isDirty?: boolean
   savedTimeAgo?: string
-  themeType?: string
+  themeType?: ThemeType
 }
 
 export const ThemeContextPanel = ({
@@ -18,10 +47,14 @@ export const ThemeContextPanel = ({
   onThemeNameChange,
   isDirty = false,
   savedTimeAgo = "Saved 2 mins ago",
-  themeType = "composer",
+  themeType = DEFAULT_THEME_TYPE,
 }: ThemeContextPanelProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(themeName)
+
+  // The fallback covers a value arriving from untyped JavaScript, so the badge
+  // degrades to composer exactly as the generators do.
+  const badge = THEME_TYPE_BADGE[themeType] ?? THEME_TYPE_BADGE[DEFAULT_THEME_TYPE]
 
   const handleSaveName = () => {
     // Sanitised again on commit: maxLength caps typing but not every paste path,
@@ -81,23 +114,13 @@ export const ThemeContextPanel = ({
         {/* shrink-0 keeps the badges at their natural width however long the
             name is; without it they are compressed until their labels wrap. */}
         <div className="flex items-center gap-2 w-full lg:w-auto lg:shrink-0 lg:justify-end">
-          {/* Theme Type Badge. Violet and blue are used rather than green so the
-              type badge cannot be mistaken for the emerald "Saved" status pill
-              sitting beside it. */}
+          {/* Theme Type Badge, resolved through THEME_TYPE_BADGE above. */}
           {themeType && (
             <span
-              className={`inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${
-                themeType === "composer"
-                  ? "text-violet-700 bg-violet-100"
-                  : "text-blue-700 bg-blue-100"
-              }`}
+              className={`inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${badge.className}`}
             >
-              {themeType === "composer" ? (
-                <Mail className="h-3.5 w-3.5" />
-              ) : (
-                <Monitor className="h-3.5 w-3.5" />
-              )}
-              {themeType === "composer" ? "Email Composer" : "Landing Pages and Events Desk"}
+              <badge.Icon className="h-3.5 w-3.5" />
+              {badge.label}
             </span>
           )}
           {/* Status Pill */}

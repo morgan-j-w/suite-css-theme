@@ -38,6 +38,9 @@ import {
   validateThemeForSave,
   findDuplicateColourIds,
   sanitiseThemeName,
+  normaliseThemeType,
+  DEFAULT_THEME_TYPE,
+  type ThemeType,
   stripHexWhitespace,
   normaliseHexOnBlur,
   type TypographyValues,
@@ -77,7 +80,7 @@ export default function ThemeGenerator() {
   const [copiedImport, setCopiedImport] = useState(false)
   const [resetStyles, setResetStyles] = useState<Set<string>>(new Set())
   const [themeName, setThemeName] = useState("Untitled Theme")
-  const [themeType, setThemeType] = useState("composer")
+  const [themeType, setThemeType] = useState<ThemeType>(DEFAULT_THEME_TYPE)
   const [savedTimeAgo, setSavedTimeAgo] = useState("")
   const [wcagFilter, setWcagFilter] = useState<'all' | 'AA' | 'AAA'>('all')
   const [activeContrastSuggestionStyleId, setActiveContrastSuggestionStyleId] = useState<string | null>(null)
@@ -335,10 +338,10 @@ export default function ThemeGenerator() {
       setThemeName(sanitiseThemeName(savedThemeName))
     }
     
-    const savedThemeType = localStorage.getItem("themeType")
-    if (savedThemeType) {
-      setThemeType(savedThemeType)
-    }
+    // Normalised on the way back in, so a stored value that is neither
+    // "composer" nor "events" cannot show an Events badge over composer output.
+    // An absent value normalises to the same composer default as the state.
+    setThemeType(normaliseThemeType(localStorage.getItem("themeType")))
     
     const lastSaved = localStorage.getItem("lastSavedTime")
     if (lastSaved) {
@@ -3283,7 +3286,7 @@ White #FFFFFF, Black #000000`}
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="flex flex-row gap-3">
-                      <RadioGroup value={themeType} onValueChange={setThemeType}>
+                      <RadioGroup value={themeType} onValueChange={(value) => setThemeType(normaliseThemeType(value))}>
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center space-x-3">
                             <RadioGroupItem value="composer" id="composer-theme" className="w-5 h-5 border-2 border-slate-300" />
