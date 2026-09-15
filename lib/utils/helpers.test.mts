@@ -37,3 +37,83 @@ test("formatFontForCSS quotes multi-word families", () => {
   assert.equal(formatFontForCSS("Arial, sans-serif"), "Arial, sans-serif")
   assert.equal(formatFontForCSS(undefined), "'Arial', sans-serif")
 })
+
+/**
+ * A font stack must never carry a semicolon, an unescaped apostrophe or a brace
+ * into the declaration. Each of those ends the declaration early and the email
+ * client drops the rest of the rule.
+ */
+const CSS_BREAKERS = /[;{}]/
+
+test("a second font stack after a semicolon is dropped, not quoted", () => {
+  // Reported by a tester: the generated CSS read
+  //   font-family: Inter, 'sans-serif; Montserrat', sans-serif;
+  // which does not parse, so the theme's fonts were lost in the email.
+  assert.equal(
+    formatFontForCSS("Inter, sans-serif; Montserrat, sans-serif"),
+    "Inter, sans-serif",
+  )
+  assert.equal(formatFontForCSS("Inter, sans-serif;Montserrat"), "Inter, sans-serif")
+  // A trailing semicolon on its own is not a second stack.
+  assert.equal(formatFontForCSS("Arial, sans-serif;"), "Arial, sans-serif")
+  assert.equal(
+    formatFontForCSS("font-family: Inter, sans-serif; Montserrat, sans-serif;"),
+    "Inter, sans-serif",
+  )
+})
+
+test("a value already stored in the broken form is repaired", () => {
+  // FontField formats on blur and stores the result, so testers already have
+  // the mangled string in localStorage. Reformatting it has to recover.
+  assert.equal(
+    formatFontForCSS("Inter, 'sans-serif; Montserrat', sans-serif"),
+    "Inter, sans-serif",
+  )
+})
+
+test("an apostrophe in a family name is escaped, not left to close the quote", () => {
+  assert.equal(formatFontForCSS("Jo's Font, sans-serif"), "'Jo\\'s Font', sans-serif")
+  assert.ok(!CSS_BREAKERS.test(formatFontForCSS("Jo's Font, sans-serif")))
+})
+
+test("braces and newlines cannot escape the rule", () => {
+  for (const attack of ["}\n.evil{color:red", "Arial}\n.x{y:z", "a{b}c, sans-serif"]) {
+    const out = formatFontForCSS(attack)
+    assert.ok(!CSS_BREAKERS.test(out), `breaker survived in ${JSON.stringify(attack)}`)
+    assert.ok(!/[\r\n]/.test(out), `newline survived in ${JSON.stringify(attack)}`)
+  }
+})
+
+test("generic families stay unquoted so they keep their meaning", () => {
+  // Quoting sans-serif asks for a font named "sans-serif" instead of the keyword.
+  for (const generic of ["sans-serif", "serif", "monospace", "cursive", "system-ui"]) {
+    assert.equal(formatFontForCSS(`Arial, ${generic}`), `Arial, ${generic}`)
+  }
+})
+
+test("formatting is idempotent, because the result is stored and reformatted", () => {
+  const inputs = [
+    "Inter, sans-serif; Montserrat, sans-serif",
+    "Hubot Sans, sans-serif",
+    "Jo's Font, sans-serif",
+    "'Hubot Sans', sans-serif",
+    'Inter, "Helvetica Neue", sans-serif',
+    "Arial, sans-serif",
+  ]
+  for (const input of inputs) {
+    const once = formatFontForCSS(input)
+    assert.equal(formatFontForCSS(once), once, `not stable for ${JSON.stringify(input)}`)
+    assert.ok(!CSS_BREAKERS.test(once), `breaker in output for ${JSON.stringify(input)}`)
+  }
+})
+
+test("double quotes are normalised to single quotes", () => {
+  assert.equal(formatFontForCSS('Inter, "Helvetica Neue", sans-serif'), "Inter, 'Helvetica Neue', sans-serif")
+})
+
+test("a value with nothing usable falls back rather than emitting an empty stack", () => {
+  assert.equal(formatFontForCSS(";"), "'Arial', sans-serif")
+  assert.equal(formatFontForCSS("  "), "'Arial', sans-serif")
+  assert.equal(formatFontForCSS(","), "'Arial', sans-serif")
+  assert.equal(formatFontForCSS(""), "'Arial', sans-serif")
+})

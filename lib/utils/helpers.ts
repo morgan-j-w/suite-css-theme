@@ -42,31 +42,74 @@ export const cleanFontValue = (fontValue: string | undefined): string => {
   return fontValue.trim().replace(/;$/, "")
 }
 
+/**
+ * Reverses escapeCssString. FontField stores the formatter's own output, which
+ * then goes through the formatter again when the CSS is generated, so without
+ * this a name containing an apostrophe would gain a backslash on every pass.
+ */
+const unescapeCssString = (value: string): string => value.replace(/\\(.)/g, "$1")
+
+/**
+ * A family may only go unquoted if it is a single CSS identifier.
+ *
+ * Generic families must stay unquoted to keep their meaning: 'sans-serif' in
+ * quotes asks for a font actually named "sans-serif" rather than the keyword.
+ */
+const isBareFamilyIdentifier = (name: string): boolean => /^-?[A-Za-z_][A-Za-z0-9_-]*$/.test(name)
+
+/**
+ * Renders a font stack safe to drop into a declaration.
+ *
+ * The field behind this is free text, so the value can be anything a user
+ * pasted. Previously it only added quotes around multi-word names, which meant
+ * it could emit CSS that does not parse:
+ *
+ *   "Inter, sans-serif; Montserrat, sans-serif"
+ *     -> font-family: Inter, 'sans-serif; Montserrat', sans-serif;
+ *
+ * The semicolon ended the declaration mid-value and the rest of the rule was
+ * discarded by the email client. Two related cases failed the same way: an
+ * apostrophe ("Jo's Font") closed its own quote early, and a brace escaped the
+ * rule altogether.
+ *
+ * Each part is now reduced to a bare family name - delimiting quotes stripped,
+ * however unbalanced - and then re-quoted and escaped only if it needs it. That
+ * also repairs a value already stored in the broken form, since the stray
+ * semicolon truncates and the orphaned quote is stripped.
+ *
+ * Truncating at the first semicolon matches how a browser reads the original:
+ * everything after it is a separate declaration, not a fallback in this stack.
+ * Because FontField reformats on blur, the field visibly corrects itself as the
+ * user leaves it rather than silently dropping the remainder at export time.
+ *
+ * Known limit: splitting on commas would also split a family name containing
+ * one. No real font is named that way, and the previous version split the same.
+ */
 export const formatFontForCSS = (fontValue: string | undefined): string => {
   if (!fontValue) return "'Arial', sans-serif"
-  
-  // Remove font-family: prefix if present (case-insensitive)
+
+  // Drop a pasted "font-family:" prefix.
   let cleaned = fontValue.trim().replace(/^font-family\s*:\s*/i, "")
-  
-  // Use cleanFontValue to remove trailing semicolon
-  cleaned = cleanFontValue(cleaned)
-  
-  // Split by comma to handle fallback fonts
-  const fonts = cleaned.split(",").map((font) => {
-    let trimmed = font.trim()
-    
-    // Replace double quotes with single quotes
-    trimmed = trimmed.replace(/"/g, "'")
-    
-    // Add single quotes if the font has spaces and isn't already quoted
-    if (trimmed.includes(" ") && !trimmed.startsWith("'")) {
-      return `'${trimmed}'`
-    }
-    
-    return trimmed
-  })
-  
-  return fonts.join(", ")
+
+  // Nothing after the first semicolon belongs to this stack.
+  cleaned = cleaned.split(";")[0]
+
+  // A brace would close the rule and let what follows be read as a selector.
+  cleaned = cleaned.replace(/[{}]/g, " ")
+
+  const families = cleaned
+    .split(",")
+    .map((part) => {
+      const name = unescapeCssString(
+        part.trim().replace(/^["']+/, "").replace(/["']+$/, ""),
+      ).trim()
+      if (name === "") return ""
+      return isBareFamilyIdentifier(name) ? name : `'${escapeCssString(name)}'`
+    })
+    .filter((name) => name !== "")
+
+  // Everything was punctuation or empty; fall back rather than emit nothing.
+  return families.length > 0 ? families.join(", ") : "'Arial', sans-serif"
 }
 
 export const getAvailableFonts = (webfontImports: string): string[] => {
