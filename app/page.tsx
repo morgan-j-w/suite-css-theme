@@ -1283,6 +1283,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
 .link-text a {text-align: left;}
 .single-link table {width: 100%;}
 #layout .block[data-sd-content="links"] .block-body .header-container .header {padding-bottom:${titlePaddingSplit.headerPaddingBottom}px;}
+#layout .block[data-sd-content="links"] .intro {padding-top: ${titlePaddingSplit.linkTextPaddingTop}px; padding-bottom: ${titlePaddingSplit.headerPaddingBottom}px;}
 
 .share-article {padding-top: 0px;}
 
