@@ -4,8 +4,7 @@ import assert from "node:assert/strict"
 import {
   STYLE_COLOUR_FIELDS,
   buildStyleDescription,
-  renameColourInStyles,
-} from "./colour-references.ts"
+  renameColourInStyles, sameHex, findColourByHex } from "./colour-references.ts"
 
 /** Run with: pnpm test */
 
@@ -109,4 +108,52 @@ test("buildStyleDescription matches the wizard's wording", () => {
     buildStyleDescription({ background: "White", headingColor: "Black", buttonBg: "Red" }),
     "White background with black headings and red buttons",
   )
+})
+
+/**
+ * Hex matching. The same colour reaches the app spelled two ways: the seeded
+ * palette and the colour input use lowercase, the bulk importer stored
+ * uppercase. Comparing with === made that difference matter.
+ */
+
+const palette = (...entries: [string, string][]) =>
+  entries.map(([name, hex], i) => ({ id: String(i + 1), name, hex }))
+
+test("sameHex ignores case and surrounding whitespace", () => {
+  assert.ok(sameHex("#ffffff", "#FFFFFF"))
+  assert.ok(sameHex(" #ffffff ", "#FFFFFF"))
+  assert.ok(sameHex("#FfFfFf", "#ffffff"))
+  assert.ok(!sameHex("#ffffff", "#000000"))
+  assert.ok(!sameHex(undefined, "#ffffff"))
+})
+
+test("white is found whatever case it was stored in", () => {
+  for (const stored of ["#ffffff", "#FFFFFF", "#FfFfFf"]) {
+    const colors = palette(["Black", "#000000"], ["White", stored])
+    assert.equal(findColourByHex(colors, "#ffffff")?.name, "White", `failed for ${stored}`)
+  }
+})
+
+test("the white lookup no longer falls through to the first colour", () => {
+  // The reported symptom. With === and an uppercase white that is not first in
+  // the list, the lookup missed and addStyle fell back to colors[0] - black -
+  // so a style meant to be white came out black on black.
+  const colors = palette(["Black", "#000000"], ["White", "#FFFFFF"])
+
+  const underOldComparison = colors.find((c) => c.hex === "#ffffff") || colors[0]
+  assert.equal(underOldComparison.name, "Black", "old behaviour picked black for white")
+
+  assert.equal((findColourByHex(colors, "#ffffff") || colors[0]).name, "White")
+})
+
+test("black was never affected, which is why only white was reported", () => {
+  // "#000000" has no letters, so changing case leaves it identical and every
+  // black lookup matched even under the old comparison.
+  assert.equal("#000000".toUpperCase(), "#000000")
+  const colors = palette(["Black", "#000000"], ["White", "#FFFFFF"])
+  assert.equal(findColourByHex(colors, "#000000")?.name, "Black")
+})
+
+test("an absent hex returns undefined so the caller can fall back", () => {
+  assert.equal(findColourByHex(palette(["Brand", "#ec2176"]), "#ffffff"), undefined)
 })

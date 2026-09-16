@@ -26,7 +26,7 @@ import { cleanFontValue, escapeCssString, formatFontForCSS, toCssPx } from "@/li
 import { FONT_WEIGHT_OPTIONS, getFontWeightLabel } from "@/lib/font-weights"
 import { buildIconTemplates } from "@/lib/icon-templates"
 import { splitTitlePadding } from "@/lib/title-padding"
-import { renameColourInStyles } from "@/lib/colour-references"
+import { renameColourInStyles, findColourByHex, sameHex } from "@/lib/colour-references"
 import { clearedTypographyOverrides, hasTypographyOverrides } from "@/lib/typography-overrides"
 import { checkAllContrasts, getComplianceLevel, isLargeTextForWCAG, type ContrastResults, type TextEvaluationConfig } from "@/lib/wcag"
 import { validateCSS } from "@/lib/validators/css-validator"
@@ -538,7 +538,9 @@ export default function ThemeGenerator() {
           newColors.push({
             id: Date.now().toString() + Math.random(),
             name: name.trim(),
-            hex: hex.toUpperCase(),
+            // Lowercase to match the seeded palette and the native colour
+            // input, so one colour has one spelling wherever it came from.
+            hex: hex.toLowerCase(),
           })
         }
       } else {
@@ -562,8 +564,11 @@ export default function ThemeGenerator() {
   }
 
   const addStyle = () => {
-    const whiteColor = colors.find(c => c.hex === "#ffffff") || colors[0]
-    const blackColor = colors.find(c => c.hex === "#000000") || colors[1]
+    // Case-insensitive: an imported palette stores hexes in a different case
+    // from the seeded one, and === made white stop matching while black, having
+    // no letters, kept working. See sameHex in lib/styles.ts.
+    const whiteColor = findColourByHex(colors, "#ffffff") || colors[0]
+    const blackColor = findColourByHex(colors, "#000000") || colors[1]
     
     const bgName = whiteColor?.name || "White"
     const headingName = blackColor?.name || "Black"
@@ -4159,7 +4164,7 @@ White #FFFFFF, Black #000000`}
                                       style={{ backgroundColor: style.iconColor || "#000000" }}
                                     />
                                     <span className="truncate text-xs">
-                                      {colors.find((c) => c.hex === style.iconColor)?.name || "Black"}
+                                      {colors.find((c) => sameHex(c.hex, style.iconColor))?.name || "Black"}
                                     </span>
                                   </div>
                                 </SelectValue>

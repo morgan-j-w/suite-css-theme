@@ -1,4 +1,4 @@
-import { ColorDefinition } from "./types"
+import type { ColorDefinition } from "./types"
 import { getContrastRatio } from "./wcag"
 
 
@@ -6,6 +6,7 @@ export const getColorHex = (colorName: string, colors: ColorDefinition[]): strin
   const color = colors.find((c) => c.name.toLowerCase() === colorName.toLowerCase())
   return color?.hex || "#000000"
 }
+
 
 export const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)

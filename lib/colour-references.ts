@@ -1,5 +1,5 @@
 // Type-only and relative, so Node's type stripping can run this file directly.
-import type { StyleDefinition } from "./types"
+import type { ColorDefinition, StyleDefinition } from "./types"
 
 /**
  * Styles refer to palette colours by name, not by hex, and the lookup falls
@@ -98,3 +98,25 @@ export const renameColourInStyles = (
     return updated
   })
 }
+
+/**
+ * Hex values compare case-insensitively, because the same colour reaches this
+ * app spelled either way: the seeded palette and the native colour input use
+ * lowercase, while the bulk importer stored uppercase.
+ *
+ * Comparing with === made that difference matter, and it only ever bit white.
+ * "#000000" has no letters, so changing case leaves it identical and every
+ * black lookup kept working; "#ffffff" became "#FFFFFF" and stopped matching.
+ * A style seeded from an imported palette then fell back to the first colour in
+ * the list for its background, which is how a theme came out black where the
+ * white was meant to be - the same fall-back-to-black failure this module's
+ * rename logic exists to prevent.
+ */
+export const sameHex = (a: string | undefined, b: string | undefined): boolean =>
+  (a ?? "").trim().toLowerCase() === (b ?? "").trim().toLowerCase()
+
+/** Finds a palette colour by hex, ignoring case and surrounding whitespace. */
+export const findColourByHex = (
+  colors: ColorDefinition[],
+  hex: string,
+): ColorDefinition | undefined => colors.find((c) => sameHex(c.hex, hex))
