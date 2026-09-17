@@ -37,6 +37,25 @@ export const toCssPx = (value: string | undefined, fallback: string): string => 
   return /^-?\d*\.?\d+$/.test(chosen) ? `${chosen}px` : chosen
 }
 
+/**
+ * What a draft field should push up when it loses focus, or null for "nothing
+ * to commit".
+ *
+ * The three cases are distinct and were previously collapsed into two:
+ *
+ *   null  - focused but never typed in. Nothing to commit; the value stands.
+ *   ""    - typed in and cleared. The fallback applies.
+ *   text  - edited. That is what commits.
+ *
+ * Treating the first case as the second is what made an edited field revert:
+ * set the padding to 44, click into it again, click away without typing, and
+ * the blur committed the fallback, putting 25 back.
+ */
+export const commitOnBlur = (draft: string | null, fallback: string): string | null => {
+  if (draft === null) return null
+  return draft.trim() === "" ? fallback : draft
+}
+
 export const cleanFontValue = (fontValue: string | undefined): string => {
   if (!fontValue) return ""
   return fontValue.trim().replace(/;$/, "")

@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { formatFontForCSS } from "@/lib/utils/helpers"
+import { commitOnBlur, formatFontForCSS } from "@/lib/utils/helpers"
 
 /**
  * Shared inputs for the Advanced Theme Designer wizard.
@@ -75,9 +75,9 @@ export function NumberField({
         if (next !== "") onValueChange(next)
       }}
       onBlur={(e) => {
-        const committed = draft === null || draft.trim() === "" ? fallback : draft
+        const committed = commitOnBlur(draft, fallback)
         setDraft(null)
-        onValueChange(committed)
+        if (committed !== null) onValueChange(committed)
         onBlur?.(e)
       }}
     />
@@ -113,9 +113,9 @@ export function FontField({
         if (next.trim() !== "") onValueChange(next)
       }}
       onBlur={(e) => {
-        const committed = draft === null || draft.trim() === "" ? fallback : draft
+        const committed = commitOnBlur(draft, fallback)
         setDraft(null)
-        onValueChange(formatFontForCSS(committed))
+        if (committed !== null) onValueChange(formatFontForCSS(committed))
         onBlur?.(e)
       }}
     />

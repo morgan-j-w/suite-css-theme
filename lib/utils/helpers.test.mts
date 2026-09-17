@@ -1,7 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 
-import { escapeCssString, toCssPx, formatFontForCSS } from "./helpers.ts"
+import { escapeCssString, toCssPx, formatFontForCSS, commitOnBlur } from "./helpers.ts"
 
 /** Run with: pnpm test */
 
@@ -116,4 +116,34 @@ test("a value with nothing usable falls back rather than emitting an empty stack
   assert.equal(formatFontForCSS("  "), "'Arial', sans-serif")
   assert.equal(formatFontForCSS(","), "'Arial', sans-serif")
   assert.equal(formatFontForCSS(""), "'Arial', sans-serif")
+})
+
+/**
+ * Blur handling for the draft fields. A field that was focused but never typed
+ * in must commit nothing, or leaving it puts the default back over an edit.
+ */
+
+test("a field that was focused but never typed in commits nothing", () => {
+  // The reported bug: set padding to 44, click in again, click away without
+  // typing, and the field went back to 25.
+  assert.equal(commitOnBlur(null, "25"), null)
+  assert.equal(commitOnBlur(null, "Arial, sans-serif"), null)
+})
+
+test("a field the user actually cleared falls back", () => {
+  assert.equal(commitOnBlur("", "25"), "25")
+  assert.equal(commitOnBlur("   ", "25"), "25", "whitespace only counts as cleared")
+})
+
+test("an edited field commits what was typed", () => {
+  assert.equal(commitOnBlur("44", "25"), "44")
+  assert.equal(commitOnBlur("0", "25"), "0", "zero is a real value, not empty")
+  assert.equal(commitOnBlur("Inter, sans-serif", "Arial, sans-serif"), "Inter, sans-serif")
+})
+
+test("the three cases stay distinct", () => {
+  // Collapsing never-typed into cleared is exactly what caused the revert.
+  const neverTyped = commitOnBlur(null, "25")
+  const cleared = commitOnBlur("", "25")
+  assert.notEqual(neverTyped, cleared)
 })

@@ -1248,7 +1248,7 @@ padding: ${paddingValue}px}
 
 #layout .block[data-sd-content=subscription] {padding: ${paddingValue}px;}
 
-#layout .block[data-sd-content=article]:not([data-image-position]) .block-body > tbody > tr .header, #layout .block[data-sd-content=article][data-image-position=top] .block-body > tbody > tr:not(.media-container) .header, #layout .block[data-sd-content=article][data-image-position=bottom] .block-body > tbody > tr:first-child > .header {padding-bottom:14px;}
+#layout .block[data-sd-content=article]:not([data-image-position]) .block-body > tbody > tr .header, #layout .block[data-sd-content=article][data-image-position=top] .block-body > tbody > tr:not(.media-container) .header, #layout .block[data-sd-content=article][data-image-position=bottom] .block-body > tbody > tr:first-child > .header {padding-bottom:${titlePaddingValue}px;}
 
 /*end of defaults*/
 
@@ -1386,6 +1386,19 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
         ? ` border: ${btnBorderWidth}px solid ${btnBorderColor};`
         : ""
 
+      // Step 4 offers these five per style and the preview honours them, but
+      // the exported CSS never emitted either declaration, so an overridden
+      // button silently kept the global padding and radius once exported.
+      // toCssPx because the two sides store the unit differently: the global
+      // fields are unitless ("10") and updateStyle writes "10px". See #67.
+      const btnPadding = [
+        toCssPx(style.buttonPaddingTop || buttonPaddingTop, "10"),
+        toCssPx(style.buttonPaddingRight || buttonPaddingRight, "20"),
+        toCssPx(style.buttonPaddingBottom || buttonPaddingBottom, "10"),
+        toCssPx(style.buttonPaddingLeft || buttonPaddingLeft, "20"),
+      ].join(" ")
+      const btnRadius = style.buttonBorderRadius || buttonBorderRadius || "4px"
+
       const h1FontVal = formatFontForCSS(style.h1Font || h1Font || "Arial, sans-serif")
       const h2FontVal = formatFontForCSS(style.h2Font || h2Font || "Arial, sans-serif")
       const h3FontVal = formatFontForCSS(style.h3Font || h3Font || "Arial, sans-serif")
@@ -1421,7 +1434,7 @@ a.btn-cm.btn-width-auto {text-decoration: underline; font-weight: normal;}
       css += `${className} .figcaption a:hover, ${className} a:hover, ${READMORE_BTN}:hover {text-decoration:none;}\n`
       css += `${className} .single-link a {font-family: ${bodyFontVal}; text-decoration: underline; color: ${linkColor};${linkWeightDecl ? ` ${linkWeightDecl}` : ""}}\n`
       css += `${className} .single-link a:visited {text-decoration: underline; color: ${linkColor} !important;${linkWeightDecl ? ` ${linkWeightDecl}` : ""}}\n`
-      css += `${className} .btn-cm, ${className} button.btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight};${btnBorderDecl}}\n`
+      css += `${className} .btn-cm, ${className} button.btn-cm{background-color:${btnBg}; text-decoration:none;color:${btnText}; font-family: ${btnFont}; font-size:${btnSize};line-height:${btnLineHeight}; font-weight: ${btnWeight}; padding:${btnPadding}; border-radius:${btnRadius};${btnBorderDecl}}\n`
       css += `${className} .btn-cm:hover, ${className} .btn-cm:focus, ${className} button.btn-cm:hover, ${className} button.btn-cm:focus {background-color:${btnBgHover} !important; text-decoration:none;color:${btnTextHover} !important; border-color: ${btnBorderColorHover} !important;}\n`
       
       // Add no padding CSS if noPadding is enabled
